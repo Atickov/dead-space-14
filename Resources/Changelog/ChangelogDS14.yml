@@ -1914,3 +1914,10 @@ Entries:
   changes:
   - type: Fix
     message: баги
+- id: 176
+  author: IvanKuvalda
+  time: '2026-05-24T10:06:22.707242+00:00'
+  pr: 1484
+  changes:
+  - type: Fix
+    message: Теперь труп не сможет уйти из переноса в руках, увы
