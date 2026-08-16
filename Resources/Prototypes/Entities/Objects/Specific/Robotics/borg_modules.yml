@@ -573,6 +573,7 @@
     - item: Wirecutter
     - item: WelderIndustrial
     - item: Multitool
+    - item: WeaponPlasmaCutter # DS14
   - type: BorgModuleIcon
     icon: { sprite: Interface/Actions/actions_borg.rsi, state: tool-module }
 
@@ -639,6 +640,7 @@
   - type: ItemBorgModule
     hands:
     - item: MiningDrill
+    - item: WeaponProtoKineticAccelerator # DS14
     - item: Shovel
     - item: MineralScannerUnpowered
     - item: BorgOreBag
@@ -658,6 +660,7 @@
   - type: ItemBorgModule
     hands:
     - item: MiningDrillDiamond
+    - item: WeaponPlasmaCutter # DS14
     - item: Shovel
     - item: AdvancedMineralScannerUnpowered
     - item: OreBagOfHolding
@@ -707,6 +710,7 @@
     - item: WelderExperimental
     - item: Multitool
     - item: RemoteSignallerAdvanced
+    - item: WeaponPlasmaCutter # DS14
   - type: BorgModuleIcon
     icon: { sprite: Interface/Actions/actions_borg.rsi, state: adv-tools-module }
 
@@ -729,24 +733,28 @@
     - state: icon-construction
   - type: ItemBorgModule
     hands:
+    - item: HandCuttingMachine # DS14
     - hand:
         emptyRepresentative: BorgModuleConstructionMaterialPlaceholder
         emptyLabel: borg-slot-construction-empty
         whitelist:
           tags:
           - ConstructionMaterial
+          - Diamond # DS14
     - hand:
         emptyRepresentative: BorgModuleConstructionMaterialPlaceholder
         emptyLabel: borg-slot-construction-empty
         whitelist:
           tags:
           - ConstructionMaterial
+          - Diamond # DS14
     - hand:
         emptyRepresentative: BorgModuleConstructionMaterialPlaceholder
         emptyLabel: borg-slot-construction-empty
         whitelist:
           tags:
           - ConstructionMaterial
+          - Diamond # DS14
     - hand:
         emptyRepresentative: DoorElectronics
         emptyLabel: borg-slot-circuitboards-empty
@@ -910,7 +918,7 @@
   - type: ItemBorgModule
     hands:
     - item: HandheldHealthAnalyzer
-    - item: AdvancedJetInjector
+    # - item: AdvancedJetInjector #DS14
     - item: Gauze
       hand:
         emptyLabel: borg-slot-topicals-empty
@@ -975,14 +983,17 @@
   - type: ItemBorgModule
     hands:
     - item: HandLabeler
-    - item: Syringe
-      hand:
-        emptyLabel: borg-slot-injector-dropper-empty
-        emptyRepresentative: Syringe
-        whitelist:
-          tags:
-          - Dropper
-          - Syringe
+    #DS14-start
+    - item: AdvancedJetInjector
+    #- item: Syringe
+    #  hand:
+    #    emptyLabel: borg-slot-injector-dropper-empty
+    #    emptyRepresentative: Syringe
+    #    whitelist:
+    #      tags:
+    #      - Dropper
+    #      - Syringe
+    #DS14-end
     - item: PillCanister
       hand:
         emptyLabel: borg-slot-small-containers-empty
@@ -1511,6 +1522,12 @@
   name: basic xenoborg module
   description: Essential items for any Xenoborg.
   components:
+  # DS14-start
+  - type: Tag
+    tags:
+    - XenoborgModuleGeneric
+    - XenoborgModuleMiner
+  # DS14-end
   - type: Sprite
     layers:
     - state: xenoborg_generic
@@ -1523,9 +1540,14 @@
         whitelist:
           tags:
           - ConstructionMaterial
+          # DS14-start
+          - Sheet
+          - RawMaterial
+          - Ingot
+          # DS14-end
     - item: XenoborgMaterialBag
     - item: PinpointerMothership
-    - item: HandheldGPSBasic
+    - item: HandheldGPSXenoborg # DS14
   - type: BorgModuleIcon
     icon: { sprite: Interface/Actions/actions_borg.rsi, state: xenoborg-basic-module }
 
@@ -1535,6 +1557,12 @@
   name: tool xenoborg module
   description: Simple tools for most Xenoborgs.
   components:
+  # DS14-start
+  - type: Tag
+    tags:
+    - XenoborgModuleGeneric
+    - XenoborgModuleMiner
+  # DS14-end
   - type: Sprite
     layers:
     - state: xenoborg_generic
@@ -1654,13 +1682,19 @@
   name: space movement xenoborg module
   description: Module that helps a Xenoborg move better in space.
   components:
+  # DS14-start
+  - type: Tag
+    tags:
+    - XenoborgModuleScout
+    - XenoborgModuleMiner
+  # DS14-end
   - type: Sprite
     layers:
     - state: xenoborg_scout
     - state: icon-xenoborg-space-movement
   - type: ItemBorgModule
     hands:
-    - item: HandheldGPSBasic
+    - item: HandheldGPSXenoborg # DS14
     - item: HandHeldMassScannerBorg
     - item: PinpointerMothership
     - item: HandheldStationMapUnpowered
@@ -1689,8 +1723,8 @@
 - type: entity
   parent: [ BaseXenoborgModuleScout, BaseProviderBorgModule, BaseXenoborgContraband ]
   id: XenoborgModuleEnergySword
-  name: energy dagger xenoborg module
-  description: Module with an energy dagger.
+  name: energy sword xenoborg module # DS14
+  description: Module with a blue energy sword. # DS14
   components:
   - type: Sprite
     layers:
@@ -1698,7 +1732,7 @@
     - state: icon-xenoborg-sword2
   - type: ItemBorgModule
     hands:
-    - item: EnergyDaggerLoudBlue
+    - item: XenoborgEnergySwordBlue # DS14
     - item: JetpackXenoborg
   - type: BorgModuleIcon
     icon: { sprite: Interface/Actions/actions_borg.rsi, state: xenoborg-sword2-module }

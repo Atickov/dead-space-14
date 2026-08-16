@@ -214,6 +214,7 @@
     - Janitor
     - Instruments
     - Equipment
+    - HoldingBags # DS14
     - NightVisionTech # DS14
     - LanguageImplanters # DS14
     - MedicalDynamic # DS14
@@ -710,6 +711,7 @@
     - FloorConcreteTilesStatic
     - CircuitFloorsStatic
     - FloorMarbleTilesStatic
+    - SpecialFloorTilesStatic # DS14
     dynamicPacks:
     - FauxTiles
   - type: MaterialStorage

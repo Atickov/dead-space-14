@@ -34,6 +34,7 @@
   - PlushieLucius
   - PlushieEvelina
   - PlushieLieutenant
+  - PlushieDrGnarAlt
   # IV rang start
   - PlushieSmetanaJonita
   - PlushieScarlettPvrsifvlAlt2
@@ -55,6 +56,12 @@
   - Plushie0black_cat0
   - PlushieDosDydosYukari
   - PlushieYosugaMarsel
+  - PlushiePERedGora
+  - PlushieKarasuNaomi
+  - PlushieSmetanaJohnFrost
+  - PlushieRavanesusDeath
+  - PlushieRavanesusOperativ
+  - PlushieDajidanNikita
   # IV rang end
   - PlushieSilAily
   - PlushieSilAizek
@@ -944,6 +951,7 @@
   - Accordion
   - Harmonica
   - Clarinet
+  - SuperSynt # ds14
   - Flute
   - Recorder
   - PanFlute
@@ -1538,6 +1546,7 @@
   - CombatBoots
   - JackBoots
   - ShoesBootsLaceup
+  - SecurityWinterBoots # DS14
 
 - type: loadoutGroup
   id: HeadofSecuritySocks
@@ -1603,6 +1612,7 @@
   - SecurityBeret
   - SecurityHat
   - TrooperHat
+  - SecurityHatCap # DS14
 
 - type: loadoutGroup
   id: SecurityMask
@@ -1667,7 +1677,7 @@
   - JackSecBoots
   - CombatBoots
   - JackBoots
-  - SecurityWinterBoots
+  - SecurityWinterBoots # DS14
 
 # DS14-disabled
 #- type: loadoutGroup
@@ -1703,13 +1713,13 @@
   - DetectiveGreyFlatCap # DS14
   - DetectiveBrownFlatCap # DS14
 
-- type: loadoutGroup
-  id: DetectiveNeck
-  name: loadout-group-detective-neck
-  minLimit: 0
-  loadouts:
-  - DetectiveTie
-  - DetectiveTieRed # DS14
+#- type: loadoutGroup
+#  id: DetectiveNeck
+#  name: loadout-group-detective-neck
+#  minLimit: 0
+#  loadouts:
+#  - DetectiveTie
+#  - DetectiveTieRed # DS14
 
 - type: loadoutGroup
   id: DetectiveJumpsuit

@@ -16,6 +16,10 @@
   - type: EmitSoundOnLand
     sound:
       path: /Audio/_DeadSpace/Items/Handing/glasses/goggles_drop.ogg
+  - type: PhysicalComposition
+    materialComposition:
+      Steel: 25
+      Glass: 25
   #DS14-End
 
 - type: entity
@@ -28,6 +32,9 @@
   - type: ShowCriminalRecordIcons
   - type: ShowContrabandDetails
   - type: ShowPatrolIcons
+  # DS14-start
+  - type: ShowPersonnelRecordIcons
+  # DS14-end
 
 - type: entity
   id: ShowMedicalIcons
@@ -101,6 +108,9 @@
   - type: Clothing
     sprite: Clothing/Eyes/Hud/command.rsi
   - type: ShowJobIcons
+  # DS14-start
+  - type: ShowPersonnelRecordIcons
+  # DS14-end
   - type: Tag
     tags:
     - HudCommand # DS14
@@ -147,6 +157,8 @@
     flavors:
       - onion
       - greasey
+  - type: StaticPrice #DS14
+    price: 8
 
 - type: entity
   parent: ClothingEyesHudBase

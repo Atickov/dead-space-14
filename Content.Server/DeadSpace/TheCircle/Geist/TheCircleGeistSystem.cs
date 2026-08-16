@@ -1,14 +1,18 @@
 // Мёртвый Космос, Licensed under custom terms with restrictions on public hosting and commercial use, full text: https://raw.githubusercontent.com/dead-space-server/space-station-14-fobos/master/LICENSE.TXT
 
 using Content.Server.Stealth;
+using Content.Server.Station.Systems;
 using Content.Shared.Actions;
+using Content.Shared.Players;
 using Content.Shared.CombatMode.Pacification;
 using Content.Shared.DeadSpace.Carrying;
 using Content.Shared.DeadSpace.TheCircle.Geist;
+using Content.Shared.Ghost;
 using Content.Shared.Movement.Systems;
 using Content.Shared.Physics;
 using Content.Shared.Stealth.Components;
 using Content.Shared.Stunnable;
+using Robust.Shared.Map;
 using Robust.Shared.Physics;
 using Robust.Shared.Physics.Components;
 using Robust.Shared.Physics.Systems;
@@ -21,11 +25,13 @@ namespace Content.Server.DeadSpace.TheCircle.Geist;
 public sealed class TheCircleGeistSystem : EntitySystem
 {
     [Dependency] private readonly SharedActionsSystem _actions = default!;
+    [Dependency] private readonly EntityLookupSystem _lookup = default!;
     [Dependency] private readonly MovementSpeedModifierSystem _movement = default!;
     [Dependency] private readonly SharedPhysicsSystem _physics = default!;
     [Dependency] private readonly StealthSystem _stealth = default!;
     [Dependency] private readonly SharedStunSystem _stun = default!;
     [Dependency] private readonly SharedTransformSystem _transform = default!;
+    [Dependency] private readonly StationSystem _station = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
 
     public override void Initialize()
@@ -41,6 +47,7 @@ public sealed class TheCircleGeistSystem : EntitySystem
     private void OnMapInit(Entity<TheCircleGeistComponent> ent, ref MapInitEvent args)
     {
         _actions.AddAction(ent.Owner, ref ent.Comp.InvisibilityActionEntity, ent.Comp.InvisibilityAction, ent.Owner);
+        ent.Comp.LastMapId = Transform(ent).MapID;
     }
 
     private void OnShutdown(Entity<TheCircleGeistComponent> ent, ref ComponentShutdown args)
@@ -132,6 +139,8 @@ public sealed class TheCircleGeistSystem : EntitySystem
         var query = EntityQueryEnumerator<TheCircleGeistComponent, PhysicsComponent>();
         while (query.MoveNext(out var uid, out var component, out var physics))
         {
+            AnnounceStationArrival((uid, component));
+
             if (component.ActiveMode == GeistInvisibilityMode.Phase)
                 UpdatePhaseCollision((uid, component));
 
@@ -143,6 +152,8 @@ public sealed class TheCircleGeistSystem : EntitySystem
 
             if (component.ActiveMode == null)
                 continue;
+
+            AlertNearbyPlayers((uid, component));
 
             var moving = physics.LinearVelocity.LengthSquared() > component.MovementThreshold * component.MovementThreshold;
             if (component.ActiveMode == GeistInvisibilityMode.Escape)
@@ -173,6 +184,45 @@ public sealed class TheCircleGeistSystem : EntitySystem
             if (component.EffectEnds != null && _timing.CurTime >= component.EffectEnds)
                 EndEffect((uid, component), true);
         }
+    }
+
+    private void AnnounceStationArrival(Entity<TheCircleGeistComponent> ent)
+    {
+        var mapId = Transform(ent).MapID;
+        if (mapId == ent.Comp.LastMapId)
+            return;
+
+        ent.Comp.LastMapId = mapId;
+        if (ent.Comp.StationArrivalAnnounced ||
+            mapId == MapId.Nullspace ||
+            _station.GetStationInMap(mapId) == null)
+            return;
+
+        ent.Comp.StationArrivalAnnounced = true;
+        var stationSector = Filter.BroadcastMap(mapId)
+            .RemoveWhereAttachedEntity(HasComp<GhostComponent>);
+        RaiseNetworkEvent(new GeistStationArrivalEvent(), stationSector);
+    }
+
+    private void AlertNearbyPlayers(Entity<TheCircleGeistComponent> ent)
+    {
+        if (_timing.CurTime < ent.Comp.NextNearbyAlert)
+            return;
+
+        ent.Comp.NextNearbyAlert = _timing.CurTime + ent.Comp.NearbyAlertInterval;
+        var nearbyPlayers = new List<EntityUid>();
+        var coordinates = _transform.GetMapCoordinates(ent.Owner);
+        foreach (var player in _lookup.GetEntitiesInRange<ActorComponent>(coordinates, ent.Comp.NearbyAlertRange))
+        {
+            var uid = player.Owner;
+            if (uid == ent.Owner || HasComp<GhostComponent>(uid))
+                continue;
+
+            nearbyPlayers.Add(uid);
+        }
+
+        if (nearbyPlayers.Count > 0)
+            RaiseNetworkEvent(new GeistStationArrivalEvent(), Filter.Entities([.. nearbyPlayers]));
     }
 
     private void SetVisibility(EntityUid uid, float value)

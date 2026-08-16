@@ -1,6 +1,29 @@
 # Traitor Ultra uplink catalog. Listings are copied from the regular traitor uplink with separate ids/categories so prices can diverge.
 
 - type: listing
+  id: UplinkTraitorUltraMalorian
+  name: uplink-malorian-name
+  description: uplink-malorian-desc
+  productEntity: WeaponPistolMalorian
+  cost:
+    Telecrystal: 12
+  categories:
+  - TraitorUltraUplinkWeaponry
+  conditions:
+  - !type:BuyerAntagCondition
+    whitelist:
+    - TraitorUltra
+  - !type:StoreWhitelistCondition
+    blacklist:
+      tags:
+      - NukeOpsUplink
+      - LoneOpsUplink
+  - !type:BuyerWhitelistCondition
+    blacklist:
+      components:
+      - SurplusBundle
+
+- type: listing
   id: UplinkTraitorUltraPistolViper
   name: uplink-pistol-viper-name
   description: uplink-pistol-viper-desc
@@ -2945,6 +2968,26 @@
           - SurplusBundle
 
 - type: listing
+  id: UplinkTraitorUltraMonowireBundle
+  name: uplink-monowire-name
+  description: uplink-monowire-desc
+  icon: { sprite: _DeadSpace/Objects/Weapons/Melee/monowire.rsi, state: icon }
+  productEntity: MonowireImplanter
+  cost:
+    Telecrystal: 20
+  categories:
+  - TraitorUltraUplinkWeaponry
+  conditions:
+    - !type:StoreWhitelistCondition
+      whitelist:
+        tags:
+          - NukeOpsUplink
+    - !type:BuyerWhitelistCondition
+      blacklist:
+        components:
+          - SurplusBundle
+
+- type: listing
   id: UplinkTraitorUltraSyndieSabre
   name: uplink-syndiesabre-name
   description: uplink-syndiesabre-desc
@@ -3799,7 +3842,7 @@
   name: uplink-gorlex-hypospray-name
   description: uplink-gorlex-hypospray-desc
   icon: { sprite: /Textures/Objects/Specific/Medical/syndihypo.rsi, state: hypo }
-  productEntity: ADTCyberHypospray
+  productEntity: SyndiHypo
   cost:
     Telecrystal: 12
   categories:

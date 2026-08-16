@@ -50,6 +50,9 @@
   id: DrinkBeerBottleFull
 
 - type: Tag
+  id: DrinkGlass
+
+- type: Tag
   id: CantChangeScale
 
 - type: Tag
@@ -182,6 +185,15 @@
   id: FoodChiliPepper
 
 - type: Tag
+  id: FoodDoughSmallFlat
+
+- type: Tag
+  id: FoodDoughSmallSlice
+
+- type: Tag
+  id: FoodMeatSmallBall
+
+- type: Tag
   id: GasTank
 
 - type: Tag
@@ -265,6 +277,7 @@
 - type: Tag
   id: MagazineEagleAP
 
+
 - type: Tag
   id: MagazineGurza
 
@@ -285,6 +298,9 @@
 
 - type: Tag
   id: MantisBlades
+
+- type: Tag
+  id: Monowire
 
 - type: Tag
   id: MeatAnomalyCooked
@@ -339,6 +355,9 @@
 
 - type: Tag
   id: RevolverPython
+
+- type: Tag
+  id: SharkEmotes
 
 - type: Tag
   id: ShotgunBulldog

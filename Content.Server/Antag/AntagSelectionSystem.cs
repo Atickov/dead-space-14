@@ -2,6 +2,7 @@ using System.Linq;
 using Content.Server.Administration.Managers;
 using Content.Server.Antag.Components;
 using Content.Server.Chat.Managers;
+using Content.Server.DeadSpace.Prison;
 using Content.Server.DeadSpace.Traitor;
 using Content.Server.DeadSpace.Administration;
 using Content.Server.GameTicking;
@@ -63,6 +64,7 @@ public sealed partial class AntagSelectionSystem : GameRuleSystem<AntagSelection
     [Dependency] private readonly MindSystem _mind = default!;
     [Dependency] private readonly IPlayerManager _playerManager = default!;
     [Dependency] private readonly PlayTimeTrackingSystem _playTime = default!;
+    [Dependency] private readonly PrisonSystem _prison = default!;
     [Dependency] private readonly IServerPreferencesManager _pref = default!;
     [Dependency] private readonly RoleSystem _role = default!;
     [Dependency] private readonly TransformSystem _transform = default!;
@@ -418,8 +420,12 @@ public sealed partial class AntagSelectionSystem : GameRuleSystem<AntagSelection
     {
         _adminLogger.Add(LogType.AntagSelection, $"Start trying to make {session} become the antagonist: {ToPrettyString(ent)}");
 
-        if (checkPref && !HasPrimaryAntagPreference(session, def))
+        // DS14-start
+        if (checkPref &&
+            !HasPrimaryAntagPreference(session, def) &&
+            !HasFallbackAntagPreference(session, def))
             return false;
+        // DS14-end
 
         if (!IsSessionValid(ent, session, def) || !IsEntityValid(session?.AttachedEntity, def))
             return false;
@@ -445,6 +451,13 @@ public sealed partial class AntagSelectionSystem : GameRuleSystem<AntagSelection
     /// </summary>
     public void MakeAntag(Entity<AntagSelectionComponent> ent, ICommonSession? session, AntagSelectionDefinition def, bool ignoreSpawner = false)
     {
+        if (session != null && _prison.IsUserPrisoner(session.UserId))
+        {
+            Log.Info($"Rejected prison-bound {session.Name} as antagonist: {ToPrettyString(ent)}");
+            _adminLogger.Add(LogType.AntagSelection, $"Rejected prison-bound {session.Name} as antagonist: {ToPrettyString(ent)}");
+            return;
+        }
+
         // DS14-start
         if (session != null && TryRedirectSleeperAgentToTraitorUltra(ent, session))
             return;
@@ -929,7 +942,11 @@ public sealed partial class AntagSelectionSystem : GameRuleSystem<AntagSelection
         var priorityList = new List<ICommonSession>();
         var preferredList = new List<ICommonSession>();
         var fallbackList = new List<ICommonSession>();
-        var useSponsorsPriority = def.SponsorsPriority || def.SponsorsPriorityRatio != null; // DS14
+        // DS14-start
+        var useSponsorsPriority = def.SponsorsPriority ||
+                                  def.SponsorsPriorityRatio != null ||
+                                  def.NonSponsorSlotTotalAntagRatio > 0;
+        // DS14-end
         foreach (var session in sessions)
         {
             if (!IsSessionValid(ent, session, def) || !IsEntityValid(session.AttachedEntity, def))
@@ -953,11 +970,39 @@ public sealed partial class AntagSelectionSystem : GameRuleSystem<AntagSelection
         }
 
         // DS14-start
-        if (def.SponsorsPriorityRatio is { } sponsorsPriorityRatio && selectionCount > 0)
+        if (selectionCount > 0 &&
+            (def.SponsorsPriorityRatio != null || def.NonSponsorSlotTotalAntagRatio > 0))
         {
-            var ratio = Math.Clamp(sponsorsPriorityRatio, 0f, 1f);
-            var sponsorSlots = (int) Math.Ceiling(selectionCount * ratio);
-            return new AntagSelectionPlayerPool(priorityList, preferredList, fallbackList, sponsorSlots, selectionCount);
+            var sponsorSlots = selectionCount;
+
+            if (def.SponsorsPriorityRatio is { } sponsorsPriorityRatio)
+            {
+                var ratio = Math.Clamp(sponsorsPriorityRatio, 0f, 1f);
+                sponsorSlots = Math.Min(sponsorSlots, (int) Math.Ceiling(selectionCount * ratio));
+            }
+
+            var strictNonSponsorSlots = def.NonSponsorSlotTotalAntagRatio > 0;
+            if (strictNonSponsorSlots)
+            {
+                var totalTargetCount = GetTargetAntagCount(ent, GetTotalPlayerCount(sessions));
+                var minimumNonSponsorSlots = Math.Max(def.MinimumNonSponsorSlots, 0);
+                var maximumNonSponsorSlots = Math.Max(def.MaximumNonSponsorSlots, minimumNonSponsorSlots);
+                var nonSponsorSlots = Math.Clamp(
+                    totalTargetCount / def.NonSponsorSlotTotalAntagRatio,
+                    minimumNonSponsorSlots,
+                    maximumNonSponsorSlots);
+                sponsorSlots = Math.Min(
+                    sponsorSlots,
+                    selectionCount - Math.Clamp(nonSponsorSlots, 0, selectionCount));
+            }
+
+            return new AntagSelectionPlayerPool(
+                priorityList,
+                preferredList,
+                fallbackList,
+                sponsorSlots,
+                selectionCount,
+                strictNonSponsorSlots);
         }
         // DS14-end
 
@@ -976,6 +1021,9 @@ public sealed partial class AntagSelectionSystem : GameRuleSystem<AntagSelection
             return true;
 
         if (session.Status is SessionStatus.Disconnected or SessionStatus.Zombie)
+            return false;
+
+        if (_prison.IsUserPrisoner(session.UserId))
             return false;
 
         if (ent.Comp.AssignedSessions.Contains(session))
@@ -1009,6 +1057,11 @@ public sealed partial class AntagSelectionSystem : GameRuleSystem<AntagSelection
         if (!_jobs.CanBeAntag(session))
             return false;
 
+        // DS14-start
+        if (def.JobWhitelist != null &&
+            (!_jobs.MindTryGetJobId(mind, out var jobId) || jobId is not { } job || !def.JobWhitelist.Contains(job)))
+            return false;
+        // DS14-end
         return true;
     }
 
