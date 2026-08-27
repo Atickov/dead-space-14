@@ -134,6 +134,15 @@ public sealed class CCCCVars
     public static readonly CVarDef<int> PrisonMurderPenaltyMinutes =
         CVarDef.Create("prison.murder_penalty_minutes", 60, CVar.SERVERONLY);
 
+    public static readonly CVarDef<float> PrisonSentenceTimeMultiplier =
+        CVarDef.Create("prison.sentence_time_multiplier", 1.1f, CVar.SERVERONLY);
+
+    public static readonly CVarDef<int> PrisonCrossFactionKillRewardMinutes =
+        CVarDef.Create("prison.cross_faction_kill_reward_minutes", 2, CVar.SERVERONLY);
+
+    public static readonly CVarDef<int> PrisonFactionSelectionSeconds =
+        CVarDef.Create("prison.faction_selection_seconds", 20, CVar.SERVERONLY);
+
     /// <summary>
     /// Moves long-stuck dynamic physics bodies out of static hard overlaps.
     /// </summary>
@@ -192,8 +201,10 @@ public sealed class CCCCVars
     /// </summary>
     public static readonly CVarDef<bool> MultipleInventoryWindows =
         CVarDef.Create("storage.multiple_inventory_windows", false, CVar.CLIENTONLY | CVar.ARCHIVE);
+    // DS14-start - scrolling screens accept two 32-character lines plus their separator.
     public static readonly CVarDef<int> MaxBroadcastLength =
-        CVarDef.Create("chat.max_broadcast_length", 10, CVar.SERVER | CVar.REPLICATED);
+        CVarDef.Create("chat.max_broadcast_length", 65, CVar.SERVER | CVar.REPLICATED);
+    // DS14-end
 
     /*
     * Попауты

@@ -4,6 +4,7 @@
   components:
   - type: TimedDespawn
     lifetime: 0.4
+
   - type: Sprite
     drawdepth: BelowMobs
     layers:
@@ -162,6 +163,11 @@
     sprite: Objects/Weapons/Guns/Projectiles/projectiles2.rsi
     layers:
     - state: uranium
+      shader: unshaded
+  - type: PointLight
+    enabled: true
+    color: "#059919"
+    radius: 2.0
   - type: Projectile
     damage:
       types:
@@ -720,6 +726,48 @@
     energy: 0.5
 
 - type: entity
+  parent: BulletRocket
+  id: BulletGuidedXenoborgMissile
+  name: guided xenoborg missile
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Sprite
+    sprite: Objects/Weapons/Guns/Projectiles/xenoborg_guided_missile.rsi
+    layers:
+    - state: base
+    - state: tip
+      shader: unshaded
+    - state: fire
+      shader: unshaded
+  - type: PointLight
+    radius: 3.5
+    color: magenta
+    energy: 0.5
+  - type: TimedDespawn
+    lifetime: 15
+  - type: TriggerOnSpawn
+    keyOut: timerTrigger
+  - type: TimerTrigger
+    delay: 14.9 # so it explodes before it despawns
+    keysIn:
+    - timerTrigger
+  - type: ExplodeOnTrigger
+    keysIn:
+    - trigger
+    - timer
+  - type: Explosive
+    explosionType: Minibomb
+    totalIntensity: 50
+    intensitySlope: 7
+    canCreateVacuum: false
+  - type: ChasingWalk
+    speed: 6
+    stopAtTarget: false
+    impulseInterval: 0.1
+    maxAngleVectorChangePerImpulse: 10
+    rotateWithImpulse: true
+
+- type: entity
   id: BulletGrenadeBaton
   name: baton grenade
   parent: BaseBullet
@@ -1068,3 +1116,43 @@
   # Short lifespan
   - type: TimedDespawn
     lifetime: 0.4
+
+# DS14-Start - projectile prototypes are consolidated in this build
+- type: entity
+  parent: BaseBulletTrigger
+  id: BulletXenoborgMechadermisRocket
+  name: mechadermis rocket
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Sprite
+    sprite: Objects/Weapons/Guns/Projectiles/projectiles2.rsi
+    layers:
+    - state: mechadermis-missile-base
+    - state: mechadermis-missile-unshaded
+      shader: unshaded
+  - type: TriggerOnSpawn
+    keyOut: timerTrigger
+  - type: TimerTrigger
+    delay: 9.9 # so it explodes before it despawns
+    keysIn:
+    - timerTrigger
+  - type: ExplodeOnTrigger
+    keysIn:
+    - trigger
+    - timer
+  - type: Explosive
+    explosionType: XenoborgAntiStructureExplosion
+    totalIntensity: 15.0
+    intensitySlope: 1.6
+    maxIntensity: 1.8
+    maxTileBreak: 0
+  - type: SineWaveAnimation
+    xWave:
+      amplitude: 0.4
+      frequency: 17
+      phaseOffset: null
+  - type: PointLight
+    radius: 2.5
+    color: magenta
+    energy: 0.4
+# DS14-End

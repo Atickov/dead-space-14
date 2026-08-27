@@ -117,7 +117,7 @@
     head: ClothingHeadHatERTLeaderBeret
     neck: ClothingNeckMantleERTLeader
     gloves: ClothingHandsGlovesCombat
-    outerClothing: ClothingOuterHardsuitERTRedLeader
+    outerClothing: ClothingOuterHardsuitERTLeader
     suitstorage: JetpackSecurityFilled
     shoes: ADTClothingShoesBootsMagERT
     id: ERTLeaderRedPDA
@@ -128,7 +128,6 @@
     back:
     - ERTloadoutRedPrimary
     - ERTloadoutRedSecondary
-    - ERTloadoutMelee
     - BoxCardboardERT
     - PinpointerNuclear
     - CrowbarRed
@@ -195,8 +194,7 @@
     back:
     - ERTloadoutGammaPrimary
     - ERTloadoutGammaSecondary
-    - ERTloadoutMelee
-    - BoxCardboardERT
+    - BoxCardboardERTGamma
     - PinpointerNuclear
     - CrowbarRed
     - BSAACombatKitFilled
@@ -312,7 +310,7 @@
     eyes: ClothingEyesHudERT
     ears: ClothingHeadsetAltAERT
     gloves: ClothingHandsGlovesCombat
-    outerClothing: ClothingOuterHardsuitERTRedSecurity
+    outerClothing: ClothingOuterHardsuitERTSecurity
     suitstorage: JetpackSecurityFilled
     shoes: ADTClothingShoesBootsMagERT
     id: ERTSecurityRedPDA
@@ -323,7 +321,6 @@
     back:
     - ERTloadoutRedPrimary
     - ERTloadoutRedSecondary
-    - ERTloadoutMelee
     - BoxCardboardERT
     - CrowbarRed
     - PinpointerNuclear
@@ -384,8 +381,7 @@
     back:
     - ERTloadoutGammaPrimary
     - ERTloadoutGammaSecondary
-    - ERTloadoutMelee
-    - BoxCardboardERT
+    - BoxCardboardERTGamma
     - CrowbarRed
     - PinpointerNuclear
     - BSAACombatKitFilled
@@ -503,7 +499,7 @@
     eyes: ClothingEyesHudERTGamma
     ears: ClothingHeadsetAltAERT
     gloves: ClothingHandsGlovesCombat
-    outerClothing: ClothingOuterHardsuitERTRedMedic
+    outerClothing: ClothingOuterHardsuitERTMedical
     suitstorage: JetpackSecurityFilled
     shoes: ADTClothingShoesBootsMagERT
     id: ERTMedicRedPDA
@@ -581,7 +577,7 @@
     - ERTloadoutGammaPrimary
     - ERTloadoutGammaSecondary
     - ERTloadoutMelee
-    - BoxCardboardERT
+    - BoxCardboardERTGamma
     - DefibrillatorCompact
     - PinpointerNuclear
     - JugTheCircleOmnizine
@@ -701,7 +697,7 @@
     eyes: ClothingEyesHudERT
     ears: ClothingHeadsetAltAERT
     gloves: ClothingHandsGlovesCombat
-    outerClothing: ClothingOuterHardsuitERTRedEngineer
+    outerClothing: ClothingOuterHardsuitERTEngineer
     suitstorage: JetpackSecurityFilled
     shoes: ADTClothingShoesBootsMagERT
     id: ERTEngineerRedPDA
@@ -775,7 +771,7 @@
     - ERTloadoutGammaPrimary
     - ERTloadoutGammaSecondary
     - ERTloadoutMelee
-    - BoxCardboardERT
+    - BoxCardboardERTGamma
     - BoxC4ERT
     - RCDRecharging
     - RCDAmmo
@@ -886,7 +882,7 @@
     eyes: ClothingEyesHudERTGamma
     ears: ClothingHeadsetAltAERT
     gloves: ClothingHandsGlovesCombat
-    outerClothing: ClothingOuterHardsuitERTRedJanitor
+    outerClothing: ClothingOuterHardsuitERTJanitor
     suitstorage: JetpackSecurityFilled
     shoes: ADTClothingShoesBootsMagERT
     id: ERTJanitorRedPDA
@@ -958,7 +954,7 @@
     - ERTloadoutGammaPrimary
     - ERTloadoutGammaSecondary
     - ERTloadoutMelee
-    - BoxCardboardERT
+    - BoxCardboardERTGamma
     - BoxLightMixed
     - BoxGrenadeCleanade
     - AdvMopItem

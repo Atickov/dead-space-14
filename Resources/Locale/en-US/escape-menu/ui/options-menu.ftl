@@ -407,6 +407,7 @@ ui-options-admin-player-tab-color-setting-roletype = Colorize all role types
 ui-options-admin-player-tab-color-setting-both = Colorize both
 
 ui-options-admin-overlay-title = Admin Overlay
+ui-options-admin-overlay-auto-enable-on-observer = Enable overlay when entering observer mode
 
 ui-options-admin-overlay-antag-format = Antag label style
 ui-options-admin-overlay-antag-format-binary = Show antag status
@@ -424,4 +425,8 @@ ui-options-admin-overlay-merge-distance = Stack merge distance
 ui-options-admin-overlay-ghost-fade-distance = Ghost overlay fade range from mouse
 ui-options-admin-overlay-ghost-hide-distance = Ghost overlay hide range from mouse
 
+ui-options-admin-strip-overlay-title = Strip Overlay
+ui-options-admin-strip-overlay-setting = Show strip overlay by default
+
 ui-options-function-use-world-target-action = Use targeted ability
+ui-options-function-parry = Parry

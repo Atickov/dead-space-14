@@ -8,6 +8,7 @@ using Content.Shared.CombatMode;
 using Content.Shared.Containers.ItemSlots;
 using Content.Shared.Damage;
 using Content.Shared.Damage.Systems;
+using Content.Shared.DeadSpace.Weapons.Akimbo;
 using Content.Shared.Examine;
 using Content.Shared.Hands;
 using Content.Shared.Hands.EntitySystems;
@@ -106,12 +107,14 @@ public abstract partial class SharedGunSystem : EntitySystem
         InitializeBattery();
         InitializeCartridge();
         InitializeChamberMagazine();
+        InitializeCustomAmmoCounter();
         InitializeMagazine();
         InitializeRevolver();
         InitializeBasicEntity();
         InitializeClothing();
         InitializeContainer();
         InitializeSolution();
+        InitializeTargetFinder(); // DS14 - pre-v288 explicit event subscriptions (#45247)
 
         // Interactions
         SubscribeLocalEvent<GunComponent, GetVerbsEvent<AlternativeVerb>>(OnAltVerb);
@@ -158,6 +161,28 @@ public abstract partial class SharedGunSystem : EntitySystem
 
         if (gun.Owner != GetEntity(msg.Gun))
             return;
+
+        // DS14-start
+        var akimbo = new AkimboSelectGunEvent(user.Value, gun.Owner);
+        RaiseLocalEvent(gun.Owner, ref akimbo);
+        if (akimbo.SelectedGun != gun.Owner)
+        {
+            if (!TryComp<GunComponent>(akimbo.SelectedGun, out var selectedGun))
+                return;
+
+            gun = (akimbo.SelectedGun, selectedGun);
+        }
+
+        // Every akimbo request is a fresh trigger pull for the selected pistol.
+        if (akimbo.Active &&
+            gun.Comp.SelectedMode == SelectiveFire.SemiAuto &&
+            !gun.Comp.BurstActivated &&
+            gun.Comp.ShotCounter != 0)
+        {
+            gun.Comp.ShotCounter = 0;
+            DirtyField(gun.AsNullable(), nameof(GunComponent.ShotCounter));
+        }
+        // DS14-end
 
         // DS14-start
         // Hold-to-attack sends a request for every attempted trigger pull. Reset semi-auto and completed burst
@@ -804,6 +829,7 @@ public enum AmmoVisuals : byte
     AmmoCount,
     AmmoMax,
     HasAmmo, // used for generic visualizers. c# stuff can just check ammocount != 0
+    IsFull, // used for generic visualizers. c# stuff can just check ammocount == ammomax
     MagLoaded,
     BoltClosed,
 }
