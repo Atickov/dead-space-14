@@ -15,6 +15,7 @@ public sealed class NinjaScannerBoundUserInterface : BoundUserInterface
         base.Open();
         _menu = this.CreateWindow<NinjaScannerWindow>();
         _menu.OnApplyDisguise += target => SendMessage(new NinjaApplyDisguiseMessage(target));
+        _menu.OnResetDisguise += () => SendMessage(new NinjaResetDisguiseMessage());
     }
 
     protected override void UpdateState(BoundUserInterfaceState state)
@@ -23,6 +24,6 @@ public sealed class NinjaScannerBoundUserInterface : BoundUserInterface
         if (state is not NinjaScannerBoundUserInterfaceState s)
             return;
 
-        _menu?.UpdateState(s.Targets);
+        _menu?.UpdateState(s.ScannedTargets, s.IsDisguised);
     }
 }

@@ -1,5 +1,6 @@
 using Robust.Shared.GameStates;
 using Content.Shared.Actions;
+using Content.Shared.Humanoid.Markings;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization;
 
@@ -25,6 +26,24 @@ public sealed partial class NinjaScannerComponent : Component
 
     [DataField, AutoNetworkedField]
     public EntityUid? OpenUiActionEntity;
+
+    [DataField]
+    public bool IsDisguised;
+
+    [DataField]
+    public float DisguiseEnergyCost = 1f;
+
+    [DataField]
+    public string? OriginalName;
+
+    [DataField]
+    public string? OriginalSpecies;
+
+    [DataField]
+    public MarkingSet? OriginalMarkings;
+
+    [DataField]
+    public Color? OriginalSkinColor;
 }
 
 public sealed partial class NinjaScanActionEvent : EntityTargetActionEvent;
@@ -34,7 +53,7 @@ public sealed partial class NinjaOpenScannerActionEvent : InstantActionEvent;
 [Serializable, NetSerializable]
 public sealed class NinjaScanData
 {
-    public string Name;
+    public string Name = string.Empty;
     public NetEntity Target;
 
     public NinjaScanData(string name, NetEntity target)
@@ -53,11 +72,13 @@ public enum NinjaScannerUiKey : byte
 [Serializable, NetSerializable]
 public sealed class NinjaScannerBoundUserInterfaceState : BoundUserInterfaceState
 {
-    public List<NinjaScanData> Targets;
+    public List<NinjaScanData> ScannedTargets { get; }
+    public bool IsDisguised { get; }
 
-    public NinjaScannerBoundUserInterfaceState(List<NinjaScanData> targets)
+    public NinjaScannerBoundUserInterfaceState(List<NinjaScanData> scannedTargets, bool isDisguised)
     {
-        Targets = targets;
+        ScannedTargets = scannedTargets;
+        IsDisguised = isDisguised;
     }
 }
 
@@ -70,4 +91,9 @@ public sealed class NinjaApplyDisguiseMessage : BoundUserInterfaceMessage
     {
         Target = target;
     }
+}
+
+[Serializable, NetSerializable]
+public sealed class NinjaResetDisguiseMessage : BoundUserInterfaceMessage
+{
 }

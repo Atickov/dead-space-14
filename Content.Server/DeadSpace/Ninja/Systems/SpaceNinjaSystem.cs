@@ -29,7 +29,6 @@ public sealed class SpaceNinjaSystem : SharedSpaceNinjaSystem
     [Dependency] private readonly CodeConditionSystem _codeCondition = default!;
     [Dependency] private readonly PowerCellSystem _powerCell = default!;
     [Dependency] private readonly SharedMindSystem _mind = default!;
-    [Dependency] private readonly SharedNinjaSuitSystem _suit = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
 
     public override void Initialize()

@@ -10,14 +10,18 @@ namespace Content.Client.DeadSpace.Ninja.UI;
 public sealed partial class NinjaScannerWindow : FancyWindow
 {
     public event Action<NetEntity>? OnApplyDisguise;
+    public event Action? OnResetDisguise;
 
     public NinjaScannerWindow()
     {
         RobustXamlLoader.Load(this);
+        ResetDisguiseButton.OnPressed += _ => OnResetDisguise?.Invoke();
     }
 
-    public void UpdateState(List<NinjaScanData> targets)
+    public void UpdateState(List<NinjaScanData> targets, bool isDisguised)
     {
+        ResetDisguiseButton.Disabled = !isDisguised;
+
         TargetsContainer.RemoveAllChildren();
 
         if (targets.Count == 0)
@@ -43,7 +47,7 @@ public sealed partial class NinjaScannerWindow : FancyWindow
                 Text = data.Name,
                 HorizontalExpand = true
             };
-            
+
             var button = new Button
             {
                 Text = Loc.GetString("ninja-scanner-window-disguise-button")

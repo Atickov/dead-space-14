@@ -17,9 +17,9 @@ public sealed class NinjaCloakSystem : SharedNinjaCloakSystem
 
         if (cloak.Enabled)
         {
-            if (TryComp<NinjaSmokeAbilityComponent>(suitUid, out var smokeComp))
+            if (TryComp<NinjaSmokeAbilityComponent>(suitUid, out var smokeComp) && smokeComp.AutoMode)
             {
-                _ninjaSmoke.TrySpawnNinjaSmoke((suitUid, smokeComp), true);
+                _ninjaSmoke.TrySpawnNinjaSmoke((suitUid, smokeComp), autoMode: true);
             }
         }
     }

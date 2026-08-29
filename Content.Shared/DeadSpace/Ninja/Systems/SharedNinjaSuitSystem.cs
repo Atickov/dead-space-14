@@ -2,8 +2,6 @@ using Content.Shared.Actions;
 using Content.Shared.Clothing;
 using Content.Shared.Clothing.Components;
 using Content.Shared.Inventory.Events;
-using Content.Shared.Item.ItemToggle;
-using Content.Shared.Item.ItemToggle.Components;
 using Content.Shared.DeadSpace.Ninja.Components;
 using Content.Shared.Popups;
 using Content.Shared.Timing;
@@ -17,7 +15,6 @@ namespace Content.Shared.DeadSpace.Ninja.Systems;
 public abstract class SharedNinjaSuitSystem : EntitySystem
 {
     [Dependency] private readonly ActionContainerSystem _actionContainer = default!;
-    [Dependency] private readonly ItemToggleSystem _toggle = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] protected readonly SharedPopupSystem Popup = default!;
     [Dependency] private readonly SharedSpaceNinjaSystem _ninja = default!;
@@ -33,7 +30,6 @@ public abstract class SharedNinjaSuitSystem : EntitySystem
         SubscribeLocalEvent<NinjaSuitComponent, ToggleClothingCheckEvent>(OnCloakCheck);
         SubscribeLocalEvent<NinjaSuitComponent, CheckItemCreatorEvent>(OnStarCheck);
         SubscribeLocalEvent<NinjaSuitComponent, CreateItemAttemptEvent>(OnCreateStarAttempt);
-        SubscribeLocalEvent<NinjaSuitComponent, ItemToggleActivateAttemptEvent>(OnActivateAttempt);
         SubscribeLocalEvent<NinjaSuitComponent, GotUnequippedEvent>(OnUnequipped);
     }
 
@@ -112,27 +108,20 @@ public abstract class SharedNinjaSuitSystem : EntitySystem
 
         var uid = ent.Owner;
         var comp = ent.Comp;
-        if (_toggle.TryDeactivate(uid, user) || !disable)
+
+        if (!TryComp<NinjaCloakComponent>(uid, out var cloak) || !cloak.Enabled)
             return;
+
+        cloak.Enabled = false;
+        Dirty(uid, cloak);
 
         // previously cloaked, disable abilities for a short time
         _audio.PlayPredicted(comp.RevealSound, uid, user);
         Popup.PopupClient(Loc.GetString("ninja-revealed"), user, user, PopupType.MediumCaution);
-        _useDelay.TryResetDelay(uid, id: comp.DisableDelayId);
-    }
 
-    private void OnActivateAttempt(Entity<NinjaSuitComponent> ent, ref ItemToggleActivateAttemptEvent args)
-    {
-        if (!_ninja.IsNinja(args.User))
+        if (disable)
         {
-            args.Cancelled = true;
-            return;
-        }
-
-        if (IsDisabled((ent, ent.Comp, null)))
-        {
-            args.Cancelled = true;
-            args.Popup = Loc.GetString("ninja-suit-cooldown");
+            _useDelay.TryResetDelay(uid, id: comp.DisableDelayId);
         }
     }
 
@@ -166,8 +155,11 @@ public abstract class SharedNinjaSuitSystem : EntitySystem
     {
         // mark the user as not wearing a suit
         _ninja.AssignSuit(user, null);
-        // disable glove abilities
-        if (user.Comp.Gloves is { } uid)
-            _toggle.TryDeactivate(uid, user: user);
+
+        if (TryComp<NinjaCloakComponent>(ent, out var cloak) && cloak.Enabled)
+        {
+            cloak.Enabled = false;
+            Dirty(ent, cloak);
+        }
     }
 }

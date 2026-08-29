@@ -58,13 +58,6 @@ public sealed partial class NinjaSuitComponent : Component
     public float RecallOverMaxChargeRatio = 0.9f;
     // DS14-end
 }
-//DS-14 start
-[Serializable, NetSerializable]
-public enum SpiderOSUiKey
-{
-    Key,
-}
-//DS-14 end
 
 public sealed partial class RecallKatanaEvent : InstantActionEvent;
 public sealed partial class OpenSpiderOSEvent : InstantActionEvent;

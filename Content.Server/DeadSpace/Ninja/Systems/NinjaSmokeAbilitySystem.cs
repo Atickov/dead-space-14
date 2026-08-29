@@ -9,6 +9,7 @@ using Robust.Shared.Audio.Systems;
 using Robust.Shared.Map;
 using Content.Server.Power.EntitySystems;
 using Content.Shared.Containers.ItemSlots;
+using Content.Shared.DeadSpace.Ninja.Systems;
 
 namespace Content.Server.DeadSpace.Ninja.Systems;
 
@@ -22,8 +23,7 @@ public sealed class NinjaSmokeAbilitySystem : EntitySystem
     [Dependency] private readonly IMapManager _mapManager = default!;
     [Dependency] private readonly TurfSystem _turf = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly BatterySystem _battery = default!;
-    [Dependency] private readonly ItemSlotsSystem _itemSlots = default!;
+    [Dependency] private readonly SharedSpaceNinjaSystem _ninja = default!;
 
     public override void Initialize()
     {
@@ -68,21 +68,25 @@ public sealed class NinjaSmokeAbilitySystem : EntitySystem
 
     public bool TrySpawnNinjaSmoke(Entity<NinjaSmokeAbilityComponent> ent, bool autoMode)
     {
-        if (!_itemSlots.TryGetSlot(ent.Owner, "cell_slot", out var slot) || slot.Item is not { } batteryUid)
+        if (autoMode && !ent.Comp.AutoMode)
+            return false;
+
+        var user = Transform(ent).ParentUid;
+        if (!user.IsValid())
             return false;
 
         float energyCost = autoMode ? ent.Comp.EnergyCostAutoMode : ent.Comp.EnergyCost;
 
-        var xform = Transform(ent);
-        var mapCoords = _xform.GetMapCoordinates(ent);
+        if (!_ninja.TryUseCharge(user, energyCost))
+            return false;
+
+        var xform = Transform(user);
+        var mapCoords = _xform.GetMapCoordinates(user);
         if (!_mapManager.TryFindGridAt(mapCoords, out var gridUid, out var grid) ||
             !_map.TryGetTileRef(gridUid, grid, xform.Coordinates, out var tileRef))
             return false;
 
         if (_spreader.RequiresFloorToSpread(ent.Comp.SmokePrototype.ToString()) && _turf.IsSpace(tileRef))
-            return false;
-
-        if (!_battery.TryUseCharge(batteryUid, energyCost))
             return false;
 
         var coords = _map.MapToGrid(gridUid, mapCoords);
@@ -92,7 +96,7 @@ public sealed class NinjaSmokeAbilitySystem : EntitySystem
             return false;
         }
 
-        _audio.PlayPvs(ent.Comp.SmokeSound, ent);
+        _audio.PlayPvs(ent.Comp.SmokeSound, user);
         if (!autoMode)
         {
             _smoke.StartSmoke(smoke, new Solution(), (float)ent.Comp.Duration.TotalSeconds, ent.Comp.SpreadAmount, smokeComp);

@@ -2,7 +2,6 @@ using Content.Server.Cloning;
 using Content.Shared.DeadSpace.Ninja.Components;
 using Content.Shared.Mind;
 using Content.Shared.Mobs;
-using Content.Shared.Mobs.Systems;
 
 namespace Content.Server.DeadSpace.Ninja.Systems;
 
@@ -11,7 +10,6 @@ public sealed class NinjaSecondChanceSystem : EntitySystem
     [Dependency] private readonly CloningSystem _cloning = default!;
     [Dependency] private readonly SharedMindSystem _mind = default!;
     [Dependency] private readonly SharedTransformSystem _transform = default!;
-    [Dependency] private readonly MobStateSystem _mobState = default!;
 
     public override void Initialize()
     {

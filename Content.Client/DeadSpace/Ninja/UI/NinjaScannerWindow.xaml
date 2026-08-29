@@ -25,5 +25,9 @@
         </PanelContainer>
         <BoxContainer Name="TargetsContainer" Orientation="Vertical" VerticalExpand="True">
         </BoxContainer>
+        <Button Name="ResetDisguiseButton"
+                Text="{Loc 'ninja-scanner-window-reset-button'}"
+                HorizontalAlignment="Center"
+                Margin="0 8 0 0" />
     </BoxContainer>
 </controls:FancyWindow>
