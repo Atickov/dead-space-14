@@ -10,26 +10,18 @@ using JetBrains.Annotations;
 namespace Content.Server.DeadSpace.Atmos.Reactions;
 
 [UsedImplicitly]
-public sealed partial class NitricOxideProductionReaction : IGasReactionEffect
+public sealed partial class NitrousOxideProductionReaction : IGasReactionEffect
 {
-    private const float RatioTolerance = 0.08f;
-    private const float ConversionDivisor = 8f;
-    private const float EnergyPerMole = -45_000f;
+    private const float OxygenPerNitrogen = 0.5f;
+    private const float ConversionDivisor = 3f;
+    private const float EnergyPerMole = 25_000f;
 
     public ReactionResult React(GasMixture mixture, IGasMixtureHolder? holder, AtmosphereSystem atmosphereSystem, float heatScale)
     {
         var nitrogen = mixture.GetMoles(Gas.Nitrogen);
         var oxygen = mixture.GetMoles(Gas.Oxygen);
 
-        if (!SoyuzGasReactionHelpers.HasApproximateRatios(
-                RatioTolerance,
-                (nitrogen, 1f),
-                (oxygen, 1f)))
-        {
-            return ReactionResult.NoReaction;
-        }
-
-        var units = MathF.Min(nitrogen, oxygen) / ConversionDivisor;
+        var units = MathF.Min(nitrogen, oxygen / OxygenPerNitrogen) / ConversionDivisor;
         if (units <= 0f)
             return ReactionResult.NoReaction;
 
@@ -37,8 +29,8 @@ public sealed partial class NitricOxideProductionReaction : IGasReactionEffect
         var oldHeatCapacity = atmosphereSystem.GetHeatCapacity(mixture, true);
 
         mixture.AdjustMoles(Gas.Nitrogen, -units);
-        mixture.AdjustMoles(Gas.Oxygen, -units);
-        mixture.AdjustMoles(Gas.NitricOxide, units * 2f);
+        mixture.AdjustMoles(Gas.Oxygen, -(units * OxygenPerNitrogen));
+        mixture.AdjustMoles(Gas.NitrousOxide, units);
 
         SoyuzGasReactionHelpers.ApplyEnergy(
             mixture,
@@ -46,7 +38,7 @@ public sealed partial class NitricOxideProductionReaction : IGasReactionEffect
             heatScale,
             oldHeatCapacity,
             oldTemperature,
-            units * 2f * EnergyPerMole);
+            units * EnergyPerMole);
 
         return ReactionResult.Reacting;
     }
