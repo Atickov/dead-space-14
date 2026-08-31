@@ -1,0 +1,30 @@
+{
+    "version": 1,
+<<<<<<<< HEAD:Resources/Textures/_DeadSpace/Sponsor/unemotional/helmet.rsi/meta.json
+    "license": "CC-BY-SA-4.0",
+    "copyright": "Created by hq._.dishka (discord) for Space Station 14 server Dead Space",
+========
+    "license": "CC-BY-SA-3.0",
+    "copyright": "made by ayanami_prime (discord) for Space Station 14 server Мёртвый Космос",
+>>>>>>>> master:Resources/Textures/_DeadSpace/Sponsor/MrGman/hardsuit/helmet.rsi/meta.json
+    "size": {
+        "x": 32,
+        "y": 32
+    },
+    "states": [
+        {
+            "name": "icon"
+        },
+        {
+            "name": "icon-flash"
+        },
+        {
+            "name": "off-equipped-HELMET",
+            "directions": 4
+        },
+        {
+            "name": "on-equipped-HELMET",
+            "directions": 4
+        }
+    ]
+}

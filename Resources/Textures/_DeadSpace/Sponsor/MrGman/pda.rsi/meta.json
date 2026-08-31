@@ -1,0 +1,65 @@
+﻿{
+  "version": 1,
+  "license": "CC-BY-SA-3.0",
+<<<<<<<< HEAD:Resources/Textures/_DeadSpace/Sponsor/DrGnarAlt/pda.rsi/meta.json
+  "copyright": "made by sastr. (discord) for Space Station 14 server Мёртвый Космос",
+========
+  "copyright": "made by ayanami_prime (discord) for Space Station 14 server Мёртвый Космос",
+>>>>>>>> master:Resources/Textures/_DeadSpace/Sponsor/MrGman/pda.rsi/meta.json
+  "size": {
+    "x": 32,
+    "y": 32
+  },
+  "states": [
+    {
+      "name": "id_overlay"
+    },
+    {
+      "name": "id_overlay_wide"
+    },
+    {
+      "name": "equipped-BELT",
+      "directions": 4
+    },
+    {
+      "name": "equipped-IDCARD",
+      "directions": 4
+    },
+    {
+      "name": "inhand-left",
+      "directions": 4
+    },
+    {
+      "name": "inhand-right",
+      "directions": 4
+    },
+    {
+      "name": "insert_overlay"
+    },
+    {
+      "name": "light_overlay"
+    },
+    {
+<<<<<<<< HEAD:Resources/Textures/_DeadSpace/Sponsor/DrGnarAlt/pda.rsi/meta.json
+      "name": "pda",
+            "delays": [
+                [
+                    0.3,
+                    0.3,
+                    0.3,
+                    0.3
+                ]
+            ]
+    },
+    {
+      "name": "equipped-IDCARD",
+      "directions": 4
+========
+      "name": "light_overlay_wide"
+>>>>>>>> master:Resources/Textures/_DeadSpace/Sponsor/MrGman/pda.rsi/meta.json
+    },
+    {
+      "name": "id_overlay_wide"
+    }
+  ]
+}

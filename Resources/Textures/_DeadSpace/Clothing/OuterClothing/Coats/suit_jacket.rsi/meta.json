@@ -1,0 +1,67 @@
+{
+  "version": 1,
+  "license": "CC-BY-SA-3.0",
+<<<<<<<< HEAD:Resources/Textures/_DeadSpace/Sponsor/DrGnarAlt/tools_welder.rsi/meta.json
+  "copyright": "made by sastr. (discord) for Space Station 14 server Мёртвый Космос",
+========
+  "copyright": "Taken from ParadiseSS13 at commit https://github.com/ParadiseSS13/Paradise/commit/f955a7b595353ac58d279c3789d3333011b121a3",
+>>>>>>>> master:Resources/Textures/_DeadSpace/Clothing/OuterClothing/Coats/suit_jacket.rsi/meta.json
+  "size": {
+    "x": 32,
+    "y": 32
+  },
+  "states": [
+    {
+      "name": "icon"
+    },
+    {
+<<<<<<<< HEAD:Resources/Textures/_DeadSpace/Sponsor/DrGnarAlt/tools_welder.rsi/meta.json
+      "name": "welder_flame",
+      "delays": [
+        [
+          0.2,
+          0.1
+        ]
+      ]
+========
+      "name": "icon-open"
+    },
+    {
+      "name": "equipped-OUTERCLOTHING",
+      "directions": 4
+    },
+    {
+      "name": "open-equipped-OUTERCLOTHING",
+      "directions": 4
+>>>>>>>> master:Resources/Textures/_DeadSpace/Clothing/OuterClothing/Coats/suit_jacket.rsi/meta.json
+    },
+    {
+      "name": "inhand-left",
+      "directions": 4
+    },
+    {
+      "name": "inhand-right",
+      "directions": 4
+    },
+    {
+<<<<<<<< HEAD:Resources/Textures/_DeadSpace/Sponsor/DrGnarAlt/tools_welder.rsi/meta.json
+      "name": "inhand-left-flame",
+      "directions": 4
+    },
+    {
+      "name": "inhand-right-flame",
+      "directions": 4
+    },
+    {
+      "name": "equipped-BELT",
+========
+      "name": "open-inhand-left",
+      "directions": 4
+    },
+    {
+      "name": "open-inhand-right",
+>>>>>>>> master:Resources/Textures/_DeadSpace/Clothing/OuterClothing/Coats/suit_jacket.rsi/meta.json
+      "directions": 4
+    }
+  ]
+}

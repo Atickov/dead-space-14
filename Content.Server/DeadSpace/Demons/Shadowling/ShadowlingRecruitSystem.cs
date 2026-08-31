@@ -151,6 +151,8 @@ public sealed class ShadowlingRecruitSystem : EntitySystem
 
     private void RemoveShadowlingRadio(EntityUid uid)
     {
+        var keepReceiver = false;
+
         if (TryComp<IntrinsicRadioTransmitterComponent>(uid, out var transmitter))
         {
             transmitter.Channels.Remove(ShadowlingChannel);
@@ -160,11 +162,13 @@ public sealed class ShadowlingRecruitSystem : EntitySystem
         if (TryComp<ActiveRadioComponent>(uid, out var active))
         {
             active.Channels.Remove(ShadowlingChannel);
-            if (active.Channels.Count == 0) RemCompDeferred<ActiveRadioComponent>(uid);
+            keepReceiver = active.ReceiveAllChannels || active.Channels.Count > 0;
+            if (!keepReceiver) RemCompDeferred<ActiveRadioComponent>(uid);
             else Dirty(uid, active);
         }
 
-        RemCompDeferred<IntrinsicRadioReceiverComponent>(uid);
+        if (!keepReceiver)
+            RemCompDeferred<IntrinsicRadioReceiverComponent>(uid);
     }
 
     private void OnSlaveStateChanged(EntityUid uid, ShadowlingSlaveComponent component, MobStateChangedEvent args)
@@ -198,9 +202,9 @@ public sealed class ShadowlingRecruitSystem : EntitySystem
             _popup.PopupEntity("Разум цели защищён имплантом!", uid, uid, PopupType.Medium);
             return;
         }
-        if (_mobState.IsDead(target) || _mobState.IsCritical(target))
+        if (_mobState.IsDead(target))
         {
-            _popup.PopupEntity("Цель должна быть в сознании!", uid, uid, PopupType.Medium);
+            _popup.PopupEntity("Цель должна быть жива!", uid, uid, PopupType.Medium);
             return;
         }
         if (!HasComp<HumanoidAppearanceComponent>(target))
@@ -257,9 +261,9 @@ public sealed class ShadowlingRecruitSystem : EntitySystem
             return;
         }
 
-        if (_mobState.IsDead(targetUid) || _mobState.IsCritical(targetUid))
+        if (_mobState.IsDead(targetUid))
         {
-            _popup.PopupEntity("Цель должна быть в сознании!", uid, uid, PopupType.Medium);
+            _popup.PopupEntity("Цель должна быть жива!", uid, uid, PopupType.Medium);
             return;
         }
 
