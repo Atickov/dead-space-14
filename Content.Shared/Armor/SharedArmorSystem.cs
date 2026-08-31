@@ -62,6 +62,9 @@ public abstract class SharedArmorSystem : EntitySystem
         if (TryComp<MaskComponent>(uid, out var mask) && mask.IsToggled)
             return;
 
+        if (component.Modifiers == null) // DS14
+            return; // DS14
+
         args.Args.Damage = DamageSpecifier.ApplyModifierSet(args.Args.Damage, component.Modifiers);
     }
 
@@ -70,6 +73,9 @@ public abstract class SharedArmorSystem : EntitySystem
     {
         if (TryComp<MaskComponent>(uid, out var mask) && mask.IsToggled)
             return;
+
+        if (component.Modifiers == null) // DS14
+            return; // DS14
 
         args.Args.Damage = DamageSpecifier.ApplyModifierSet(args.Args.Damage, component.Modifiers);
     }

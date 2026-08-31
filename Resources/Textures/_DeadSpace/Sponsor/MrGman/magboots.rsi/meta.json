@@ -1,0 +1,33 @@
+{
+  "version": 1,
+  "license": "CC-BY-SA-3.0",
+<<<<<<<< HEAD:Resources/Textures/_DeadSpace/Sponsor/DrGnarAlt/magboots.rsi/meta.json
+  "copyright": "made by sastr. (discord) for Space Station 14 server Мёртвый Космос",
+========
+  "copyright": "made by ayanami_prime (discord) for Space Station 14 server Мёртвый Космос",
+>>>>>>>> master:Resources/Textures/_DeadSpace/Sponsor/MrGman/magboots.rsi/meta.json
+  "size": {
+    "x": 32,
+    "y": 32
+  },
+  "states": [
+<<<<<<<< HEAD:Resources/Textures/_DeadSpace/Sponsor/DrGnarAlt/magboots.rsi/meta.json
+{
+========
+    {
+>>>>>>>> master:Resources/Textures/_DeadSpace/Sponsor/MrGman/magboots.rsi/meta.json
+      "name": "equipped-FEET",
+      "directions": 4
+    },
+    {
+      "name": "on-equipped-FEET",
+      "directions": 4
+    },
+    {
+      "name": "icon"
+    },
+    {
+      "name": "icon-on"
+    }
+  ]
+}

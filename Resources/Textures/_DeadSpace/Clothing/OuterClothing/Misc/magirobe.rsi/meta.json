@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "license": "CC-BY-SA-3.0",
+<<<<<<<< HEAD:Resources/Textures/_DeadSpace/Clothing/OuterClothing/Hardsuits/redsword.rsi/meta.json
+  "copyright": "Made by x_muted_x (discord) for Space Station 14 server Мёртвый Космос.",
+========
+  "copyright": "Taken from ParadiseSS13 at commit https://github.com/ParadiseSS13/Paradise/commit/a521d61924279ba5a281a319ba609e5927c72cb8",
+>>>>>>>> master:Resources/Textures/_DeadSpace/Clothing/OuterClothing/Misc/magirobe.rsi/meta.json
+  "size": {
+    "x": 32,
+    "y": 32
+  },
+  "states": [
+    {
+      "name": "inhand-right",
+      "directions": 4
+    },
+    {
+      "name": "equipped-OUTERCLOTHING",
+      "directions": 4
+    },
+    {
+      "name": "icon"
+    },
+    {
+      "name": "inhand-left",
+      "directions": 4
+    }
+  ]
+}

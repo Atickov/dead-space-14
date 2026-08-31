@@ -109,8 +109,15 @@
     - RadiationProtection
     - Adrenaline
   - type: Temperature
+  # DS14-start
   - type: TemperatureDamage
-    heatDamageThreshold: 2400
+    heatDamageThreshold: 100000
+    coldDamageThreshold: -100000
+    heatDamage:
+      types: {}
+    coldDamage:
+      types: {}
+  # DS14-end
   - type: Metabolizer
     solutionOnBody: false
     updateInterval: 0.25
@@ -150,7 +157,6 @@
       components:
       - MobState
       - Door
-      tags:
       - Wall
   - type: Tag
     tags:
@@ -164,6 +170,11 @@
     - NamesDragon
     - NamesDragonTitle
     nameFormat: name-format-dragon
+  - type: Grammar
+    attributes:
+      proper: true
+  - type: NameIdentifier
+    group: null
   - type: Prying
     pryPowered: true
     force: true
@@ -238,6 +249,10 @@
   parent: BaseMobDragon
   id: MobDragon
   components:
+  # DS14-start
+  - type: Stamina
+    baseCritThreshold: 200
+  # DS14-end
   - type: Dragon
     spawnRiftAction: ActionSpawnRift
   - type: GhostRole
@@ -333,7 +348,6 @@
       components:
       - MobState
       - Door
-      tags:
       - Wall
     event: !type:DevourActionEvent
 

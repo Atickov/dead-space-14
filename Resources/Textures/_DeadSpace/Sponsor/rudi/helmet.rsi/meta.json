@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "license": "CC-BY-SA-3.0",
+<<<<<<<< HEAD:Resources/Textures/_DeadSpace/Clothing/Head/Hardsuits/redsword.rsi/meta.json
+  "copyright": "Made by x_muted_x (discord) for Space Station 14 server Мёртвый Космос.",
+========
+  "copyright": "made by sastr. (discord) for Space Station 14 server Мёртвый Космос",
+>>>>>>>> master:Resources/Textures/_DeadSpace/Sponsor/rudi/helmet.rsi/meta.json
+  "size": {
+    "x": 32,
+    "y": 32
+  },
+  "states": [
+    {
+      "name": "on-equipped-HELMET",
+      "directions": 4
+    },
+    {
+      "name": "icon"
+    },
+    {
+      "name": "icon-flash"
+    },
+    {
+      "name": "off-equipped-HELMET",
+      "directions": 4
+    }
+  ]
+}

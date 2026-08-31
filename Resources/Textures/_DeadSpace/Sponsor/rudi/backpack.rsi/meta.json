@@ -1,0 +1,26 @@
+{
+  "version": 1,
+  "license": "CC-BY-SA-4.0",
+<<<<<<<< HEAD:Resources/Textures/_DeadSpace/Sponsor/DrGnarAlt/under/socks.rsi/meta.json
+  "copyright": "made by chuiomoio (discord) for Space Station 14 server Мёртвый Космос, resprite by sastr. (discord) for Space Station 14 server Мёртвый Космос",
+========
+  "copyright": "made by sastr. (discord) for Space Station 14 server Мёртвый Космос",
+>>>>>>>> master:Resources/Textures/_DeadSpace/Sponsor/rudi/backpack.rsi/meta.json
+  "size": {
+    "x": 32,
+    "y": 32
+  },
+  "states": [
+    {
+      "name": "icon"
+    },
+    {
+<<<<<<<< HEAD:Resources/Textures/_DeadSpace/Sponsor/DrGnarAlt/under/socks.rsi/meta.json
+      "name": "equipped-SOCKS",
+========
+      "name": "equipped-BACKPACK",
+>>>>>>>> master:Resources/Textures/_DeadSpace/Sponsor/rudi/backpack.rsi/meta.json
+      "directions": 4
+    }
+  ]
+}

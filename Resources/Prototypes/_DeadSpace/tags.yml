@@ -8,6 +8,9 @@
   id: AmbrosiaDeus
 
 - type: Tag
+  id: AmeJar
+
+- type: Tag
   id: AnimateSpellBlacklist
 
 - type: Tag
@@ -152,6 +155,15 @@
   id: EnergySwordDouble
 
 - type: Tag
+  id: ParryEnergySword
+
+- type: Tag
+  id: ParryAll
+
+- type: Tag
+  id: ParryStandardWeapon
+
+- type: Tag
   id: EncryptionTaipan
 
 - type: Tag
@@ -195,6 +207,9 @@
 
 - type: Tag
   id: GasTank
+
+- type: Tag
+  id: GasTankBorg
 
 - type: Tag
   id: GiantSpiderSpace
