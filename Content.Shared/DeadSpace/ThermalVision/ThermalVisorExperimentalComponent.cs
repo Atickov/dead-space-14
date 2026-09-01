@@ -22,10 +22,6 @@ public sealed partial class ThermalVisorExperimentalComponent : Component
 
     [DataField]
     [ViewVariables(VVAccess.ReadWrite)]
-    public bool UseShader = true;
-
-    [DataField]
-    [ViewVariables(VVAccess.ReadWrite)]
     public SoundSpecifier? ActivateSound = null;
 
     [DataField]

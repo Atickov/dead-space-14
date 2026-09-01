@@ -1,7 +1,10 @@
 using Robust.Shared.Audio;
 using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom;
-using Content.Shared.MedicalScanner; //DS14
-using Content.Shared.FixedPoint; //DS14
+//DS14-start
+using Content.Shared.MedicalScanner;
+using Content.Shared.FixedPoint;
+using Content.Server.DeadSpace.Ninja.Systems;
+//DS14-end
 
 namespace Content.Server.Medical.Components;
 
@@ -22,7 +25,7 @@ public record HealthAnalyzerData(
 //DS14-end
 
 [RegisterComponent, AutoGenerateComponentPause]
-[Access(typeof(HealthAnalyzerSystem), typeof(CryoPodSystem))]
+[Access(typeof(HealthAnalyzerSystem), typeof(CryoPodSystem), typeof(SelfHealthAnalyzerSystem))] //DS14
 public sealed partial class HealthAnalyzerComponent : Component
 {
     /// <summary>
