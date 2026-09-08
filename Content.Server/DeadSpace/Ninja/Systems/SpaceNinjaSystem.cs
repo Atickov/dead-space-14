@@ -60,7 +60,7 @@ public sealed class SpaceNinjaSystem : SharedSpaceNinjaSystem
             {
                 heat.Heat += heat.HeatRate * frameTime;
 
-                if (heat.Heat >= heat.EffectsThreshold)
+                if (heat.Heat >= heat.EffectsThreshold && heat.MaxHeat > heat.EffectsThreshold)
                 {
                     var chance = (heat.Heat - heat.EffectsThreshold) / (heat.MaxHeat - heat.EffectsThreshold);
                     if (_random.Prob(chance * frameTime * 2f))
@@ -82,7 +82,14 @@ public sealed class SpaceNinjaSystem : SharedSpaceNinjaSystem
                 heat.Heat = MathF.Max(0f, heat.Heat - heat.CoolRate * frameTime);
             }
 
-            Dirty(suitUid, heat);
+            // The heat state has no client-side consumer, so propagating it every tick just
+            // re-sends the whole suit entity to every client that has the ninja in view.
+            // Only drift it out when it moves by a visible amount.
+            if (MathF.Abs(heat.Heat - heat.LastSentHeat) >= 1f)
+            {
+                heat.LastSentHeat = heat.Heat;
+                Dirty(suitUid, heat);
+            }
         }
     }
 

@@ -803,6 +803,7 @@
     sprite: Clothing/Mask/ninja.rsi
   - type: Item
     storedRotation: -90
+  - type: NinjaAppearanceItem
   - type: EyeProtection
   - type: BreathMask
   - type: IdentityBlocker

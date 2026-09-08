@@ -4,20 +4,21 @@ using Content.Shared.DeadSpace.Ninja.Components;
 
 namespace Content.Shared.DeadSpace.Ninja.Systems;
 
-public abstract class SharedNinjaEmpAbilitySystem : EntitySystem
+public sealed class SharedNinjaEmpAbilitySystem : EntitySystem
 {
     [Dependency] private readonly ActionContainerSystem _actionContainer = default!;
     [Dependency] private readonly SharedEmpSystem _emp = default!;
+    [Dependency] private readonly SharedSpaceNinjaSystem _ninja = default!;
     public override void Initialize()
     {
         base.Initialize();
 
-        SubscribeLocalEvent<NinjaEmpAbilityComponent, ComponentInit>(OnCompInit);
+        SubscribeLocalEvent<NinjaEmpAbilityComponent, MapInitEvent>(OnMapInit);
         SubscribeLocalEvent<NinjaEmpAbilityComponent, GetItemActionsEvent>(OnGetActions);
         SubscribeLocalEvent<NinjaEmpAbilityComponent, NinjaEmpEvent>(OnEmp);
     }
 
-    private void OnCompInit(Entity<NinjaEmpAbilityComponent> ent, ref ComponentInit args)
+    private void OnMapInit(Entity<NinjaEmpAbilityComponent> ent, ref MapInitEvent args)
     {
         var (uid, comp) = ent;
         _actionContainer.EnsureAction(uid, ref comp.EmpActionEntity, comp.EmpAction);
@@ -33,6 +34,9 @@ public abstract class SharedNinjaEmpAbilitySystem : EntitySystem
 
     private void OnEmp(Entity<NinjaEmpAbilityComponent> ent, ref NinjaEmpEvent args)
     {
+        if (!_ninja.TryUseCharge(args.Performer, ent.Comp.Charge))
+            return;
+
         args.Handled = true;
         var (uid, comp) = ent;
         _emp.EmpPulse(Transform(uid).Coordinates, comp.EmpRange, comp.EmpConsumption, comp.EmpDuration, args.Performer);

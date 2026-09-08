@@ -1603,6 +1603,8 @@
         pda-ninja
   - type: Icon
     state: pda-ninja
+  - type: NinjaAppearanceItem
+    itemType: Color
 
 - type: entity
   parent: [ BaseMajorContraband, SyndiPDA ]

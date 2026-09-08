@@ -6,6 +6,7 @@ using Content.Shared.Humanoid;
 using Content.Shared.Humanoid.Markings;
 using Content.Shared.NameModifier.EntitySystems;
 using Content.Shared.Inventory;
+using Content.Shared.Inventory.Events;
 using Content.Shared.Clothing.Components;
 using Content.Shared.Clothing.EntitySystems;
 using Robust.Server.GameObjects;
@@ -34,6 +35,7 @@ public sealed class NinjaScannerSystem : EntitySystem
         SubscribeLocalEvent<NinjaScannerComponent, NinjaOpenScannerActionEvent>(OnOpenUi);
         SubscribeLocalEvent<NinjaScannerComponent, NinjaApplyDisguiseMessage>(OnApplyDisguise);
         SubscribeLocalEvent<NinjaScannerComponent, NinjaResetDisguiseMessage>(OnResetDisguise);
+        SubscribeLocalEvent<NinjaScannerComponent, GotUnequippedEvent>(OnUnequipped);
     }
 
     private void OnMapInit(Entity<NinjaScannerComponent> ent, ref MapInitEvent args)
@@ -135,6 +137,14 @@ public sealed class NinjaScannerSystem : EntitySystem
         RevertDisguise(ent, performer);
     }
 
+    private void OnUnequipped(Entity<NinjaScannerComponent> ent, ref GotUnequippedEvent args)
+    {
+        if (!ent.Comp.IsDisguised)
+            return;
+
+        RevertDisguise(ent, args.Equipee);
+    }
+
     private void ApplyDisguise(Entity<NinjaScannerComponent> ent, EntityUid target, EntityUid performer)
     {
         var comp = ent.Comp;
@@ -189,6 +199,13 @@ public sealed class NinjaScannerSystem : EntitySystem
             comp.OriginalSpecies = humanoid.Species;
             comp.OriginalMarkings = new MarkingSet(humanoid.MarkingSet);
             comp.OriginalSkinColor = humanoid.SkinColor;
+            comp.OriginalEyeColor = humanoid.EyeColor;
+            comp.OriginalAge = humanoid.Age;
+            comp.OriginalSex = humanoid.Sex;
+            comp.OriginalGender = humanoid.Gender;
+            comp.OriginalCustomBaseLayers = new(humanoid.CustomBaseLayers);
+            comp.OriginalVoice = humanoid.Voice;
+            comp.OriginalSpeakerColor = humanoid.SpeakerColor;
         }
     }
 
@@ -209,6 +226,27 @@ public sealed class NinjaScannerSystem : EntitySystem
 
             if (comp.OriginalSkinColor.HasValue)
                 _humanoid.SetSkinColor(performer, comp.OriginalSkinColor.Value, humanoid: humanoid);
+
+            if (comp.OriginalEyeColor.HasValue)
+                humanoid.EyeColor = comp.OriginalEyeColor.Value;
+
+            if (comp.OriginalAge.HasValue)
+                humanoid.Age = comp.OriginalAge.Value;
+
+            if (comp.OriginalSex.HasValue)
+                _humanoid.SetSex(performer, comp.OriginalSex.Value, humanoid: humanoid);
+
+            if (comp.OriginalGender.HasValue)
+                _humanoid.SetGender((performer, humanoid), comp.OriginalGender.Value);
+
+            if (comp.OriginalCustomBaseLayers != null)
+                humanoid.CustomBaseLayers = new(comp.OriginalCustomBaseLayers);
+
+            if (comp.OriginalVoice != null)
+                humanoid.Voice = comp.OriginalVoice.Value;
+
+            if (comp.OriginalSpeakerColor.HasValue)
+                humanoid.SpeakerColor = comp.OriginalSpeakerColor.Value;
 
             if (comp.OriginalMarkings != null)
             {

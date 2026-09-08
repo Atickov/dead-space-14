@@ -48,6 +48,7 @@
   description: Disable any nearby technology with an electro-magnetic pulse.
   components:
   - type: Action
+    useDelay: 60
     icon:
       sprite: _DeadSpace/Actions/ninja_actions.rsi #DS14
       state: emp #DS14
@@ -302,4 +303,76 @@
       Chiyurizine: 10
   - type: LimitedCharges
     maxCharges: 3
+
+- type: entity
+  parent: BaseAction
+  id: NinjaEmergencyTeleportAction
+  name: экстренный телепорт
+  description: Позволяет автоматически создавать дымовую завесу при использовании некоторых других способностей в ослабленном виде и за уменьшенную цену.
+  components:
+  - type: Action
+    icon:
+      sprite: _DeadSpace/Actions/ninja_actions.rsi
+      state: emergencyblink
+    useDelay: 180
+    itemIconStyle: BigAction
+  - type: InstantAction
+    event: !type:NinjaEmergencyTeleportEvent
+
+- type: entity
+  parent: BaseAction
+  id: NinjaSpiritFormAction
+  name: форма призрака
+  description: Позволяет автоматически создавать дымовую завесу при использовании некоторых других способностей в ослабленном виде и за уменьшенную цену.
+  components:
+  - type: Action
+    icon:
+      sprite: _DeadSpace/Actions/ninja_actions.rsi
+      state: spiritform
+    useDelay: 1.0
+    itemIconStyle: BigAction
+  - type: InstantAction
+    event: !type:NinjaSpiritFormEvent
+
+- type: entity
+  parent: BaseAction
+  id: ActionNinjaCycleColor
+  name: смена цвета снаряжения
+  description: Циклически меняет цветовую схему всего снаряжения ниндзя.
+  components:
+  - type: Action
+    icon:
+      sprite: _DeadSpace/Actions/ninja_actions.rsi
+      state: cloak
+    itemIconStyle: BigAction
+  - type: InstantAction
+    event: !type:CycleNinjaColorEvent
+
+- type: entity
+  parent: BaseAction
+  id: ActionNinjaToggleScarf
+  name: шарф ниндзя
+  description: Показать или скрыть шарф ниндзя.
+  components:
+  - type: Action
+    icon:
+      sprite: _DeadSpace/Actions/ninja_actions.rsi
+      state: smoke
+    itemIconStyle: BigAction
+  - type: InstantAction
+    event: !type:ToggleNinjaScarfEvent
+
+- type: entity
+  parent: BaseAction
+  id: ActionNinjaToggleHelmet
+  name: шлем ниндзя
+  description: Показать или скрыть шлем ниндзя.
+  components:
+  - type: Action
+    icon:
+      sprite: _DeadSpace/Actions/ninja_actions.rsi
+      state: emp
+    itemIconStyle: BigAction
+  - type: InstantAction
+    event: !type:ToggleNinjaHelmetEvent
 #DS-14 End

@@ -266,3 +266,18 @@
     sprite: Clothing/Neck/Scarfs/PrideScarfs/lesbian-long.rsi
   - type: Clothing
     sprite: Clothing/Neck/Scarfs/PrideScarfs/lesbian-long.rsi
+
+# DS14 - Ninja scarf. Placeholder art until the _DeadSpace variant is added;
+# recolored and hidden/shown by the suit's NinjaAppearanceComponent.
+- type: entity
+  parent: [ClothingScarfBase, BaseHighlyIllegalContraband]
+  id: ClothingNeckScarfNinja
+  name: ninja scarf
+  description: A flowing scarf of the Spider Clan, woven with nano-fibers. Its color matches the rest of your gear.
+  components:
+  - type: Sprite
+    sprite: Clothing/Neck/mantles/mantle.rsi
+  - type: Clothing
+    sprite: Clothing/Neck/mantles/mantle.rsi
+  - type: NinjaAppearanceItem
+    itemType: Scarf

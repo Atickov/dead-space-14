@@ -7,13 +7,11 @@ using Content.Shared.DeadSpace.Ninja.Components;
 using Content.Shared.Maps;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Map;
-using Content.Server.Power.EntitySystems;
-using Content.Shared.Containers.ItemSlots;
 using Content.Shared.DeadSpace.Ninja.Systems;
 
 namespace Content.Server.DeadSpace.Ninja.Systems;
 
-public sealed class NinjaSmokeAbilitySystem : EntitySystem
+public sealed class NinjaSmokeAbilitySystem : SharedNinjaSmokeAbilitySystem
 {
     [Dependency] private readonly SharedActionsSystem _actions = default!;
     [Dependency] private readonly SmokeSystem _smoke = default!;
@@ -66,7 +64,7 @@ public sealed class NinjaSmokeAbilitySystem : EntitySystem
         _actions.SetToggled(comp.ActionAutoSmokeEntity, comp.AutoMode);
     }
 
-    public bool TrySpawnNinjaSmoke(Entity<NinjaSmokeAbilityComponent> ent, bool autoMode)
+    public override bool TrySpawnNinjaSmoke(Entity<NinjaSmokeAbilityComponent> ent, bool autoMode)
     {
         if (autoMode && !ent.Comp.AutoMode)
             return false;
@@ -77,9 +75,6 @@ public sealed class NinjaSmokeAbilitySystem : EntitySystem
 
         float energyCost = autoMode ? ent.Comp.EnergyCostAutoMode : ent.Comp.EnergyCost;
 
-        if (!_ninja.TryUseCharge(user, energyCost))
-            return false;
-
         var xform = Transform(user);
         var mapCoords = _xform.GetMapCoordinates(user);
         if (!_mapManager.TryFindGridAt(mapCoords, out var gridUid, out var grid) ||
@@ -89,22 +84,19 @@ public sealed class NinjaSmokeAbilitySystem : EntitySystem
         if (_spreader.RequiresFloorToSpread(ent.Comp.SmokePrototype.ToString()) && _turf.IsSpace(tileRef))
             return false;
 
+        if (!_ninja.TryUseCharge(user, energyCost))
+            return false;
+
         var coords = _map.MapToGrid(gridUid, mapCoords);
         var smoke = Spawn(ent.Comp.SmokePrototype, coords.SnapToGrid());
         if (!TryComp<SmokeComponent>(smoke, out var smokeComp))
-        {
             return false;
-        }
 
         _audio.PlayPvs(ent.Comp.SmokeSound, user);
         if (!autoMode)
-        {
             _smoke.StartSmoke(smoke, new Solution(), (float)ent.Comp.Duration.TotalSeconds, ent.Comp.SpreadAmount, smokeComp);
-        }
-        else if (ent.Comp.AutoMode)
-        {
+        else
             _smoke.StartSmoke(smoke, new Solution(), (float)ent.Comp.DurationAutoMode.TotalSeconds, ent.Comp.SpreadAmountAutoMode, smokeComp);
-        }
         return true;
     }
 }

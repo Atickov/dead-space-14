@@ -161,13 +161,13 @@
   - type: TemperatureProtection
     heatingCoefficient: 0.01
     coolingCoefficient: 0.01
-  - type: Armor
+  - type: Armor #DS14
     modifiers:
       coefficients:
-        Blunt: 0.75
-        Slash: 0.75
-        Piercing: 0.75
-        Heat: 0.75
+        Blunt: 0.6
+        Slash: 0.6
+        Piercing: 0.6
+        Heat: 0.6
   - type: StaminaResistance #DS14
     damageCoefficient: 0.5
   # phase cloak
@@ -218,6 +218,10 @@
   - type: ChameleonClothing
     slot: outerclothing
     default: ClothingOuterSuitSpaceNinja
+  - type: NinjaSpiritForm
+  - type: NinjaEmergencyTeleport
+  - type: NinjaAppearance
+  - type: NinjaAppearanceItem
   #DS14 end
   - type: EmpResistance
     strengthMultiplier: 0

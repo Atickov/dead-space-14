@@ -13,6 +13,7 @@
     jumpsuit: ClothingUniformJumpsuitNinja
     back: ADTClothingBackpackSatchelninja
     mask: ClothingMaskNinja
+    neck: ClothingNeckScarfNinja #DS14
     head: ClothingHeadHelmetSpaceNinja
     eyes: ClothingEyesVisorNinja
     gloves: ClothingHandsGlovesSpaceNinja
@@ -24,17 +25,8 @@
     pocket2: PinpointerStation
     belt: ClothingBeltNinjaSheath #DS14
   storage:
-    back: # belt holds katana so satchel has the tools for sabotaging things
-    - Crowbar
-    - Wrench
-    - Screwdriver
-    - Wirecutter
-    - Welder
-    - Multitool
-    - EmergencyMedipen
-    - Flare
-    - FoodSnackNutribrick
-    - DrinkWaterBottleFull
+    back:
+    - BoxMRE
 
 - type: chameleonOutfit
   id: NinjaChameleonOutfit

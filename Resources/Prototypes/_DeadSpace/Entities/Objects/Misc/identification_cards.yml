@@ -620,7 +620,11 @@
     - state: Ninja_ID
   - type: Access
   - type: Item
-    heldPrefix: green
+    inhandVisuals:
+      left:
+      - state: green-inhand-left
+      right:
+      - state: green-inhand-right
   - type: Clothing
     sprite: _DeadSpace/Objects/Misc/ninja_id.rsi
   - type: UIRequiresLock
@@ -629,6 +633,7 @@
     verbText: agent-id-open-ui-verb
   - type: Tag
     tags: [] # ignore "WhitelistChameleon" tag
+  - type: NinjaAppearanceItem
   - type: UserInterface
     interfaces:
       enum.AgentIDCardUiKey.Key:

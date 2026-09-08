@@ -34,11 +34,9 @@ public sealed class NinjaSuitRefillSystem : EntitySystem
 
         foreach (var (actionProtoId, cost) in ent.Comp.ActionMaterials)
         {
-            // Проверяем что тип стака совпадает
             if (stack.StackTypeId != cost.Stack)
                 continue;
 
-            // Ищем EntityUid действия
             EntityUid? actionUid = null;
             for (var i = 0; i < suitActions.Actions.Count; i++)
             {

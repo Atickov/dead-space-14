@@ -148,6 +148,7 @@
   - type: ClothingGrantComponent
     component: 
       - type: RenegadeCANTRenegadeForce
+  - type: NinjaAppearanceItem
 
 - type: entity
   parent: ClothingShoesBaseButcherable

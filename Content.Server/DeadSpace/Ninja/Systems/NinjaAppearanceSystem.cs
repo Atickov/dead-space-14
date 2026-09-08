@@ -1,0 +1,229 @@
+using Content.Shared.Clothing.Components;
+using Content.Shared.DeadSpace.Ninja.Components;
+using Content.Shared.DeadSpace.Ninja.Systems;
+using Content.Shared.Humanoid;
+using Content.Shared.Inventory;
+using Content.Shared.Inventory.Events;
+using Robust.Shared.Containers;
+using Robust.Shared.GameObjects;
+
+namespace Content.Server.DeadSpace.Ninja.Systems;
+
+/// <summary>
+/// Server half of the ninja gear appearance toggles. Applies the action handlers from
+/// <see cref="SharedNinjaAppearanceSystem"/>; the visual repaint happens on the client.
+/// Also freezes the colorway onto items the moment they leave a suit's inventory, so a
+/// dropped/handed-off ninja item keeps its color for the rest of the round.
+/// </summary>
+public sealed partial class NinjaAppearanceSystem : SharedNinjaAppearanceSystem
+{
+    [Dependency] private readonly InventorySystem _inventory = default!;
+    [Dependency] private readonly SharedHumanoidAppearanceSystem _humanoid = default!;
+
+    public override void Initialize()
+    {
+        base.Initialize();
+
+        SubscribeLocalEvent<NinjaAppearanceItemComponent, EntParentChangedMessage>(OnItemReparented);
+        SubscribeLocalEvent<NinjaAppearanceComponent, GotUnequippedEvent>(OnSuitUnequipped);
+    }
+
+    protected override void OnHelmetHiddenChanged(Entity<NinjaAppearanceComponent> ent, bool shown)
+    {
+        var wearer = Transform(ent.Owner).ParentUid;
+        if (!wearer.IsValid() || !TryComp<HumanoidAppearanceComponent>(wearer, out var humanoid))
+            return;
+
+        EntityUid? helmet = null;
+        foreach (var item in EnumerateWearerItems(wearer))
+        {
+            if (TryComp<NinjaAppearanceItemComponent>(item, out var itemComp) &&
+                itemComp.ItemType == NinjaAppearanceItemType.Helmet)
+            {
+                helmet = item;
+                break;
+            }
+        }
+
+        if (helmet is not { } helmetUid ||
+            !TryComp<NinjaAppearanceItemComponent>(helmetUid, out var comp) ||
+            FindSuit(Transform(helmetUid).ParentUid) is not { } claim || claim.Uid != ent.Owner)
+        {
+            return;
+        }
+
+        if (shown)
+            RestoreHideLayerClothing(wearer, helmetUid, comp, humanoid.HideLayersOnEquip);
+        else
+            RemoveHideLayerClothing(wearer, helmetUid, comp, humanoid.HideLayersOnEquip);
+    }
+
+    /// <summary>
+    /// Drops the helmet's <see cref="HideLayerClothingComponent"/> so the wearer's hair shows
+    /// again while it is deactivated. The hidden layers are saved on the item component so they
+    /// can be restored verbatim on re-show.
+    /// </summary>
+    private void RemoveHideLayerClothing(EntityUid wearer, EntityUid helmet,
+        NinjaAppearanceItemComponent comp, HashSet<HumanoidVisualLayers> hideable)
+    {
+        if (comp.SavedHideLayers != null || !TryComp<HideLayerClothingComponent>(helmet, out var hide))
+            return;
+
+        var inSlot = TryComp<ClothingComponent>(helmet, out var clothing)
+            ? clothing.InSlotFlag ?? SlotFlags.NONE
+            : SlotFlags.NONE;
+
+        if (inSlot == SlotFlags.NONE)
+            return;
+
+        comp.SavedHideLayers = new Dictionary<HumanoidVisualLayers, SlotFlags>(hide.Layers);
+        ToggleHiddenLayers(wearer, hide.Layers, hideable, inSlot, hidden: false);
+        RemComp<HideLayerClothingComponent>(helmet);
+    }
+
+    /// <summary>
+    /// Re-adds the helmet's <see cref="HideLayerClothingComponent"/> and re-hides the saved layers.
+    /// </summary>
+    private void RestoreHideLayerClothing(EntityUid wearer, EntityUid helmet,
+        NinjaAppearanceItemComponent comp, HashSet<HumanoidVisualLayers> hideable)
+    {
+        if (comp.SavedHideLayers is not { } saved)
+            return;
+
+        var inSlot = TryComp<ClothingComponent>(helmet, out var clothing)
+            ? clothing.InSlotFlag ?? SlotFlags.NONE
+            : SlotFlags.NONE;
+
+        if (inSlot == SlotFlags.NONE)
+            return;
+
+        var hide = EnsureComp<HideLayerClothingComponent>(helmet);
+        hide.Layers = saved;
+        Dirty(helmet, hide);
+        comp.SavedHideLayers = null;
+
+        ToggleHiddenLayers(wearer, saved, hideable, inSlot, hidden: true);
+    }
+
+    /// <summary>
+    /// Flips the managed body layers, gated exactly like
+    /// <see cref="Content.Shared.Clothing.EntitySystems.HideLayerClothingSystem"/>: the
+    /// layer must be hideable by the wearer's <c>HideLayersOnEquip</c> and the gated slots must
+    /// cover the slot the helmet is equipped in.
+    /// </summary>
+    private void ToggleHiddenLayers(EntityUid wearer, Dictionary<HumanoidVisualLayers, SlotFlags> layers,
+        HashSet<HumanoidVisualLayers> hideable, SlotFlags inSlot, bool hidden)
+    {
+        foreach (var (layer, validSlots) in layers)
+        {
+            if (hideable.Contains(layer) && validSlots.HasFlag(inSlot))
+                _humanoid.SetLayerVisibility(wearer, layer, visible: !hidden, source: inSlot);
+        }
+    }
+
+    private void OnSuitUnequipped(Entity<NinjaAppearanceComponent> ent, ref GotUnequippedEvent args)
+    {
+        // The suit no longer drives the gear, so bake its colorway onto the still-worn ninja
+        // items. Otherwise they would snap back to the default look the next time they are
+        // re-rendered, because FrozenColor is only set when an item itself leaves the suit.
+        var colorway = ent.Comp.Colorway;
+
+        foreach (var item in EnumerateWearerItems(args.Equipee))
+        {
+            if (item == ent.Owner)
+                continue;
+
+            if (!TryComp<NinjaAppearanceItemComponent>(item, out var itemComp) ||
+                FindSuit(Transform(item).ParentUid) != null)
+            {
+                // Still driven by another (or this, still-contained) ninja suit.
+                continue;
+            }
+
+            if (itemComp.FrozenColor != colorway)
+            {
+                itemComp.FrozenColor = colorway;
+                Dirty(item, itemComp);
+            }
+        }
+    }
+
+    private IEnumerable<EntityUid> EnumerateWearerItems(EntityUid wearer)
+    {
+        if (TryComp<InventoryComponent>(wearer, out var inventory))
+        {
+            var enumerator = _inventory.GetSlotEnumerator((wearer, inventory));
+            while (enumerator.NextItem(out var item, out _))
+            {
+                yield return item;
+                foreach (var contained in EnumerateContainedItems(item))
+                    yield return contained;
+            }
+        }
+    }
+
+    private IEnumerable<EntityUid> EnumerateContainedItems(EntityUid item)
+    {
+        if (!TryComp<ContainerManagerComponent>(item, out var containerManager))
+            yield break;
+
+        foreach (var container in containerManager.Containers.Values)
+        {
+            foreach (var contained in container.ContainedEntities)
+            {
+                yield return contained;
+                foreach (var inner in EnumerateContainedItems(contained))
+                    yield return inner;
+            }
+        }
+    }
+
+    private void OnItemReparented(Entity<NinjaAppearanceItemComponent> ent, ref EntParentChangedMessage args)
+    {
+        // While an item is in a suit's inventory the suit drives its color, so do nothing while
+        // the new parent chain contains a suit. Otherwise bake the color it had into the item so
+        // all clients keep showing it after it leaves the ninja.
+        if (FindSuit(args.Transform.ParentUid) != null)
+            return;
+
+        NinjaColorway? color = null;
+
+        if (TryComp<NinjaAppearanceComponent>(ent.Owner, out var own))
+            color = own.Colorway;
+        else if (FindSuit(args.OldParent) is { } oldSuit)
+            color = oldSuit.Comp.Colorway;
+
+        if (color is { } frozen && ent.Comp.FrozenColor != frozen)
+        {
+            ent.Comp.FrozenColor = frozen;
+            Dirty(ent.Owner, ent.Comp);
+        }
+    }
+
+    private (EntityUid Uid, NinjaAppearanceComponent Comp)? FindSuit(EntityUid? root)
+    {
+        if (root is not { } parent || !parent.IsValid())
+            return null;
+
+        while (parent.IsValid())
+        {
+            if (!Exists(parent))
+                return null;
+
+            if (TryComp<NinjaAppearanceComponent>(parent, out var comp))
+                return (parent, comp);
+
+            // A suit worn by an ancestor is its child (inventory), not an ancestor itself.
+            var enumerator = _inventory.GetSlotEnumerator(parent);
+            while (enumerator.NextItem(out var wornItem, out _))
+            {
+                if (TryComp<NinjaAppearanceComponent>(wornItem, out var wornComp))
+                    return (wornItem, wornComp);
+            }
+
+            parent = Transform(parent).ParentUid;
+        }
+
+        return null;
+    }
+}

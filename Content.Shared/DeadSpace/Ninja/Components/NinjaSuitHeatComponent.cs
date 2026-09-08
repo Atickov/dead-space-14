@@ -19,4 +19,10 @@ public sealed partial class NinjaSuitHeatComponent : Component
 
     [DataField]
     public float EffectsThreshold = 50f;
+
+    /// <summary>
+    /// Last heat value sent to clients, so the suit is not re-sent every tick. Server-side only.
+    /// </summary>
+    [ViewVariables]
+    public float LastSentHeat = 0f;
 }
