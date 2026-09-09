@@ -1,11 +1,7 @@
 using Robust.Shared.GameStates;
 using Content.Shared.Actions;
-using Content.Shared.Humanoid;
-using Content.Shared.Humanoid.Markings;
-using Content.Shared.Corvax.TTS;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization;
-using Robust.Shared.Enums;
 
 namespace Content.Shared.DeadSpace.Ninja.Components;
 
@@ -35,39 +31,6 @@ public sealed partial class NinjaScannerComponent : Component
 
     [DataField]
     public float DisguiseEnergyCost = 1f;
-
-    [DataField]
-    public string? OriginalName;
-
-    [DataField]
-    public string? OriginalSpecies;
-
-    [DataField]
-    public MarkingSet? OriginalMarkings;
-
-    [DataField]
-    public Color? OriginalSkinColor;
-
-    [DataField]
-    public Color? OriginalEyeColor;
-
-    [DataField]
-    public int? OriginalAge;
-
-    [DataField]
-    public Sex? OriginalSex;
-
-    [DataField]
-    public Gender? OriginalGender;
-
-    [DataField]
-    public Dictionary<HumanoidVisualLayers, CustomBaseLayerInfo>? OriginalCustomBaseLayers;
-
-    [DataField]
-    public ProtoId<TTSVoicePrototype>? OriginalVoice;
-
-    [DataField]
-    public Color? OriginalSpeakerColor;
 }
 
 public sealed partial class NinjaScanActionEvent : EntityTargetActionEvent;

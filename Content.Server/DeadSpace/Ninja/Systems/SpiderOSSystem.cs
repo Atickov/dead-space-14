@@ -14,11 +14,7 @@ public sealed class SpiderOSSystem : EntitySystem
     {
         base.Initialize();
 
-        Subs.BuiEvents<SpiderOSComponent>(SpiderOSUiKey.Key, subs =>
-            {
-                subs.Event<SpiderOSSelectModuleMessage>(OnSelectModule);
-            });
-
+        Subs.BuiEvents<SpiderOSComponent>(SpiderOSUiKey.Key, subs => { subs.Event<SpiderOSSelectModuleMessage>(OnSelectModule); });
         SubscribeLocalEvent<SpiderOSComponent, BoundUIOpenedEvent>(OnBuiOpened);
     }
 
@@ -43,7 +39,7 @@ public sealed class SpiderOSSystem : EntitySystem
         comp.SelectedModules[args.Tier] = args.ModuleId;
         comp.LockedTiers.Add(args.Tier);
 
-        GrantModuleReward(suitUid, args.Tier, args.ModuleId);
+        GrantModule(suitUid, args.Tier, args.ModuleId);
 
         var wearer = _transform.GetParentUid(suitUid);
         if (wearer.IsValid())
@@ -55,7 +51,7 @@ public sealed class SpiderOSSystem : EntitySystem
         UpdateUi(suitUid, comp);
     }
 
-    private void GrantModuleReward(EntityUid suitUid, int tier, string category)
+    private void GrantModule(EntityUid suitUid, int tier, string category)
     {
         switch (category)
         {
@@ -68,13 +64,40 @@ public sealed class SpiderOSSystem : EntitySystem
                     case 2:
                         EnsureComp<NinjaScannerComponent>(suitUid);
                         break;
+                    case 5:
+                        EnsureComp<NinjaSpiritFormComponent>(suitUid);
+                        break;
                 }
                 break;
 
             case "Snake":
+                switch (tier)
+                {
+                    case 1:
+                        EnsureComp<NinjaJohyoAbilityComponent>(suitUid);
+                        break;
+                    case 2:
+                        EnsureComp<NinjaHealingCocktailAbilityComponent>(suitUid);
+                        break;
+                    case 3:
+                        EnsureComp<NinjaEmergencyTeleportComponent>(suitUid);
+                        break;
+                }
                 break;
 
             case "Steel":
+                switch (tier)
+                {
+                    case 1:
+                        EnsureComp<NinjaShurikenAbilityComponent>(suitUid);
+                        break;
+                    case 2:
+                        EnsureComp<NinjaAdrenalAbilityComponent>(suitUid);
+                        break;
+                    case 3:
+                        EnsureComp<NinjaEmpAbilityComponent>(suitUid);
+                        break;
+                }
                 break;
         }
     }

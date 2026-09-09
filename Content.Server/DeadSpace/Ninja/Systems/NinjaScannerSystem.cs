@@ -1,30 +1,38 @@
-using Content.Server.Humanoid;
-using Content.Shared.DeadSpace.Ninja.Components;
-using Content.Shared.Popups;
+using System;
+using System.Collections.Generic;
 using Content.Shared.Actions;
-using Content.Shared.Humanoid;
-using Content.Shared.Humanoid.Markings;
-using Content.Shared.NameModifier.EntitySystems;
-using Content.Shared.Inventory;
-using Content.Shared.Inventory.Events;
 using Content.Shared.Clothing.Components;
 using Content.Shared.Clothing.EntitySystems;
-using Robust.Server.GameObjects;
+using Content.Shared.Cloning;
+using Content.Shared.DeadSpace.Ninja.Components;
 using Content.Shared.DeadSpace.Ninja.Systems;
+using Content.Shared.Humanoid;
+using Content.Shared.IdentityManagement;
+using Content.Shared.Inventory;
+using Content.Shared.Popups;
+using Robust.Server.GameObjects;
+using Robust.Shared.Map;
+using Robust.Shared.Prototypes;
+using Robust.Shared.Serialization.Manager;
 
 namespace Content.Server.DeadSpace.Ninja.Systems;
 
 public sealed class NinjaScannerSystem : EntitySystem
 {
-    [Dependency] private readonly HumanoidAppearanceSystem _humanoid = default!;
+    [Dependency] private readonly SharedHumanoidAppearanceSystem _humanoidAppearance = default!;
+    [Dependency] private readonly SharedCloningSystem _cloning = default!;
+    [Dependency] private readonly IdentitySystem _identity = default!;
+    [Dependency] private readonly IPrototypeManager _prototype = default!;
     [Dependency] private readonly SharedActionsSystem _actions = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly MetaDataSystem _metaData = default!;
-    [Dependency] private readonly NameModifierSystem _nameMod = default!;
     [Dependency] private readonly UserInterfaceSystem _ui = default!;
     [Dependency] private readonly InventorySystem _inventory = default!;
     [Dependency] private readonly SharedChameleonClothingSystem _chameleon = default!;
     [Dependency] private readonly SharedSpaceNinjaSystem _ninja = default!;
+    [Dependency] private readonly ISerializationManager _serialization = default!;
+
+    private readonly Dictionary<EntityUid, EntityUid> _originalIdentities = new();
 
     public override void Initialize()
     {
@@ -35,7 +43,7 @@ public sealed class NinjaScannerSystem : EntitySystem
         SubscribeLocalEvent<NinjaScannerComponent, NinjaOpenScannerActionEvent>(OnOpenUi);
         SubscribeLocalEvent<NinjaScannerComponent, NinjaApplyDisguiseMessage>(OnApplyDisguise);
         SubscribeLocalEvent<NinjaScannerComponent, NinjaResetDisguiseMessage>(OnResetDisguise);
-        SubscribeLocalEvent<NinjaScannerComponent, GotUnequippedEvent>(OnUnequipped);
+        SubscribeLocalEvent<NinjaScannerComponent, ComponentShutdown>(OnShutdown);
     }
 
     private void OnMapInit(Entity<NinjaScannerComponent> ent, ref MapInitEvent args)
@@ -44,6 +52,15 @@ public sealed class NinjaScannerSystem : EntitySystem
         _actions.AddAction(uid, ref comp.ScanActionEntity, comp.ScanAction);
         _actions.AddAction(uid, ref comp.OpenUiActionEntity, comp.OpenUiAction);
         Dirty(uid, comp);
+    }
+
+    private void OnShutdown(Entity<NinjaScannerComponent> ent, ref ComponentShutdown args)
+    {
+        var performer = Transform(ent.Owner).ParentUid;
+        if (performer.IsValid() && _originalIdentities.Remove(performer, out var original))
+        {
+            QueueDel(original);
+        }
     }
 
     private void OnGetActions(Entity<NinjaScannerComponent> ent, ref GetItemActionsEvent args)
@@ -119,10 +136,7 @@ public sealed class NinjaScannerSystem : EntitySystem
         var performer = args.Actor;
         var target = GetEntity(args.Target);
 
-        if (!Exists(target))
-            return;
-
-        if (!ent.Comp.ScannedTargets.Exists(d => GetEntity(d.Target) == target))
+        if (!target.IsValid() || !Exists(target))
             return;
 
         ApplyDisguise(ent, target, performer);
@@ -137,37 +151,29 @@ public sealed class NinjaScannerSystem : EntitySystem
         RevertDisguise(ent, performer);
     }
 
-    private void OnUnequipped(Entity<NinjaScannerComponent> ent, ref GotUnequippedEvent args)
+    private CloningSettingsPrototype? GetCloningSettings()
     {
-        if (!ent.Comp.IsDisguised)
-            return;
+        if (_prototype.TryIndex<CloningSettingsPrototype>("Changeling", out var settings))
+            return settings;
 
-        RevertDisguise(ent, args.Equipee);
+        if (_prototype.TryIndex<CloningSettingsPrototype>("Cloning", out var fallback))
+            return fallback;
+
+        return null;
     }
 
     private void ApplyDisguise(Entity<NinjaScannerComponent> ent, EntityUid target, EntityUid performer)
     {
         var comp = ent.Comp;
+        var settings = GetCloningSettings();
 
         if (!comp.IsDisguised)
         {
-            SaveOriginalAppearance(performer, comp);
+            SaveOriginalAppearance(performer, settings);
             comp.IsDisguised = true;
         }
 
-        if (TryComp<HumanoidAppearanceComponent>(target, out var targetHumanoid) && HasComp<HumanoidAppearanceComponent>(performer))
-        {
-            _humanoid.CloneAppearance(target, performer);
-
-            if (HasComp<InventoryComponent>(performer))
-            {
-                _inventory.SetInventorySpecies(performer, targetHumanoid.Species);
-            }
-        }
-
-        var targetName = _nameMod.GetBaseName(target);
-        _metaData.SetEntityName(performer, targetName);
-
+        CopyFullIdentity(target, performer, settings);
         CopyChameleonClothing(target, performer);
 
         Dirty(ent);
@@ -176,13 +182,32 @@ public sealed class NinjaScannerSystem : EntitySystem
         _popup.PopupEntity(Loc.GetString("ninja-scanner-disguise-success", ("target", MetaData(target).EntityName)), performer, performer);
     }
 
+    private void SaveOriginalAppearance(EntityUid performer, CloningSettingsPrototype? settings)
+    {
+        if (_originalIdentities.ContainsKey(performer))
+            return;
+
+        var original = Spawn(null, MapCoordinates.Nullspace);
+
+        CopyFullIdentity(performer, original, settings);
+
+        _originalIdentities[performer] = original;
+    }
+
     private void RevertDisguise(Entity<NinjaScannerComponent> ent, EntityUid performer)
     {
         var comp = ent.Comp;
         if (!comp.IsDisguised)
             return;
 
-        RestoreOriginalAppearance(performer, comp);
+        var settings = GetCloningSettings();
+
+        if (_originalIdentities.Remove(performer, out var original) && Exists(original))
+        {
+            CopyFullIdentity(original, performer, settings);
+            QueueDel(original);
+        }
+
         ResetChameleonClothing(performer);
         comp.IsDisguised = false;
         Dirty(ent);
@@ -190,70 +215,83 @@ public sealed class NinjaScannerSystem : EntitySystem
         _popup.PopupEntity(Loc.GetString("ninja-scanner-disguise-reverted"), performer, performer);
     }
 
-    private void SaveOriginalAppearance(EntityUid performer, NinjaScannerComponent comp)
+    private void CopyFullIdentity(EntityUid source, EntityUid target, CloningSettingsPrototype? settings)
     {
-        comp.OriginalName = _nameMod.GetBaseName(performer);
-
-        if (TryComp<HumanoidAppearanceComponent>(performer, out var humanoid))
+        if (HasComp<HumanoidAppearanceComponent>(source))
         {
-            comp.OriginalSpecies = humanoid.Species;
-            comp.OriginalMarkings = new MarkingSet(humanoid.MarkingSet);
-            comp.OriginalSkinColor = humanoid.SkinColor;
-            comp.OriginalEyeColor = humanoid.EyeColor;
-            comp.OriginalAge = humanoid.Age;
-            comp.OriginalSex = humanoid.Sex;
-            comp.OriginalGender = humanoid.Gender;
-            comp.OriginalCustomBaseLayers = new(humanoid.CustomBaseLayers);
-            comp.OriginalVoice = humanoid.Voice;
-            comp.OriginalSpeakerColor = humanoid.SpeakerColor;
+            EnsureComp<HumanoidAppearanceComponent>(target);
+            _humanoidAppearance.CloneAppearance(source, target);
+        }
+
+        if (settings != null)
+        {
+            _cloning.CloneComponents(source, target, settings);
+
+            if (settings.CopyStatusEffects)
+            {
+                _cloning.CopyStatusEffects(
+                    source,
+                    target,
+                    settings.StatusEffectWhitelist,
+                    settings.StatusEffectBlacklist);
+            }
+        }
+
+        _metaData.SetEntityName(target, Name(source), raiseEvents: false);
+        _metaData.SetEntityDescription(target, Description(source));
+        _identity.QueueIdentityUpdate(target);
+
+        if (TryComp<HumanoidAppearanceComponent>(source, out var sourceHumanoid) && HasComp<InventoryComponent>(target))
+        {
+            _inventory.SetInventorySpecies(target, sourceHumanoid.Species);
+        }
+
+        CopyExtraIdentityComponents(source, target);
+    }
+
+    private void CopyExtraIdentityComponents(EntityUid source, EntityUid target)
+    {
+        var targetComps = new List<IComponent>(EntityManager.GetComponents(target));
+        foreach (var comp in targetComps)
+        {
+            var name = comp.GetType().Name;
+            if (IsIdentityComponent(name) && !HasComponentOfType(source, comp.GetType()))
+            {
+                EntityManager.RemoveComponent(target, comp);
+            }
+        }
+
+        foreach (var comp in EntityManager.GetComponents(source))
+        {
+            var name = comp.GetType().Name;
+            if (IsIdentityComponent(name))
+            {
+                if (_serialization.CreateCopy(comp, notNullableOverride: true) is Component copied)
+                {
+                    EntityManager.AddComponent(target, copied, overwrite: true);
+                }
+            }
         }
     }
 
-    private void RestoreOriginalAppearance(EntityUid performer, NinjaScannerComponent comp)
+    private static bool IsIdentityComponent(string name)
     {
-        if (comp.OriginalName != null)
-            _metaData.SetEntityName(performer, comp.OriginalName);
+        return name.Contains("TTS") ||
+               name.Contains("TypingIndicator") ||
+               name.Contains("Voice") ||
+               name.Contains("Grammar") ||
+               name.Contains("Speech") ||
+               name.Contains("Dna");
+    }
 
-        if (TryComp<HumanoidAppearanceComponent>(performer, out var humanoid))
+    private bool HasComponentOfType(EntityUid entity, Type type)
+    {
+        foreach (var comp in EntityManager.GetComponents(entity))
         {
-            if (comp.OriginalSpecies != null)
-            {
-                _humanoid.SetSpecies(performer, comp.OriginalSpecies, humanoid: humanoid);
-
-                if (HasComp<InventoryComponent>(performer))
-                    _inventory.SetInventorySpecies(performer, comp.OriginalSpecies);
-            }
-
-            if (comp.OriginalSkinColor.HasValue)
-                _humanoid.SetSkinColor(performer, comp.OriginalSkinColor.Value, humanoid: humanoid);
-
-            if (comp.OriginalEyeColor.HasValue)
-                humanoid.EyeColor = comp.OriginalEyeColor.Value;
-
-            if (comp.OriginalAge.HasValue)
-                humanoid.Age = comp.OriginalAge.Value;
-
-            if (comp.OriginalSex.HasValue)
-                _humanoid.SetSex(performer, comp.OriginalSex.Value, humanoid: humanoid);
-
-            if (comp.OriginalGender.HasValue)
-                _humanoid.SetGender((performer, humanoid), comp.OriginalGender.Value);
-
-            if (comp.OriginalCustomBaseLayers != null)
-                humanoid.CustomBaseLayers = new(comp.OriginalCustomBaseLayers);
-
-            if (comp.OriginalVoice != null)
-                humanoid.Voice = comp.OriginalVoice.Value;
-
-            if (comp.OriginalSpeakerColor.HasValue)
-                humanoid.SpeakerColor = comp.OriginalSpeakerColor.Value;
-
-            if (comp.OriginalMarkings != null)
-            {
-                humanoid.MarkingSet = new MarkingSet(comp.OriginalMarkings);
-                Dirty(performer, humanoid);
-            }
+            if (comp.GetType() == type)
+                return true;
         }
+        return false;
     }
 
     private void CopyChameleonClothing(EntityUid target, EntityUid performer)
