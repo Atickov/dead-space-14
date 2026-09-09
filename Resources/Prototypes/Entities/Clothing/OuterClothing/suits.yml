@@ -170,13 +170,12 @@
         Heat: 0.6
   - type: StaminaResistance #DS14
     damageCoefficient: 0.5
-  # phase cloak
-  - type: NinjaCloak #DS14
   - type: Appearance #DS14
   # core ninja suit stuff
   - type: NinjaSuit
   #DS14 start
   - type: SpiderOS
+    skills: SpiderOS
   - type: UserInterface
     interfaces: 
       enum.SpiderOSUiKey.Key:
@@ -188,16 +187,6 @@
   - type: SelfHealthAnalyzer
   - type: HealthAnalyzer
   - type: AutoDust
-  - type: NinjaSmokeAbility
-    spreadAmount: 10
-    spreadAmountAutoMode: 5
-  - type: NinjaEmpAbility
-  - type: NinjaSuitActions
-    actions: 
-    - ToggleNinjaShurikenAbility
-    - ToggleNinjaJohyoAbility
-    - ActionNinjaAdrenal
-    - ActionNinjaHealingCocktail
   - type: NinjaSuitRefill
     actionMaterials:
       ActionNinjaHealingCocktail:
@@ -214,12 +203,9 @@
     heatRate: 5
     coolRate: 10
     effectsThreshold: 50 
-  - type: NinjaScanner
   - type: ChameleonClothing
     slot: outerclothing
     default: ClothingOuterSuitSpaceNinja
-  - type: NinjaSpiritForm
-  - type: NinjaEmergencyTeleport
   - type: NinjaAppearance
   - type: NinjaAppearanceItem
   #DS14 end
@@ -244,6 +230,9 @@
   - type: HideLayerClothing
     slots:
     - Tail
+  - type: MultiClothing
+    equipment: 
+      neck: ClothingNeckScarfNinja
 
 - type: entity
   parent: ClothingOuterBase

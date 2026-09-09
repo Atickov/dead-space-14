@@ -1,9 +1,12 @@
+using System.Diagnostics.CodeAnalysis;
+using Content.Shared.Actions.Components;
 using Content.Shared.DeadSpace.Ninja.Components;
 using Content.Shared.Interaction;
 using Content.Shared.Charges.Systems;
 using Content.Shared.Charges.Components;
 using Content.Shared.Stacks;
 using Content.Shared.Popups;
+using Robust.Shared.Prototypes;
 
 namespace Content.Server.DeadSpace.Ninja.Systems;
 
@@ -29,27 +32,12 @@ public sealed class NinjaSuitRefillSystem : EntitySystem
         if (!TryComp<StackComponent>(args.Used, out var stack))
             return;
 
-        if (!TryComp<NinjaSuitActionsComponent>(ent, out var suitActions))
-            return;
-
         foreach (var (actionProtoId, cost) in ent.Comp.ActionMaterials)
         {
             if (stack.StackTypeId != cost.Stack)
                 continue;
 
-            EntityUid? actionUid = null;
-            for (var i = 0; i < suitActions.Actions.Count; i++)
-            {
-                if (suitActions.Actions[i] != actionProtoId)
-                    continue;
-
-                if (i < suitActions.ActionEntities.Count)
-                    actionUid = suitActions.ActionEntities[i];
-
-                break;
-            }
-
-            if (actionUid == null)
+            if (!TryFindAction(ent.Owner, actionProtoId, out var actionUid))
                 continue;
 
             if (!TryComp<LimitedChargesComponent>(actionUid, out var charges))
@@ -64,10 +52,28 @@ public sealed class NinjaSuitRefillSystem : EntitySystem
             if (!_stack.TryUse(args.Used, cost.Amount))
                 continue;
 
-            _charges.AddCharges((actionUid.Value, charges), 1);
-            _popup.PopupEntity(Loc.GetString("ninja-action-refill", ("action", MetaData(actionUid.Value).EntityName)), args.User, args.User, PopupType.Small);
+            _charges.AddCharges((actionUid, charges), 1);
+            _popup.PopupEntity(Loc.GetString("ninja-action-refill", ("action", MetaData(actionUid).EntityName)), args.User, args.User, PopupType.Small);
             args.Handled = true;
             break;
         }
+    }
+
+    private bool TryFindAction(EntityUid suitUid, EntProtoId actionProto, [NotNullWhen(true)] out EntityUid actionUid)
+    {
+        actionUid = default;
+        if (!TryComp<ActionsContainerComponent>(suitUid, out var container))
+            return false;
+
+        foreach (var contained in container.Container.ContainedEntities)
+        {
+            if (MetaData(contained).EntityPrototype?.ID == actionProto.Id)
+            {
+                actionUid = contained;
+                return true;
+            }
+        }
+
+        return false;
     }
 }

@@ -13,7 +13,6 @@
     jumpsuit: ClothingUniformJumpsuitNinja
     back: ADTClothingBackpackSatchelninja
     mask: ClothingMaskNinja
-    neck: ClothingNeckScarfNinja #DS14
     head: ClothingHeadHelmetSpaceNinja
     eyes: ClothingEyesVisorNinja
     gloves: ClothingHandsGlovesSpaceNinja
