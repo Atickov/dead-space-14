@@ -64,8 +64,11 @@
     {
       "name": "cheminjector"
     },
-	{
+	  {
       "name": "scanner"
+    },
+    {
+      "name": "nullaction"
     }
   ]
 }

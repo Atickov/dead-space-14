@@ -1,7 +1,5 @@
-using Content.Shared.Actions;
 using Content.Shared.DeadSpace.Ninja.Systems;
 using Robust.Shared.GameStates;
-using Robust.Shared.Prototypes;
 
 namespace Content.Shared.DeadSpace.Ninja.Components;
 
@@ -43,30 +41,8 @@ public sealed partial class NinjaAppearanceComponent : Component
     public NinjaColorway Colorway = NinjaColorway.Green;
 
     [DataField, AutoNetworkedField]
-    public bool ScarfShown = true;
+    public bool ScarfShown = false;
 
     [DataField, AutoNetworkedField]
     public bool HelmetShown = true;
-
-    [DataField]
-    public EntProtoId CycleColorAction = "ActionNinjaCycleColor";
-
-    [DataField]
-    public EntProtoId ToggleScarfAction = "ActionNinjaToggleScarf";
-
-    [DataField]
-    public EntProtoId ToggleHelmetAction = "ActionNinjaToggleHelmet";
-
-    [DataField, AutoNetworkedField]
-    public EntityUid? CycleColorActionEntity;
-
-    [DataField, AutoNetworkedField]
-    public EntityUid? ToggleScarfActionEntity;
-
-    [DataField, AutoNetworkedField]
-    public EntityUid? ToggleHelmetActionEntity;
 }
-
-public sealed partial class CycleNinjaColorEvent : InstantActionEvent;
-public sealed partial class ToggleNinjaScarfEvent : InstantActionEvent;
-public sealed partial class ToggleNinjaHelmetEvent : InstantActionEvent;
