@@ -323,6 +323,9 @@
       - type: NpcFactionMember
         factions:
         - Ninja ## ds-14
+      - type: AutoImplant
+        implants:
+        - DeathAcidifierImplant
       - type: RandomMetadata
         nameSegments:
         - NamesNinjaTitle

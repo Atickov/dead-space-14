@@ -195,7 +195,6 @@
     shape:
     - 0,0,0,3
   - type: EnergyKatana
-  - type: NinjaAppearanceItem
   # DS14-start
   - type: Parry
     parryableWeapons:
