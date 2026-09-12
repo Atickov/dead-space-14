@@ -21482,6 +21482,1485 @@ entities:
       accessListsOriginal: []
   - uid: 501
     components:
+    - type: Transform
+      rot: 1.5707963267948966 rad
+      pos: 38.5,-155.5
+      parent: 2
+    - type: AccessReader
+      accessListsOriginal: []
+  - uid: 502
+    components:
+    - type: Transform
+      rot: 1.5707963267948966 rad
+      pos: 40.5,-155.5
+      parent: 2
+    - type: AccessReader
+      accessListsOriginal: []
+  - uid: 503
+    components:
+    - type: Transform
+      rot: 1.5707963267948966 rad
+      pos: 42.5,-149.5
+      parent: 2
+    - type: AccessReader
+      accessListsOriginal: []
+  - uid: 504
+    components:
+    - type: Transform
+      rot: -1.5707963267948966 rad
+      pos: 46.5,-83.5
+      parent: 2
+  - uid: 505
+    components:
+    - type: Transform
+      rot: -1.5707963267948966 rad
+      pos: 46.5,-79.5
+      parent: 2
+  - uid: 506
+    components:
+    - type: Transform
+      rot: 1.5707963267948966 rad
+      pos: -15.5,-135.5
+      parent: 2
+  - uid: 507
+    components:
+    - type: Transform
+      rot: 1.5707963267948966 rad
+      pos: -17.5,-135.5
+      parent: 2
+  - uid: 508
+    components:
+    - type: MetaData
+      name: туалет
+    - type: Transform
+      rot: 1.5707963267948966 rad
+      pos: -14.5,-137.5
+      parent: 2
+    - type: AccessReader
+      accessListsOriginal: []
+- proto: AirlockChemistryGlassLocked
+  entities:
+  - uid: 509
+    components:
+    - type: MetaData
+      name: химическая лаборатория
+    - type: Transform
+      pos: -0.5,-68.5
+      parent: 2
+    - type: AccessReader
+      accessListsOriginal: []
+      access:
+      - - Chemistry
+  - uid: 510
+    components:
+    - type: MetaData
+      name: химическая лаборатория
+    - type: Transform
+      rot: -1.5707963267948966 rad
+      pos: 19.5,-155.5
+      parent: 2
+    - type: AccessReader
+      accessListsOriginal: []
+      access:
+      - - Chemistry
+  - uid: 511
+    components:
+    - type: Transform
+      rot: -1.5707963267948966 rad
+      pos: 41.5,-109.5
+      parent: 2
+- proto: AirlockChemistryLocked
+  entities:
+  - uid: 512
+    components:
+    - type: MetaData
+      name: химическая лаборатория
+    - type: Transform
+      pos: 21.5,-154.5
+      parent: 2
+    - type: AccessReader
+      accessListsOriginal: []
+      access:
+      - - Chemistry
+- proto: AirlockChiefEngineerLocked
+  entities:
+  - uid: 513
+    components:
+    - type: MetaData
+      name: каюта Старшего инженера
+    - type: Transform
+      pos: -12.5,-105.5
+      parent: 2
+    - type: AccessReader
+      accessListsOriginal: []
+  - uid: 514
+    components:
+    - type: Transform
+      pos: -10.5,-107.5
+      parent: 2
+    - type: AccessReader
+      accessListsOriginal: []
+- proto: AirlockEngineering
+  entities:
+  - uid: 515
+    components:
+    - type: Transform
+      rot: 3.141592653589793 rad
+      pos: 4.5,-161.5
+      parent: 2
+    - type: AccessReader
+      accessListsOriginal: []
+- proto: AirlockEngineeringGlassLocked
+  entities:
+  - uid: 516
+    components:
+    - type: MetaData
+      name: зона подготовки техно-обслуживающего персонала
+    - type: Transform
+      rot: 3.141592653589793 rad
+      pos: -15.5,-97.5
+      parent: 2
+    - type: AccessReader
+      accessListsOriginal: []
+  - uid: 517
+    components:
+    - type: Transform
+      rot: 3.141592653589793 rad
+      pos: -6.5,-97.5
+      parent: 2
+  - uid: 518
+    components:
+    - type: Transform
+      rot: 3.141592653589793 rad
+      pos: -9.5,-91.5
+      parent: 2
+    - type: AccessReader
+      accessListsOriginal: []
+  - uid: 519
+    components:
+    - type: Transform
+      rot: 3.141592653589793 rad
+      pos: -8.5,-97.5
+      parent: 2
+    - type: AccessReader
+      accessListsOriginal: []
+  - uid: 520
+    components:
+    - type: MetaData
+      name: склад инженерного отдела
+    - type: Transform
+      rot: 3.141592653589793 rad
+      pos: -3.5,-102.5
+      parent: 2
+    - type: AccessReader
+      accessListsOriginal: []
+  - uid: 521
+    components:
+    - type: Transform
+      rot: 3.141592653589793 rad
+      pos: -10.5,-94.5
+      parent: 2
+    - type: AccessReader
+      accessListsOriginal: []
+  - uid: 522
+    components:
+    - type: MetaData
+      name: инженерный отсек
+    - type: Transform
+      rot: 3.141592653589793 rad
+      pos: -4.5,-94.5
+      parent: 2
+    - type: AccessReader
+      accessListsOriginal: []
+  - uid: 523
+    components:
+    - type: MetaData
+      name: инженерный отсек
+    - type: Transform
+      rot: 3.141592653589793 rad
+      pos: -4.5,-96.5
+      parent: 2
+    - type: AccessReader
+      accessListsOriginal: []
+  - uid: 524
+    components:
+    - type: Transform
+      rot: 3.141592653589793 rad
+      pos: -10.5,-96.5
+      parent: 2
+    - type: AccessReader
+      accessListsOriginal: []
+- proto: AirlockEngineeringLocked
+  entities:
+  - uid: 525
+    components:
+    - type: Transform
+      rot: 1.5707963267948966 rad
+      pos: -13.5,-58.5
+      parent: 2
+  - uid: 526
+    components:
+    - type: Transform
+      rot: 3.141592653589793 rad
+      pos: 21.5,-86.5
+      parent: 2
+  - uid: 527
+    components:
+    - type: MetaData
+      name: склад материалов
+    - type: Transform
+      rot: 3.141592653589793 rad
+      pos: -12.5,-91.5
+      parent: 2
+    - type: AccessReader
+      accessListsOriginal: []
+  - uid: 528
+    components:
+    - type: Transform
+      rot: 3.141592653589793 rad
+      pos: 23.5,-123.5
+      parent: 2
+  - uid: 529
+    components:
+    - type: Transform
+      pos: 6.5,-152.5
+      parent: 2
+  - uid: 530
+    components:
+    - type: Transform
+      pos: 37.5,-57.5
+      parent: 2
+- proto: AirlockExternal
+  entities:
+  - uid: 531
+    components:
+    - type: Transform
+      rot: 1.5707963267948966 rad
+      pos: 5.5,0.5
+      parent: 2
+  - uid: 532
+    components:
+    - type: Transform
+      rot: 1.5707963267948966 rad
+      pos: 7.5,0.5
+      parent: 2
+  - uid: 533
+    components:
+    - type: Transform
+      rot: 1.5707963267948966 rad
+      pos: 13.5,0.5
+      parent: 2
+    - type: AccessReader
+      accessListsOriginal: []
+  - uid: 534
+    components:
+    - type: Transform
+      rot: 1.5707963267948966 rad
+      pos: 15.5,0.5
+      parent: 2
+  - uid: 535
+    components:
+    - type: Transform
+      rot: 1.5707963267948966 rad
+      pos: 20.5,-18.5
+      parent: 2
+  - uid: 536
+    components:
+    - type: Transform
+      pos: 20.5,-10.5
+      parent: 2
+  - uid: 537
+    components:
+    - type: Transform
+      rot: 1.5707963267948966 rad
+      pos: -2.5,-171.5
+      parent: 2
+    - type: AccessReader
+      accessListsOriginal: []
+  - uid: 538
+    components:
+    - type: Transform
+      rot: 1.5707963267948966 rad
+      pos: -2.5,-162.5
+      parent: 2
+    - type: AccessReader
+      accessListsOriginal: []
+  - uid: 539
+    components:
+    - type: Transform
+      rot: -1.5707963267948966 rad
+      pos: 0.5,-18.5
+      parent: 2
+  - uid: 540
+    components:
+    - type: Transform
+      pos: 0.5,-10.5
+      parent: 2
+  - uid: 541
+    components:
+    - type: Transform
+      rot: 1.5707963267948966 rad
+      pos: 20.5,-14.5
+      parent: 2
+  - uid: 542
+    components:
+    - type: Transform
+      pos: 0.5,-14.5
+      parent: 2
+- proto: AirlockExternalGlassCommandLocked
+  entities:
+  - uid: 543
+    components:
+    - type: Transform
+      rot: 1.5707963267948966 rad
+      pos: 48.5,-125.5
+      parent: 2
+- proto: AirlockExternalGlassShuttleCentcommERTBSAALocked # DS14
+  entities:
+  - uid: 551
+    components:
+    - type: Transform
+      rot: 1.5707963267948966 rad
+      pos: 47.5,-202.5
+      parent: 2
+  - uid: 552
+    components:
+    - type: Transform
+      rot: 1.5707963267948966 rad
+      pos: 47.5,-200.5
+      parent: 2
+  - uid: 553
+    components:
+    - type: Transform
+      rot: 1.5707963267948966 rad
+      pos: 47.5,-198.5
+      parent: 2
+  - uid: 554
+    components:
+    - type: Transform
+      rot: 1.5707963267948966 rad
+      pos: 47.5,-196.5
+      parent: 2
+- proto: AirlockExternalGlassShuttleCentcommERTCburnLocked # DS14
+  entities:
+  - uid: 545
+    components:
+    - type: Transform
+      rot: 1.5707963267948966 rad
+      pos: 27.5,-221.5
+      parent: 2
+  - uid: 547
+    components:
+    - type: Transform
+      rot: 1.5707963267948966 rad
+      pos: 27.5,-223.5
+      parent: 2
+- proto: AirlockExternalGlassShuttleCentcommERTFieldOfficerLocked # DS14
+  entities:
+  - uid: 548
+    components:
+    - type: Transform
+      rot: 1.5707963267948966 rad
+      pos: 50.5,-170.5
+      parent: 2
+  - uid: 549
+    components:
+    - type: Transform
+      rot: 1.5707963267948966 rad
+      pos: 50.5,-168.5
+      parent: 2
+- proto: AirlockExternalGlassShuttleCentcommERTGammaLocked # DS14
+  entities:
+  - uid: 544
+    components:
+    - type: Transform
+      rot: -1.5707963267948966 rad
+      pos: -6.5,-221.5
+      parent: 2
+  - uid: 546
+    components:
+    - type: Transform
+      rot: -1.5707963267948966 rad
+      pos: -6.5,-223.5
+      parent: 2
+- proto: AirlockExternalGlassShuttleCentcommERTOfficialLocked # DS14
+  entities:
+  - uid: 550
+    components:
+    - type: Transform
+      rot: 1.5707963267948966 rad
+      pos: 50.5,-125.5
+      parent: 2
+- proto: AirlockExternalGlassShuttleEmergencyLocked
+  entities:
+  - uid: 555
+    components:
+    - type: Transform
+      rot: 3.141592653589793 rad
+      pos: 5.5,3.5
+      parent: 2
+  - uid: 556
+    components:
+    - type: Transform
+      rot: 3.141592653589793 rad
+      pos: 7.5,3.5
+      parent: 2
+  - uid: 557
+    components:
+    - type: Transform
+      rot: 3.141592653589793 rad
+      pos: 13.5,3.5
+      parent: 2
+    - type: AccessReader
+      accessListsOriginal: []
+  - uid: 558
+    components:
+    - type: Transform
+      rot: 1.5707963267948966 rad
+      pos: 22.5,-10.5
+      parent: 2
+  - uid: 559
+    components:
+    - type: Transform
+      rot: -1.5707963267948966 rad
+      pos: -1.5,-18.5
+      parent: 2
+  - uid: 560
+    components:
+    - type: Transform
+      rot: 3.141592653589793 rad
+      pos: 15.5,3.5
+      parent: 2
+  - uid: 561
+    components:
+    - type: Transform
+      rot: -1.5707963267948966 rad
+      pos: -1.5,-10.5
+      parent: 2
+  - uid: 562
+    components:
+    - type: Transform
+      rot: 1.5707963267948966 rad
+      pos: 22.5,-18.5
+      parent: 2
+  - uid: 563
+    components:
+    - type: Transform
+      rot: 1.5707963267948966 rad
+      pos: 22.5,-14.5
+      parent: 2
+  - uid: 564
+    components:
+    - type: Transform
+      rot: -1.5707963267948966 rad
+      pos: -1.5,-14.5
+      parent: 2
+- proto: AirlockExternalGlassShuttleLocked
+  entities:
+  - uid: 565
+    components:
+    - type: Transform
+      rot: 1.5707963267948966 rad
+      pos: 50.5,-79.5
+      parent: 2
+  - uid: 566
+    components:
+    - type: Transform
+      rot: 1.5707963267948966 rad
+      pos: 50.5,-83.5
+      parent: 2
+  - uid: 567
+    components:
+    - type: Transform
+      rot: 1.5707963267948966 rad
+      pos: 50.5,-66.5
+      parent: 2
+  - uid: 568
+    components:
+    - type: Transform
+      rot: 1.5707963267948966 rad
+      pos: 50.5,-68.5
+      parent: 2
+- proto: AirlockFreezer
+  entities:
+  - uid: 569
+    components:
+    - type: MetaData
+      name: морозильник
+    - type: Transform
+      pos: 6.5,-134.5
+      parent: 2
+    - type: AccessReader
+      accessListsOriginal: []
+- proto: AirlockFreezerKitchenHydroLocked
+  entities:
+  - uid: 570
+    components:
+    - type: Transform
+      rot: -1.5707963267948966 rad
+      pos: -17.5,-49.5
+      parent: 2
+- proto: AirlockFreezerLocked
+  entities:
+  - uid: 571
+    components:
+    - type: Transform
+      rot: -1.5707963267948966 rad
+      pos: -19.5,-51.5
+      parent: 2
+- proto: AirlockGlass
+  entities:
+  - uid: 572
+    components:
+    - type: Transform
+      rot: 3.141592653589793 rad
+      pos: 3.5,-67.5
+      parent: 2
+  - uid: 573
+    components:
+    - type: Transform
+      rot: 3.141592653589793 rad
+      pos: 5.5,-67.5
+      parent: 2
+  - uid: 574
+    components:
+    - type: Transform
+      rot: 3.141592653589793 rad
+      pos: 7.5,-69.5
+      parent: 2
+  - uid: 575
+    components:
+    - type: Transform
+      rot: 3.141592653589793 rad
+      pos: 7.5,-70.5
+      parent: 2
+  - uid: 576
+    components:
+    - type: Transform
+      rot: 3.141592653589793 rad
+      pos: 7.5,-72.5
+      parent: 2
+  - uid: 577
+    components:
+    - type: Transform
+      rot: 3.141592653589793 rad
+      pos: 7.5,-73.5
+      parent: 2
+  - uid: 578
+    components:
+    - type: Transform
+      rot: -1.5707963267948966 rad
+      pos: 5.5,-6.5
+      parent: 2
+  - uid: 579
+    components:
+    - type: Transform
+      rot: -1.5707963267948966 rad
+      pos: 6.5,-6.5
+      parent: 2
+    - type: AccessReader
+      accessListsOriginal: []
+  - uid: 580
+    components:
+    - type: Transform
+      rot: -1.5707963267948966 rad
+      pos: 14.5,-6.5
+      parent: 2
+  - uid: 581
+    components:
+    - type: Transform
+      rot: -1.5707963267948966 rad
+      pos: 15.5,-6.5
+      parent: 2
+    - type: Door
+      secondsUntilStateChange: -504808.88
+      state: Opening
+    - type: DeviceLinkSource
+      lastSignals:
+        DoorStatus: True
+  - uid: 582
+    components:
+    - type: Transform
+      rot: 3.141592653589793 rad
+      pos: 2.5,-22.5
+      parent: 2
+  - uid: 583
+    components:
+    - type: Transform
+      rot: 3.141592653589793 rad
+      pos: 3.5,-22.5
+      parent: 2
+  - uid: 584
+    components:
+    - type: Transform
+      rot: 3.141592653589793 rad
+      pos: 17.5,-22.5
+      parent: 2
+  - uid: 585
+    components:
+    - type: Transform
+      rot: 3.141592653589793 rad
+      pos: 18.5,-22.5
+      parent: 2
+  - uid: 586
+    components:
+    - type: MetaData
+      name: церковь
+    - type: Transform
+      rot: 1.5707963267948966 rad
+      pos: 16.5,-110.5
+      parent: 2
+  - uid: 587
+    components:
+    - type: MetaData
+      name: церковь
+    - type: Transform
+      rot: 1.5707963267948966 rad
+      pos: 16.5,-109.5
+      parent: 2
+  - uid: 588
+    components:
+    - type: MetaData
+      name: церковь
+    - type: Transform
+      rot: 1.5707963267948966 rad
+      pos: 16.5,-111.5
+      parent: 2
+  - uid: 589
+    components:
+    - type: Transform
+      rot: 1.5707963267948966 rad
+      pos: 2.5,-24.5
+      parent: 2
+  - uid: 590
+    components:
+    - type: Transform
+      rot: 1.5707963267948966 rad
+      pos: 3.5,-24.5
+      parent: 2
+  - uid: 591
+    components:
+    - type: Transform
+      rot: 1.5707963267948966 rad
+      pos: 17.5,-24.5
+      parent: 2
+  - uid: 592
+    components:
+    - type: Transform
+      rot: 1.5707963267948966 rad
+      pos: 18.5,-24.5
+      parent: 2
+  - uid: 593
+    components:
+    - type: Transform
+      rot: -1.5707963267948966 rad
+      pos: 11.5,-87.5
+      parent: 2
+  - uid: 594
+    components:
+    - type: Transform
+      pos: 3.5,-62.5
+      parent: 2
+  - uid: 595
+    components:
+    - type: Transform
+      pos: 4.5,-62.5
+      parent: 2
+  - uid: 596
+    components:
+    - type: Transform
+      pos: 5.5,-62.5
+      parent: 2
+  - uid: 597
+    components:
+    - type: Transform
+      pos: 15.5,-62.5
+      parent: 2
+  - uid: 598
+    components:
+    - type: Transform
+      pos: 16.5,-62.5
+      parent: 2
+  - uid: 599
+    components:
+    - type: Transform
+      pos: 17.5,-62.5
+      parent: 2
+  - uid: 600
+    components:
+    - type: Transform
+      pos: 13.5,-70.5
+      parent: 2
+  - uid: 601
+    components:
+    - type: Transform
+      pos: 13.5,-71.5
+      parent: 2
+  - uid: 602
+    components:
+    - type: Transform
+      pos: 15.5,-67.5
+      parent: 2
+  - uid: 603
+    components:
+    - type: Transform
+      pos: 16.5,-67.5
+      parent: 2
+  - uid: 604
+    components:
+    - type: Transform
+      pos: 17.5,-67.5
+      parent: 2
+  - uid: 605
+    components:
+    - type: Transform
+      pos: 13.5,-72.5
+      parent: 2
+  - uid: 606
+    components:
+    - type: Transform
+      rot: -1.5707963267948966 rad
+      pos: 10.5,-87.5
+      parent: 2
+  - uid: 607
+    components:
+    - type: Transform
+      rot: -1.5707963267948966 rad
+      pos: 9.5,-87.5
+      parent: 2
+  - uid: 608
+    components:
+    - type: Transform
+      pos: 11.5,-104.5
+      parent: 2
+  - uid: 609
+    components:
+    - type: Transform
+      pos: 9.5,-104.5
+      parent: 2
+  - uid: 610
+    components:
+    - type: Transform
+      pos: 10.5,-104.5
+      parent: 2
+- proto: AirlockGlassSODLocked
+  entities:
+  - uid: 611
+    components:
+    - type: MetaData
+      name: операторская Блюспейс Артиллерии
+    - type: Transform
+      pos: 5.5,-170.5
+      parent: 2
+    - type: AccessReader
+      accessListsOriginal: []
+  - uid: 612
+    components:
+    - type: MetaData
+      name: операторская Блюспейс Артиллерии
+    - type: Transform
+      pos: 5.5,-168.5
+      parent: 2
+    - type: AccessReader
+      accessListsOriginal: []
+- proto: AirlockHatch
+  entities:
+  - uid: 613
+    components:
+    - type: Transform
+      rot: -1.5707963267948966 rad
+      pos: 45.5,-200.5
+      parent: 2
+  - uid: 614
+    components:
+    - type: Transform
+      rot: -1.5707963267948966 rad
+      pos: 45.5,-202.5
+      parent: 2
+  - uid: 615
+    components:
+    - type: Transform
+      rot: -1.5707963267948966 rad
+      pos: 45.5,-198.5
+      parent: 2
+  - uid: 616
+    components:
+    - type: Transform
+      rot: -1.5707963267948966 rad
+      pos: 45.5,-196.5
+      parent: 2
+- proto: AirlockHatchBlueShieldLocked
+  entities:
+  - uid: 617
+    components:
+    - type: Transform
+      rot: -1.5707963267948966 rad
+      pos: 41.5,-123.5
+      parent: 2
+  - uid: 618
+    components:
+    - type: Transform
+      rot: -1.5707963267948966 rad
+      pos: 43.5,-123.5
+      parent: 2
+  - uid: 619
+    components:
+    - type: MetaData
+      name: проходная зона Корпуса "Синий Щит"
+    - type: Transform
+      rot: -1.5707963267948966 rad
+      pos: 18.5,-113.5
+      parent: 2
+    - type: AccessReader
+      accessListsOriginal: []
+  - uid: 620
+    components:
+    - type: Transform
+      rot: -1.5707963267948966 rad
+      pos: 30.5,-121.5
+      parent: 2
+  - uid: 621
+    components:
+    - type: MetaData
+      name: личная каюта офицера "Синий Щит"
+    - type: Transform
+      rot: -1.5707963267948966 rad
+      pos: 42.5,-105.5
+      parent: 2
+    - type: AccessReader
+      accessListsOriginal: []
+  - uid: 622
+    components:
+    - type: MetaData
+      name: личная каюта офицера "Синий Щит"
+    - type: Transform
+      rot: -1.5707963267948966 rad
+      pos: 42.5,-101.5
+      parent: 2
+    - type: AccessReader
+      accessListsOriginal: []
+- proto: AirlockHatchCentralCommandLocked
+  entities:
+  - uid: 623
+    components:
+    - type: Transform
+      pos: 30.5,-187.5
+      parent: 2
+  - uid: 624
+    components:
+    - type: Transform
+      pos: 28.5,-187.5
+      parent: 2
+  - uid: 625
+    components:
+    - type: MetaData
+      name: криокапсулы АПБТ
+    - type: Transform
+      pos: 23.5,-193.5
+      parent: 2
+  - uid: 626
+    components:
+    - type: Transform
+      pos: 31.5,-197.5
+      parent: 2
+  - uid: 627
+    components:
+    - type: MetaData
+      name: криокапсулы АПБТ
+    - type: Transform
+      pos: 25.5,-193.5
+      parent: 2
+  - uid: 628
+    components:
+    - type: Transform
+      pos: 31.5,-195.5
+      parent: 2
+  - uid: 629
+    components:
+    - type: Transform
+      pos: 27.5,-195.5
+      parent: 2
+  - uid: 630
+    components:
+    - type: Transform
+      pos: 27.5,-197.5
+      parent: 2
+  - uid: 631
+    components:
+    - type: Transform
+      pos: 21.5,-195.5
+      parent: 2
+  - uid: 632
+    components:
+    - type: Transform
+      pos: 21.5,-197.5
+      parent: 2
+  - uid: 633
+    components:
+    - type: Transform
+      rot: 1.5707963267948966 rad
+      pos: 48.5,-168.5
+      parent: 2
+  - uid: 634
+    components:
+    - type: Transform
+      rot: 1.5707963267948966 rad
+      pos: 48.5,-170.5
+      parent: 2
+  - uid: 635
+    components:
+    - type: Transform
+      pos: 38.5,-171.5
+      parent: 2
+  - uid: 636
+    components:
+    - type: Transform
+      pos: 40.5,-171.5
+      parent: 2
+  - uid: 637
+    components:
+    - type: Transform
+      pos: 38.5,-178.5
+      parent: 2
+  - uid: 638
+    components:
+    - type: Transform
+      pos: 40.5,-178.5
+      parent: 2
+  - uid: 639
+    components:
+    - type: MetaData
+      name: штаб Корпуса "Синий Щит"
+    - type: Transform
+      pos: 41.5,-127.5
+      parent: 2
+    - type: AccessReader
+      accessListsOriginal: []
+  - uid: 640
+    components:
+    - type: MetaData
+      name: штаб Корпуса "Синий Щит"
+    - type: Transform
+      pos: 43.5,-127.5
+      parent: 2
+    - type: AccessReader
+      accessListsOriginal: []
+  - uid: 641
+    components:
+    - type: Transform
+      pos: 35.5,-196.5
+      parent: 2
+  - uid: 642
+    components:
+    - type: Transform
+      pos: 35.5,-198.5
+      parent: 2
+  - uid: 643
+    components:
+    - type: Transform
+      pos: 35.5,-200.5
+      parent: 2
+  - uid: 644
+    components:
+    - type: Transform
+      pos: 35.5,-202.5
+      parent: 2
+  - uid: 645
+    components:
+    - type: MetaData
+      name: каюта начальника штаба Корпуса "Синий Щит"
+    - type: Transform
+      rot: -1.5707963267948966 rad
+      pos: 44.5,-99.5
+      parent: 2
+    - type: AccessReader
+      accessListsOriginal: []
+  - uid: 646
+    components:
+    - type: Transform
+      rot: -1.5707963267948966 rad
+      pos: 42.5,-98.5
+      parent: 2
+- proto: AirlockHatchSODLocked
+  entities:
+  - uid: 647
+    components:
+    - type: MetaData
+      name: каюта для высшего чина представителя АПБТ
+    - type: Transform
+      pos: 18.5,-203.5
+      parent: 2
+    - type: AccessReader
+      accessListsOriginal: []
+  - uid: 648
+    components:
+    - type: Transform
+      rot: 1.5707963267948966 rad
+      pos: -4.5,-194.5
+      parent: 2
+  - uid: 649
+    components:
+    - type: Transform
+      rot: 1.5707963267948966 rad
+      pos: -10.5,-194.5
+      parent: 2
+  - uid: 650
+    components:
+    - type: Transform
+      pos: 45.5,-107.5
+      parent: 2
+  - uid: 651
+    components:
+    - type: Transform
+      pos: 43.5,-107.5
+      parent: 2
+  - uid: 652
+    components:
+    - type: Transform
+      pos: 33.5,-190.5
+      parent: 2
+- proto: AirlockHatchTexSODLocked
+  entities:
+  - uid: 653
+    components:
+    - type: Transform
+      rot: 1.5707963267948966 rad
+      pos: -5.5,-190.5
+      parent: 2
+  - uid: 654
+    components:
+    - type: Transform
+      rot: 1.5707963267948966 rad
+      pos: -9.5,-190.5
+      parent: 2
+- proto: AirlockHydroGlassLocked
+  entities:
+  - uid: 655
+    components:
+    - type: MetaData
+      name: гидропоника
+    - type: Transform
+      rot: 3.141592653589793 rad
+      pos: 19.5,-54.5
+      parent: 2
+    - type: AccessReader
+      accessListsOriginal: []
+  - uid: 656
+    components:
+    - type: MetaData
+      name: гидропоника
+    - type: Transform
+      rot: 3.141592653589793 rad
+      pos: 19.5,-56.5
+      parent: 2
+    - type: AccessReader
+      accessListsOriginal: []
+  - uid: 657
+    components:
+    - type: MetaData
+      name: гидропоника
+    - type: Transform
+      pos: 22.5,-53.5
+      parent: 2
+    - type: AccessReader
+      accessListsOriginal: []
+- proto: AirlockJanitorLocked
+  entities:
+  - uid: 658
+    components:
+    - type: MetaData
+      name: уборщик
+    - type: Transform
+      rot: 1.5707963267948966 rad
+      pos: -7.5,-60.5
+      parent: 2
+    - type: AccessReader
+      accessListsOriginal: []
+  - uid: 659
+    components:
+    - type: Transform
+      pos: -5.5,-61.5
+      parent: 2
+- proto: AirlockKitchenGlassLocked
+  entities:
+  - uid: 660
+    components:
+    - type: Transform
+      pos: 1.5,-132.5
+      parent: 2
+- proto: AirlockLawyerGlassLocked
+  entities:
+  - uid: 661
+    components:
+    - type: MetaData
+      name: офисы юристов
+    - type: Transform
+      pos: 30.5,-134.5
+      parent: 2
+    - type: AccessReader
+      accessListsOriginal: []
+  - uid: 662
+    components:
+    - type: MetaData
+      name: кабинет Магистрата
+    - type: Transform
+      pos: 26.5,-134.5
+      parent: 2
+    - type: AccessReader
+      accessListsOriginal: []
+- proto: AirlockMaint
+  entities:
+  - uid: 663
+    components:
+    - type: Transform
+      pos: 36.5,-58.5
+      parent: 2
+    - type: AccessReader
+      accessListsOriginal: []
+  - uid: 664
+    components:
+    - type: Transform
+      rot: -1.5707963267948966 rad
+      pos: 33.5,-55.5
+      parent: 2
+- proto: AirlockMaintAtmoLocked
+  entities:
+  - uid: 665
+    components:
+    - type: Transform
+      rot: 1.5707963267948966 rad
+      pos: 26.5,-87.5
+      parent: 2
+  - uid: 666
+    components:
+    - type: Transform
+      pos: 40.5,-42.5
+      parent: 2
+- proto: AirlockMaintBarKitchenLocked
+  entities:
+  - uid: 667
+    components:
+    - type: Transform
+      pos: -13.5,-55.5
+      parent: 2
+    - type: AccessReader
+      accessListsOriginal: []
+- proto: AirlockMaintCargoLocked
+  entities:
+  - uid: 668
+    components:
+    - type: Transform
+      rot: 3.141592653589793 rad
+      pos: 22.5,-85.5
+      parent: 2
+- proto: AirlockMaintChiefEngineerLocked
+  entities:
+  - uid: 669
+    components:
+    - type: Transform
+      rot: 1.5707963267948966 rad
+      pos: -6.5,-40.5
+      parent: 2
+    - type: AccessReader
+      accessListsOriginal: []
+- proto: AirlockMaintEngiLocked
+  entities:
+  - uid: 670
+    components:
+    - type: Transform
+      pos: -12.5,-87.5
+      parent: 2
+    - type: AccessReader
+      accessListsOriginal: []
+  - uid: 671
+    components:
+    - type: Transform
+      pos: -4.5,-87.5
+      parent: 2
+    - type: AccessReader
+      accessListsOriginal: []
+- proto: AirlockMaintJanitorLocked
+  entities:
+  - uid: 672
+    components:
+    - type: Transform
+      pos: -12.5,-65.5
+      parent: 2
+    - type: AccessReader
+      accessListsOriginal: []
+  - uid: 673
+    components:
+    - type: Transform
+      pos: -8.5,-65.5
+      parent: 2
+    - type: AccessReader
+      accessListsOriginal: []
+- proto: AirlockMedical
+  entities:
+  - uid: 674
+    components:
+    - type: Transform
+      pos: 30.5,-156.5
+      parent: 2
+    - type: AccessReader
+      accessListsOriginal: []
+  - uid: 675
+    components:
+    - type: Transform
+      pos: 29.5,-156.5
+      parent: 2
+    - type: AccessReader
+      accessListsOriginal: []
+  - uid: 676
+    components:
+    - type: Transform
+      pos: 26.5,-151.5
+      parent: 2
+    - type: AccessReader
+      accessListsOriginal: []
+  - uid: 677
+    components:
+    - type: Transform
+      pos: 22.5,-150.5
+      parent: 2
+    - type: AccessReader
+      accessListsOriginal: []
+- proto: AirlockMedicalGlass
+  entities:
+  - uid: 678
+    components:
+    - type: Transform
+      rot: 3.141592653589793 rad
+      pos: 1.5,-72.5
+      parent: 2
+    - type: AccessReader
+      accessListsOriginal: []
+  - uid: 679
+    components:
+    - type: Transform
+      rot: 3.141592653589793 rad
+      pos: 1.5,-71.5
+      parent: 2
+    - type: AccessReader
+      accessListsOriginal: []
+  - uid: 680
+    components:
+    - type: Transform
+      rot: 3.141592653589793 rad
+      pos: 1.5,-70.5
+      parent: 2
+    - type: AccessReader
+      accessListsOriginal: []
+  - uid: 681
+    components:
+    - type: MetaData
+      name: комната отдыха медицинского персонала
+    - type: Transform
+      rot: 3.141592653589793 rad
+      pos: -11.5,-71.5
+      parent: 2
+  - uid: 682
+    components:
+    - type: MetaData
+      name: медицинский отдел КСО
+    - type: Transform
+      pos: 13.5,-156.5
+      parent: 2
+    - type: AccessReader
+      accessListsOriginal: []
+  - uid: 683
+    components:
+    - type: MetaData
+      name: медицинский отдел КСО
+    - type: Transform
+      pos: 13.5,-158.5
+      parent: 2
+    - type: AccessReader
+      accessListsOriginal: []
+  - uid: 684
+    components:
+    - type: Transform
+      pos: 20.5,-156.5
+      parent: 2
+    - type: AccessReader
+      accessListsOriginal: []
+  - uid: 685
+    components:
+    - type: Transform
+      pos: 20.5,-158.5
+      parent: 2
+    - type: AccessReader
+      accessListsOriginal: []
+  - uid: 686
+    components:
+    - type: Transform
+      pos: 23.5,-153.5
+      parent: 2
+    - type: AccessReader
+      accessListsOriginal: []
+  - uid: 687
+    components:
+    - type: Transform
+      pos: 25.5,-153.5
+      parent: 2
+    - type: AccessReader
+      accessListsOriginal: []
+- proto: AirlockMedicalGlassLocked
+  entities:
+  - uid: 688
+    components:
+    - type: Transform
+      rot: 1.5707963267948966 rad
+      pos: -5.5,-70.5
+      parent: 2
+  - uid: 689
+    components:
+    - type: MetaData
+      name: коморка парамедика
+    - type: Transform
+      rot: 1.5707963267948966 rad
+      pos: -0.5,-83.5
+      parent: 2
+    - type: AccessReader
+      accessListsOriginal: []
+  - uid: 690
+    components:
+    - type: MetaData
+      name: медицинское хранилище
+    - type: Transform
+      rot: 1.5707963267948966 rad
+      pos: -21.5,-73.5
+      parent: 2
+  - uid: 691
+    components:
+    - type: MetaData
+      name: офис психолога
+    - type: Transform
+      rot: 1.5707963267948966 rad
+      pos: 0.5,-78.5
+      parent: 2
+    - type: AccessReader
+      accessListsOriginal: []
+  - uid: 692
+    components:
+    - type: Transform
+      rot: 1.5707963267948966 rad
+      pos: -5.5,-72.5
+      parent: 2
+  - uid: 693
+    components:
+    - type: Transform
+      rot: 1.5707963267948966 rad
+      pos: -12.5,-75.5
+      parent: 2
+  - uid: 694
+    components:
+    - type: Transform
+      rot: 1.5707963267948966 rad
+      pos: -14.5,-75.5
+      parent: 2
+  - uid: 695
+    components:
+    - type: Transform
+      rot: 1.5707963267948966 rad
+      pos: -5.5,-73.5
+      parent: 2
+- proto: AirlockMedicalLocked
+  entities:
+  - uid: 696
+    components:
+    - type: MetaData
+      name: кабинет психолога
+    - type: Transform
+      rot: 1.5707963267948966 rad
+      pos: 5.5,-80.5
+      parent: 2
+    - type: AccessReader
+      accessListsOriginal: []
+  - uid: 697
+    components:
+    - type: MetaData
+      name: зона клонирования
+    - type: Transform
+      rot: 1.5707963267948966 rad
+      pos: -7.5,-79.5
+      parent: 2
+  - uid: 698
+    components:
+    - type: MetaData
+      name: операционная
+    - type: Transform
+      rot: 1.5707963267948966 rad
+      pos: -19.5,-75.5
+      parent: 2
+  - uid: 699
+    components:
+    - type: MetaData
+      name: операционная
+    - type: Transform
+      rot: 1.5707963267948966 rad
+      pos: -20.5,-79.5
+      parent: 2
+  - uid: 700
+    components:
+    - type: MetaData
+      name: зона клонирования
+    - type: Transform
+      rot: 1.5707963267948966 rad
+      pos: -7.5,-82.5
+      parent: 2
+  - uid: 701
+    components:
+    - type: MetaData
+      name: зона клонирования
+    - type: Transform
+      rot: 1.5707963267948966 rad
+      pos: -4.5,-83.5
+      parent: 2
+- proto: AirlockMedicalMorgueLocked
+  entities:
+  - uid: 702
+    components:
+    - type: MetaData
+      name: морг
+    - type: Transform
+      rot: 1.5707963267948966 rad
+      pos: -9.5,-83.5
+      parent: 2
+- proto: AirlockQuartermasterGlassLocked
+  entities:
+  - uid: 703
+    components:
+    - type: MetaData
+      name: кабинет квартирмейстера
+    - type: Transform
+      pos: 24.5,-67.5
+      parent: 2
+    - type: AccessReader
+      accessListsOriginal: []
+- proto: AirlockQuartermasterLocked
+  entities:
+  - uid: 704
+    components:
+    - type: MetaData
+      name: каюта квартирмейстера
+    - type: Transform
+      pos: 25.5,-63.5
+      parent: 2
+    - type: AccessReader
+      accessListsOriginal: []
+- proto: AirlockSODLocked
+  entities:
+  - uid: 705
+    components:
+    - type: MetaData
+      name: каюта ОСО
+    - type: Transform
+      rot: -1.5707963267948966 rad
+      pos: 21.5,-162.5
+      parent: 2
+  - uid: 706
+    components:
     - type: MetaData
       name: офис Офицера Специальных Операций
     - type: Transform
