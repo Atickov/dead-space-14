@@ -9,12 +9,14 @@ using Robust.Client.UserInterface.Controls;
 using Robust.Client.UserInterface.XAML;
 using Robust.Shared.Utility;
 using System.Numerics;
+using Robust.Client.GameObjects;
 
 namespace Content.Client.DeadSpace.Ninja.UI;
 
 public sealed partial class SpiderOSWindow : FancyWindow
 {
     [Dependency] private readonly IResourceCache _resCache = default!;
+    [Dependency] private readonly IEntitySystemManager _sysMan = default!;
 
     private static readonly string[] Categories = { "Ghost", "Snake", "Steel" };
 
@@ -218,19 +220,16 @@ public sealed partial class SpiderOSWindow : FancyWindow
 
     private bool ApplyIcon(TextureButton button, NinjaSkill skill)
     {
-        var state = PlaceholderIconState;
-        if (skill.Icon is SpriteSpecifier.Rsi rsi && !string.IsNullOrEmpty(rsi.RsiState))
+        if (skill.Icon == null)
         {
-            state = rsi.RsiState;
+            button.TextureNormal = null;
+            return false;
         }
 
-        if (TryLoadTexture(state, out var texture))
-        {
-            button.TextureNormal = texture;
-            return true;
-        }
+        var spriteSys = _sysMan.GetEntitySystem<SpriteSystem>();
+        var texture = spriteSys.Frame0(skill.Icon);
 
-        if (state == PlaceholderIconState || !TryLoadTexture(PlaceholderIconState, out texture))
+        if (texture == null)
         {
             button.TextureNormal = null;
             return false;
