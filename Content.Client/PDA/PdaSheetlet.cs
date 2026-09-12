@@ -115,7 +115,7 @@ public sealed class PdaSheetlet : Sheetlet<NanotrasenStylesheet>
         var settingsPressed = new StyleBoxFlat(settingsNormal)
         {
             BackgroundColor = settingsPressedColor,
-            BorderColor = Color.Transparent,
+            BorderColor = DeadSpaceStylePalette.ClassicChrome ? Color.Transparent : DeadSpaceStylePalette.PressedOutline,
         };
         var settingsDisabled = new StyleBoxFlat(settingsNormal)
         {
@@ -131,12 +131,12 @@ public sealed class PdaSheetlet : Sheetlet<NanotrasenStylesheet>
         var settingsPositiveHover = new StyleBoxFlat(settingsPositive)
         {
             BackgroundColor = DeadSpaceStylePalette.PositiveHover,
-            BorderColor = DeadSpaceStylePalette.ClassicChrome ? Color.Transparent : DeadSpaceStylePalette.HoverOutline,
+            BorderColor = DeadSpaceStylePalette.PositiveBorderHover,
         };
         var settingsPositivePressed = new StyleBoxFlat(settingsPositive)
         {
             BackgroundColor = DeadSpaceStylePalette.PositivePressed,
-            BorderColor = Color.Transparent,
+            BorderColor = DeadSpaceStylePalette.PositiveBorderPressed,
         };
 
         var programNormal = DeadSpaceStyleBoxes.Flat(
@@ -153,7 +153,7 @@ public sealed class PdaSheetlet : Sheetlet<NanotrasenStylesheet>
         var programPressed = new StyleBoxFlat(programNormal)
         {
             BackgroundColor = programPressedColor,
-            BorderColor = Color.Transparent,
+            BorderColor = DeadSpaceStylePalette.ClassicChrome ? Color.Transparent : DeadSpaceStylePalette.PressedOutline,
         };
         var programDisabled = new StyleBoxFlat(programNormal)
         {

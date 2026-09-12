@@ -1,6 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using Content.Server.DeadSpace.CentComm;
 using Content.Server.Station.Components;
 using Content.Shared.GameTicking.Components;
 using Content.Shared.Random.Helpers;
@@ -34,22 +33,8 @@ public abstract partial class GameRuleSystem<T> where T: IComponent
     /// <summary>
     ///     Utility function for finding a random event-eligible station entity
     /// </summary>
-    protected bool TryGetRandomStation([NotNullWhen(true)] out EntityUid? station, Func<EntityUid, bool>? filter = null, EntityUid? rule = null) // DS14
+    protected bool TryGetRandomStation([NotNullWhen(true)] out EntityUid? station, Func<EntityUid, bool>? filter = null)
     {
-        // DS14-start
-        if (rule is { } eventRule)
-            RuleStation.EnsureEventTarget(eventRule);
-        if (rule is { } ruleUid && RuleStation.GetTargetStation(ruleUid) is { } target)
-        {
-            station = null;
-            if (!HasComp<StationDataComponent>(target) || (filter != null && !filter(target)))
-                return false;
-
-            station = target;
-            return true;
-        }
-        // DS14-end
-
         var stations = new ValueList<EntityUid>(Count<StationEventEligibleComponent>());
 
         filter ??= _ => true;
@@ -77,13 +62,13 @@ public abstract partial class GameRuleSystem<T> where T: IComponent
     protected bool TryFindRandomTile(out Vector2i tile,
         [NotNullWhen(true)] out EntityUid? targetStation,
         out EntityUid targetGrid,
-        out EntityCoordinates targetCoords, EntityUid? rule = null) // DS14
+        out EntityCoordinates targetCoords)
     {
         tile = default;
         targetStation = EntityUid.Invalid;
         targetGrid = EntityUid.Invalid;
         targetCoords = EntityCoordinates.Invalid;
-        if (TryGetRandomStation(out targetStation, rule: rule)) // DS14
+        if (TryGetRandomStation(out targetStation))
         {
             return TryFindRandomTileOnStation((targetStation.Value, Comp<StationDataComponent>(targetStation.Value)),
                 out tile,

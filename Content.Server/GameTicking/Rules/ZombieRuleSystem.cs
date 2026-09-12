@@ -28,7 +28,7 @@ public sealed class ZombieRuleSystem : GameRuleSystem<ZombieRuleComponent>
 {
     [Dependency] private readonly AntagSelectionSystem _antag = default!;
     [Dependency] private readonly IAdminManager _admin = default!; // DS14
-    // [Dependency] private readonly ChatSystem _chat = default!; // DS14: announcements use RuleStation.
+    [Dependency] private readonly ChatSystem _chat = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly ISharedPlayerManager _player = default!;
     [Dependency] private readonly MobStateSystem _mobState = default!;
@@ -146,7 +146,7 @@ public sealed class ZombieRuleSystem : GameRuleSystem<ZombieRuleComponent>
     /// <summary>
     ///     The big kahoona function for checking if the round is gonna end
     /// </summary>
-    private void CheckRoundEnd(EntityUid uid, ZombieRuleComponent zombieRuleComponent) // DS14
+    private void CheckRoundEnd(ZombieRuleComponent zombieRuleComponent)
     {
         var healthy = GetHealthyHumans();
         if (healthy.Count == 1) // Only one human left. spooky
@@ -166,8 +166,11 @@ public sealed class ZombieRuleSystem : GameRuleSystem<ZombieRuleComponent>
             }
             else if (!_roundEnd.IsRoundEndRequested())
             {
-                RuleStation.Announce(uid, Loc.GetString("zombie-shuttle-call"), colorOverride: Color.Crimson);
-                _roundEnd.RequestRoundEnd(checkCooldown: false, name: "station-event-announcer", announcementSource: uid);
+                foreach (var station in _station.GetStations())
+                {
+                    _chat.DispatchStationAnnouncement(station, Loc.GetString("zombie-shuttle-call"), colorOverride: Color.Crimson);
+                }
+                _roundEnd.RequestRoundEnd(checkCooldown: false);
             }
         }
         // DS14-end
@@ -207,7 +210,7 @@ public sealed class ZombieRuleSystem : GameRuleSystem<ZombieRuleComponent>
         base.ActiveTick(uid, component, gameRule, frameTime);
         if (!component.NextRoundEndCheck.HasValue || component.NextRoundEndCheck > _timing.CurTime)
             return;
-        CheckRoundEnd(uid, component); // DS14
+        CheckRoundEnd(component);
         component.NextRoundEndCheck = _timing.CurTime + component.EndCheckDelay;
     }
 

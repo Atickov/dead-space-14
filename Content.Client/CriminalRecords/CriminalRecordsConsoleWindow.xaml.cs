@@ -2,7 +2,6 @@ using Content.Client.UserInterface.Controls;
 using Content.Shared.Access.Systems;
 using Content.Shared.Administration;
 using Content.Shared.CriminalRecords;
-using Content.Shared.CriminalRecords.Components;
 using Content.Shared.Dataset;
 using Content.Shared.Random.Helpers;
 using Content.Shared.Security;
@@ -43,8 +42,6 @@ public sealed partial class CriminalRecordsConsoleWindow : FancyWindow
     public Action<CriminalRecord, bool, bool>? OnHistoryUpdated;
     public Action? OnHistoryClosed;
     public Action<SecurityStatus, string>? OnDialogConfirmed;
-    public Action<string, string>? OnDetainedConfirmed; // DS14: articles, sentence
-    public Action? OnPrintDocument; // DS14
 
     public Action<SecurityStatus>? OnStatusFilterPressed;
     private uint _maxLength;
@@ -148,10 +145,6 @@ public sealed partial class CriminalRecordsConsoleWindow : FancyWindow
             if (_selectedRecord is { } record)
                 OnHistoryUpdated?.Invoke(record, _access, true);
         };
-
-        // DS14-start
-        PrintButton.OnPressed += _ => OnPrintDocument?.Invoke();
-        // DS14-end
     }
 
     public void StatusFilterPressed(SecurityStatus statusSelected)
@@ -197,10 +190,6 @@ public sealed partial class CriminalRecordsConsoleWindow : FancyWindow
         // hide access-required editing parts when no access
         var editing = _access && selected;
         StatusOptionButton.Disabled = !editing;
-
-        // DS14: print button follows server-computed CanPrint (needs access + eligible status)
-        PrintButton.Visible = _entManager.GetComponent<CriminalRecordsConsoleComponent>(Console).HasPrinter;
-        PrintButton.Disabled = !_access || !state.CanPrint;
 
         if (state is { CriminalRecord: not null, StationRecord: not null })
         {
@@ -293,14 +282,6 @@ public sealed partial class CriminalRecordsConsoleWindow : FancyWindow
             return;
         }
 
-        // DS14-start
-        if (status == SecurityStatus.Detained)
-        {
-            GetDetainedInfo();
-            return;
-        }
-        // DS14-end
-
         OnStatusSelected?.Invoke(status);
     }
 
@@ -332,45 +313,6 @@ public sealed partial class CriminalRecordsConsoleWindow : FancyWindow
 
         _reasonDialog.OnClose += () => { _reasonDialog = null; };
     }
-
-    // DS14-start
-    private void GetDetainedInfo()
-    {
-        if (_reasonDialog != null)
-        {
-            _reasonDialog.MoveToFront();
-            return;
-        }
-
-        var articlesField = "articles";
-        var sentenceField = "sentence";
-        var title = Loc.GetString("criminal-records-status-detained");
-
-        var articlesEntry = new QuickDialogEntry(articlesField, QuickDialogEntryType.LongText,
-            Loc.GetString("criminal-records-console-detained-articles"),
-            Loc.GetString("criminal-records-console-detained-articles-placeholder"));
-        var sentenceEntry = new QuickDialogEntry(sentenceField, QuickDialogEntryType.ShortText,
-            Loc.GetString("criminal-records-console-detained-sentence"),
-            Loc.GetString("criminal-records-console-detained-sentence-placeholder"));
-
-        var entries = new List<QuickDialogEntry>() { articlesEntry, sentenceEntry };
-        _reasonDialog = new DialogWindow(title, entries);
-
-        _reasonDialog.OnConfirmed += responses =>
-        {
-            var articles = responses[articlesField];
-            var sentence = responses[sentenceField];
-            if (articles.Length < 1 || articles.Length > _maxLength ||
-                sentence.Length < 1 || sentence.Length > _maxLength)
-                return;
-
-            OnDetainedConfirmed?.Invoke(articles, sentence);
-        };
-
-        _reasonDialog.OnClose += () => { _reasonDialog = null; };
-    }
-    // DS14-end
-
     private string GetStatusIcon(SecurityStatus status)
     {
         return status switch

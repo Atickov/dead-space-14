@@ -26,9 +26,6 @@ public sealed class GamePresetsResponseMessage : EntityEventArgs
     public bool PreventRepeatMode { get; }
     public bool CheckPlayerLimit { get; }
     public List<string> WhitelistModeIds { get; }
-    public bool EnableLowPlayerPreset { get; }
-    public int LowPlayerThreshold { get; }
-    public string? LowPlayerPresetId { get; }
 
     public GamePresetsResponseMessage(
         List<string> activePresetIds,
@@ -44,10 +41,7 @@ public sealed class GamePresetsResponseMessage : EntityEventArgs
         bool isLobby,
         bool preventRepeatMode,
         bool checkPlayerLimit,
-        List<string> whitelistModeIds,
-        bool enableLowPlayerPreset,
-        int lowPlayerThreshold,
-        string? lowPlayerPresetId)
+        List<string> whitelistModeIds)
     {
         ActivePresetIds = activePresetIds;
         CustomPresets = customPresets;
@@ -63,9 +57,6 @@ public sealed class GamePresetsResponseMessage : EntityEventArgs
         PreventRepeatMode = preventRepeatMode;
         CheckPlayerLimit = checkPlayerLimit;
         WhitelistModeIds = whitelistModeIds;
-        EnableLowPlayerPreset = enableLowPlayerPreset;
-        LowPlayerThreshold = lowPlayerThreshold;
-        LowPlayerPresetId = lowPlayerPresetId;
     }
 }
 
@@ -201,20 +192,8 @@ public sealed class UpdatePresetSettingsMessage : EntityEventArgs
     public bool PreventRepeatMode { get; }
     public bool CheckPlayerLimit { get; }
     public List<string> WhitelistModeIds { get; }
-    public bool EnableLowPlayerPreset { get; }
-    public int LowPlayerThreshold { get; }
-    public string? LowPlayerPresetId { get; }
 
-    public UpdatePresetSettingsMessage(
-        int maxRdmRow,
-        int voteDurationSeconds,
-        bool disableOocDuringVote,
-        bool preventRepeatMode,
-        bool checkPlayerLimit,
-        List<string> whitelistModeIds,
-        bool enableLowPlayerPreset,
-        int lowPlayerThreshold,
-        string? lowPlayerPresetId)
+    public UpdatePresetSettingsMessage(int maxRdmRow, int voteDurationSeconds, bool disableOocDuringVote, bool preventRepeatMode, bool checkPlayerLimit, List<string> whitelistModeIds)
     {
         MaxRdmRow = maxRdmRow;
         VoteDurationSeconds = voteDurationSeconds;
@@ -222,9 +201,6 @@ public sealed class UpdatePresetSettingsMessage : EntityEventArgs
         PreventRepeatMode = preventRepeatMode;
         CheckPlayerLimit = checkPlayerLimit;
         WhitelistModeIds = whitelistModeIds;
-        EnableLowPlayerPreset = enableLowPlayerPreset;
-        LowPlayerThreshold = lowPlayerThreshold;
-        LowPlayerPresetId = lowPlayerPresetId;
     }
 }
 

@@ -1,7 +1,7 @@
 {
   "version": 1,
   "license": "CC-BY-SA-3.0",
-  "copyright": "Сreated by sastr. (discord) for Space Station 14 server Мёртвый Космос",
+  "copyright": "made by sastr. (discord) for Space Station 14 server Мёртвый Космос",
   "size": {
     "x": 32,
     "y": 32
@@ -11,14 +11,7 @@
       "name": "icon"
     },
     {
-      "name": "icon-unshaded"
-    },
-    {
       "name": "equipped-OUTERCLOTHING",
-      "directions": 4
-    },
-    {
-      "name": "equipped-OUTERCLOTHING-unshaded",
       "directions": 4
     }
   ]

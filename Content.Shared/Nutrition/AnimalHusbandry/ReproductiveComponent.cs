@@ -70,7 +70,7 @@ public sealed partial class ReproductiveComponent : Component
     /// When gestation will end.
     /// Null if <see cref="Gestating"/> is false
     /// </summary>
-    [DataField(customTypeSerializer: typeof(TimeOffsetSerializer)), AutoPausedField, ViewVariables(VVAccess.ReadWrite)]
+    [DataField, ViewVariables(VVAccess.ReadWrite)]
     public TimeSpan? GestationEndTime;
 
     /// <summary>

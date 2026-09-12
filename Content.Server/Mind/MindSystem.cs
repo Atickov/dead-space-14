@@ -278,7 +278,7 @@ public sealed class MindSystem : SharedMindSystem
             Entity<MindComponent> mindEnt = (mindId, mind);
             Entity<MindContainerComponent> containerEnt = (entity.Value, component);
             RaiseLocalEvent(entity.Value, new MindAddedMessage(mindEnt, containerEnt, oldEntity));
-            RaiseLocalEvent(mindId, new MindGotAddedEvent(mindEnt, containerEnt, oldEntity), true);
+            RaiseLocalEvent(mindId, new MindGotAddedEvent(mindEnt, containerEnt, oldEntity));
             Dirty(entity.Value, component);
         }
     }

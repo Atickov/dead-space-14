@@ -50,14 +50,14 @@ public sealed class CriminalRecordsSystem : SharedCriminalRecordsSystem
     /// Reason should only be passed if status is Wanted, nullability isn't checked.
     /// </summary>
     /// <returns>True if the status is changed, false if not</returns>
-    public bool TryChangeStatus(StationRecordKey key, SecurityStatus status, string? reason, string? initiatorName = null, string? articles = null, string? sentence = null)
+    public bool TryChangeStatus(StationRecordKey key, SecurityStatus status, string? reason, string? initiatorName = null)
     {
         // don't do anything if its the same status
         if (!_records.TryGetRecord<CriminalRecord>(key, out var record)
             || status == record.Status)
             return false;
 
-        OverwriteStatus(key, record, status, reason, initiatorName, articles, sentence);
+        OverwriteStatus(key, record, status, reason, initiatorName);
 
         return true;
     }
@@ -65,13 +65,11 @@ public sealed class CriminalRecordsSystem : SharedCriminalRecordsSystem
     /// <summary>
     /// Sets the status without checking previous status or reason nullability.
     /// </summary>
-    public void OverwriteStatus(StationRecordKey key, CriminalRecord record, SecurityStatus status, string? reason, string? initiatorName = null, string? articles = null, string? sentence = null)
+    public void OverwriteStatus(StationRecordKey key, CriminalRecord record, SecurityStatus status, string? reason, string? initiatorName = null)
     {
         record.Status = status;
         record.Reason = reason;
         record.InitiatorName = initiatorName;
-        record.Articles = articles; // DS14: only meaningful for Detained, see CriminalRecord.Articles
-        record.Sentence = sentence; // DS14: only meaningful for Detained, see CriminalRecord.Sentence
 
         var name = _records.RecordName(key);
         if (name != string.Empty)
@@ -111,9 +109,9 @@ public sealed class CriminalRecordsSystem : SharedCriminalRecordsSystem
     /// <summary>
     /// Creates and tries to add a history entry using the current time.
     /// </summary>
-    public bool TryAddHistory(StationRecordKey key, string line, string? initiatorName = null, string? sentence = null) // DS14: added sentence
+    public bool TryAddHistory(StationRecordKey key, string line, string? initiatorName = null)
     {
-        var entry = new CrimeHistory(_ticker.RoundDuration(), line, initiatorName, sentence); // DS14: added sentence
+        var entry = new CrimeHistory(_ticker.RoundDuration(), line, initiatorName);
         return TryAddHistory(key, entry);
     }
 

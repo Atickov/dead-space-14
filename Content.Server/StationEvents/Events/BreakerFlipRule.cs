@@ -29,7 +29,7 @@ public sealed class BreakerFlipRule : StationEventSystem<BreakerFlipRuleComponen
     {
         base.Started(uid, component, gameRule, args);
 
-        if (!TryGetRandomStation(out var chosenStation, station => _whitelist.IsWhitelistFailOrNull(component.Blacklist, station), rule: uid)) // DS14
+        if (!TryGetRandomStation(out var chosenStation, uid => _whitelist.IsWhitelistFailOrNull(component.Blacklist, uid)))
             return;
 
         // DS14-start

@@ -31,7 +31,6 @@ namespace Content.Server.RoundEnd
     /// </summary>
     public sealed partial class RoundEndSystem : EntitySystem // DS14
     {
-        [Dependency] private readonly Content.Server.DeadSpace.CentComm.GameRuleStationSystem _ruleStation = default!; // DS14
         [Dependency] private readonly IAdminLogManager _adminLogger = default!;
         [Dependency] private readonly IConfigurationManager _cfg = default!;
         [Dependency] private readonly IChatManager _chatManager = default!;
@@ -153,7 +152,7 @@ namespace Content.Server.RoundEnd
         /// <param name="text">text in the announcement of shuttle calling</param>
         /// <param name="name">name in the announcement of shuttle calling</param>
         /// <param name="cantRecall">if the station shouldn't be able to recall the shuttle</param>
-        public void RequestRoundEnd(EntityUid? requester = null, EntityUid? machine = null, bool checkCooldown = true, string text = "round-end-system-shuttle-called-announcement", string name = "round-end-system-shuttle-sender-announcement", bool cantRecall = false, EntityUid? announcementSource = null) // DS14
+        public void RequestRoundEnd(EntityUid? requester = null, EntityUid? machine = null, bool checkCooldown = true, string text = "round-end-system-shuttle-called-announcement", string name = "round-end-system-shuttle-sender-announcement", bool cantRecall = false)
         {
             var duration = DefaultCountdownDuration;
 
@@ -168,7 +167,7 @@ namespace Content.Server.RoundEnd
                 }
             }
 
-            RequestRoundEnd(duration, requester, machine, checkCooldown, text, name, cantRecall, announcementSource); // DS14
+            RequestRoundEnd(duration, requester, machine, checkCooldown, text, name, cantRecall);
         }
 
         /// <summary>
@@ -181,7 +180,7 @@ namespace Content.Server.RoundEnd
         /// <param name="text">text in the announcement of shuttle calling</param>
         /// <param name="name">name in the announcement of shuttle calling</param>
         /// <param name="cantRecall">if the station shouldn't be able to recall the shuttle</param>
-        public void RequestRoundEnd(TimeSpan countdownTime, EntityUid? requester = null, EntityUid? machine = null, bool checkCooldown = true, string text = "round-end-system-shuttle-called-announcement", string name = "round-end-system-shuttle-sender-announcement", bool cantRecall = false, EntityUid? announcementSource = null) // DS14
+        public void RequestRoundEnd(TimeSpan countdownTime, EntityUid? requester = null, EntityUid? machine = null, bool checkCooldown = true, string text = "round-end-system-shuttle-called-announcement", string name = "round-end-system-shuttle-sender-announcement", bool cantRecall = false)
         {
             if (_gameTicker.RunLevel != GameRunLevel.InRound)
                 return;
@@ -216,12 +215,7 @@ namespace Content.Server.RoundEnd
                 units = "eta-units-minutes";
             }
 
-            // DS14-start
-            var recipients = announcementSource is { } source
-                ? _ruleStation.GetEventPlayers(source)
-                : _ruleStation.GetStationPlayers();
-            // DS14-end
-            _chatSystem.DispatchAdminFilteredAnnouncement(recipients, Loc.GetString(text, // DS14
+            _chatSystem.DispatchGlobalAnnouncement(Loc.GetString(text,
                 ("time", time),
                 ("units", Loc.GetString(units))),
                 Loc.GetString(name),
@@ -229,8 +223,8 @@ namespace Content.Server.RoundEnd
                 null,
                 Color.Gold);
 
-            if (!_autoCalledBefore) _audio.PlayGlobal("/Audio/_DeadSpace/Announcements/emergency_s_called.ogg", recipients, true, AudioParams.Default.AddVolume(-4)); // DS14-Announcements: Custom sound for auto-called
-            else _audio.PlayGlobal("/Audio/_DeadSpace/Announcements/crew_s_called.ogg", recipients, true, AudioParams.Default.AddVolume(-2)); // DS14-Announcements
+            if (!_autoCalledBefore) _audio.PlayGlobal("/Audio/_DeadSpace/Announcements/emergency_s_called.ogg", Filter.Broadcast(), true, AudioParams.Default.AddVolume(-4)); // DS14-Announcements: Custom sound for auto-called
+            else _audio.PlayGlobal("/Audio/_DeadSpace/Announcements/crew_s_called.ogg", Filter.Broadcast(), true, AudioParams.Default.AddVolume(-2)); // DS14-Announcements
 
             LastCountdownStart = _gameTiming.CurTime;
             ExpectedCountdownEnd = _gameTiming.CurTime + countdownTime;
@@ -257,7 +251,7 @@ namespace Content.Server.RoundEnd
             }
         }
 
-        public void CancelRoundEndCountdown(EntityUid? requester = null, EntityUid? machine = null, bool forceRecall = false, EntityUid? announcementSource = null) // DS14
+        public void CancelRoundEndCountdown(EntityUid? requester = null, EntityUid? machine = null, bool forceRecall = false)
         {
             if (_gameTicker.RunLevel != GameRunLevel.InRound)
                 return;
@@ -277,18 +271,10 @@ namespace Content.Server.RoundEnd
             else
                 _adminLogger.Add(LogType.ShuttleRecalled, LogImpact.High, $"Shuttle recalled{what}");
 
-            // DS14-start
-            var recipients = announcementSource is { } source
-                ? _ruleStation.GetEventPlayers(source)
-                : _ruleStation.GetStationPlayers();
-            var sender = announcementSource is { } station && HasComp<StationDataComponent>(station)
-                ? Name(station)
-                : Loc.GetString("round-end-system-shuttle-sender-announcement");
-            _chatSystem.DispatchAdminFilteredAnnouncement(recipients, Loc.GetString("round-end-system-shuttle-recalled-announcement"),
-                sender, false, colorOverride: Color.Gold);
-            // DS14-end
+            _chatSystem.DispatchGlobalAnnouncement(Loc.GetString("round-end-system-shuttle-recalled-announcement"),
+                Loc.GetString("round-end-system-shuttle-sender-announcement"), false, colorOverride: Color.Gold);
 
-            _audio.PlayGlobal("/Audio/_DeadSpace/Announcements/emergency_s_recalled.ogg", recipients, true, AudioParams.Default.AddVolume(-2)); // DS14
+            _audio.PlayGlobal("/Audio/_DeadSpace/Announcements/emergency_s_recalled.ogg", Filter.Broadcast(), true, AudioParams.Default.AddVolume(-2)); // DS14-Announcements
 
             LastCountdownStart = null;
             ExpectedCountdownEnd = null;
@@ -358,7 +344,7 @@ namespace Content.Server.RoundEnd
             TimeSpan time,
             string sender = "comms-console-announcement-title-centcom",
             string textCall = "round-end-system-shuttle-called-announcement",
-            string textAnnounce = "round-end-system-shuttle-already-called-announcement", EntityUid? announcementSource = null) // DS14
+            string textAnnounce = "round-end-system-shuttle-already-called-announcement")
         {
             switch (behavior)
             {
@@ -369,18 +355,14 @@ namespace Content.Server.RoundEnd
                     // Check is shuttle called or not. We should only dispatch announcement if it's already called
                     if (IsRoundEndRequested())
                     {
-                        // DS14-start
-                        _chatSystem.DispatchAdminFilteredAnnouncement(
-                            announcementSource is { } source ? _ruleStation.GetEventPlayers(source) : _ruleStation.GetStationPlayers(),
-                            Loc.GetString(textAnnounce),
-                            // DS14-end
+                        _chatSystem.DispatchGlobalAnnouncement(Loc.GetString(textAnnounce),
                             Loc.GetString(sender),
                             colorOverride: Color.Gold);
                     }
                     else
                     {
                         RequestRoundEnd(time, checkCooldown: false, text: textCall,
-                            name: Loc.GetString(sender), announcementSource: announcementSource); // DS14
+                            name: Loc.GetString(sender));
                     }
                     break;
             }

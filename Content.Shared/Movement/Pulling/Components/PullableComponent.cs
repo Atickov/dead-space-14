@@ -1,5 +1,4 @@
 using Content.Shared.Alert;
-using Content.Shared.Interaction;
 using Robust.Shared.GameStates;
 using Robust.Shared.Prototypes;
 
@@ -12,9 +11,6 @@ namespace Content.Shared.Movement.Pulling.Components;
 [Access(typeof(Systems.PullingSystem))]
 public sealed partial class PullableComponent : Component
 {
-    [DataField, AutoNetworkedField]
-    public float PullRange = SharedInteractionSystem.InteractionRange;
-
     /// <summary>
     /// The current entity pulling this component.
     /// </summary>

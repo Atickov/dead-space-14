@@ -6,8 +6,6 @@ using Content.Server.Administration.Managers;
 using Content.Server.Chat.Systems;
 using Content.Server.Communications;
 using Content.Server.DeviceNetwork.Systems;
-using Content.Server.DeadSpace.CentComm;
-using Content.Server.Station.Components;
 using Content.Server.GameTicking;
 using Content.Server.GameTicking.Events;
 using Content.Server.Pinpointer;
@@ -63,7 +61,6 @@ public sealed partial class EmergencyShuttleSystem : SharedEmergencyShuttleSyste
     [Dependency] private readonly IdCardSystem _idSystem = default!;
     [Dependency] private readonly NavMapSystem _navMap = default!;
     [Dependency] private readonly MapLoaderSystem _loader = default!;
-    [Dependency] private readonly IPrototypeManager _prototypes = default!; // DS14
     [Dependency] private readonly MetaDataSystem _metaData = default!;
     [Dependency] private readonly RoundEndSystem _roundEnd = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
@@ -545,26 +542,41 @@ public sealed partial class EmergencyShuttleSystem : SharedEmergencyShuttleSyste
             return;
         }
 
-        // DS14-start
-        var grids = _ticker.LoadGameMap(_prototypes.Index(component.Map), out var mapId);
-        var map = _mapSystem.GetMapOrInvalid(mapId);
-        var grid = grids.FirstOrNull(uid => HasComp<BecomesStationComponent>(uid));
-        if (grid == null || _station.GetOwningStation(grid.Value) is not { } centcommStation ||
-            !HasComp<CentCommStationComponent>(centcommStation))
+        var map = _mapSystem.CreateMap(out var mapId);
+        if (!_loader.TryLoadGrid(mapId, component.Map, out var grid))
         {
-            Log.Error("CentComm map has no Central Command station grid.");
+            Log.Error($"Failed to set up centcomm grid!");
+            return;
+        }
+
+        if (!Exists(map))
+        {
+            Log.Error($"Failed to set up centcomm map!");
+            QueueDel(grid);
+            return;
+        }
+
+        if (!Exists(grid))
+        {
+            Log.Error($"Failed to set up centcomm grid!");
             QueueDel(map);
             return;
         }
 
+        var xform = Transform(grid.Value);
+        if (xform.ParentUid != map || xform.MapUid != map)
+        {
+            Log.Error($"Centcomm grid is not parented to its own map?");
+            QueueDel(map);
+            QueueDel(grid);
+            return;
+        }
+
         component.MapEntity = map;
-        component.Entity = grid;
         _metaData.SetEntityName(map, Loc.GetString("map-name-centcomm"));
-        _mapSystem.InitializeMap(map);
-        _mapSystem.SetPaused(map, false);
+        component.Entity = grid;
         _shuttle.TryAddFTLDestination(mapId, true, out _);
-        Log.Info($"Created CentComm station {ToPrettyString(centcommStation)} on map {ToPrettyString(map)} for station {ToPrettyString(station)}");
-        // DS14-end
+        Log.Info($"Created centcomm grid {ToPrettyString(grid)} on map {ToPrettyString(map)} for station {ToPrettyString(station)}");
     }
 
     public HashSet<EntityUid> GetCentcommMaps()

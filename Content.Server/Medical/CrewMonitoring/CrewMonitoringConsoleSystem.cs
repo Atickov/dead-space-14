@@ -53,15 +53,7 @@ public sealed class CrewMonitoringConsoleSystem : EntitySystem
         SubscribeLocalEvent<CrewMonitoringConsoleComponent, ComponentRemove>(OnRemove);
         SubscribeLocalEvent<CrewMonitoringConsoleComponent, DeviceNetworkPacketEvent>(OnPacketReceived);
         SubscribeLocalEvent<CrewMonitoringConsoleComponent, BoundUIOpenedEvent>(OnUIOpened);
-
-        // DS14-start
-        SubscribeLocalEvent<CrewMonitoringConsoleComponent, GetVerbsEvent<Verb>>(OnGetVerb);
-
-        Subs.BuiEvents<CrewMonitoringConsoleComponent>(CrewMonitoringUIKey.Key, subs =>
-        {
-            subs.Event<CrewMonitoringSetPingModeMessage>(OnSetPingModeMessage);
-        });
-        // DS14-end
+        SubscribeLocalEvent<CrewMonitoringConsoleComponent, GetVerbsEvent<Verb>>(OnGetVerb); // DS14
     }
 
     private void OnRemove(EntityUid uid, CrewMonitoringConsoleComponent component, ComponentRemove args)
@@ -72,9 +64,7 @@ public sealed class CrewMonitoringConsoleSystem : EntitySystem
     // DS14-start
     private void TryPlayPing(Entity<CrewMonitoringConsoleComponent> ent, CrewMonitoringConsolePingMode pingMode)
     {
-        var isStationAi = HasComp<StationAiHeldComponent>(ent.Owner);
-
-        if ((HasComp<ActorComponent>(ent.Owner) && !isStationAi) ||
+        if (HasComp<ActorComponent>(ent.Owner) ||
             ent.Comp.CurrentPingMode == CrewMonitoringConsolePingMode.Disabled ||
             ent.Comp.CurrentPingMode > pingMode)
         {
@@ -87,35 +77,21 @@ public sealed class CrewMonitoringConsoleSystem : EntitySystem
 
         if (HasComp<PowerCellDrawComponent>(ent.Owner))
         {
+            //6.6f это примерно 2% у маленькой батареи. При обычном (20f) 6% маленькой батареи
             if (!_cell.TryUseCharge(ent.Owner, 6.6f))
                 return;
         }
-        else if (!isStationAi && !_power.IsPowered(ent.Owner))
+        else if (!_power.IsPowered(ent.Owner))
         {
             return;
         }
 
         ent.Comp.NextSound = curTime + ent.Comp.SoundInterval;
 
-        if (isStationAi)
-        {
-            _popup.PopupCursor(
-                Loc.GetString("crew-monitoring-console-ping-ai", ("mode", GetTextByMode(pingMode))),
-                ent.Owner,
-                PopupType.Medium);
-            _audio.PlayGlobal(new SoundPathSpecifier("/Audio/Effects/beep1.ogg"), Filter.Entities(ent.Owner), true);
-        }
-        else
-        {
-            var popup = Loc.GetString("crew-monitoring-console-ping", ("monitor", MetaData(ent.Owner).EntityName));
-            _popup.PopupEntity(popup, ent.Owner, PopupType.Medium);
-            _audio.PlayPvs(new SoundPathSpecifier("/Audio/Effects/beep1.ogg"), ent.Owner);
-        }
-    }
-
-    private void OnSetPingModeMessage(Entity<CrewMonitoringConsoleComponent> ent, ref CrewMonitoringSetPingModeMessage msg)
-    {
-        SetPingMode(ent, msg.Mode, msg.Actor);
+        var popup = Loc.GetString("crew-monitoring-console-ping",
+            ("monitor", MetaData(ent.Owner).EntityName));
+        _popup.PopupEntity(popup, ent.Owner, PopupType.Medium);
+        _audio.PlayPvs(new SoundPathSpecifier("/Audio/Effects/beep1.ogg"), ent.Owner);
     }
     // DS14-end
 
@@ -194,8 +170,7 @@ public sealed class CrewMonitoringConsoleSystem : EntitySystem
 
         // Update all sensors info
         var allSensors = component.ConnectedSensors.Values.ToList();
-        _uiSystem.SetUiState(uid, CrewMonitoringUIKey.Key,
-            new CrewMonitoringState(allSensors, component.CurrentPingMode));
+        _uiSystem.SetUiState(uid, CrewMonitoringUIKey.Key, new CrewMonitoringState(allSensors));
     }
 
     // DS14-start
@@ -224,7 +199,7 @@ public sealed class CrewMonitoringConsoleSystem : EntitySystem
                 Impact = LogImpact.Low,
                 DoContactInteraction = false,
                 CloseMenu = true,
-                Act = () => SetPingMode((uid, component), pingMode, args.User),
+                Act = () => SetPingMode((uid, component), pingMode, text, args.User),
             });
         }
     }
@@ -232,15 +207,12 @@ public sealed class CrewMonitoringConsoleSystem : EntitySystem
     private void SetPingMode(
         Entity<CrewMonitoringConsoleComponent> ent,
         CrewMonitoringConsolePingMode pingMode,
+        string text,
         EntityUid user)
     {
-        if (!Enum.IsDefined(pingMode) || ent.Comp.CurrentPingMode == pingMode)
-            return;
-
         ent.Comp.CurrentPingMode = pingMode;
-        UpdateUserInterface(ent);
         _popup.PopupEntity(
-            Loc.GetString("crew-monitoring-console-ping-mode-set", ("mode", GetTextByMode(pingMode))),
+            Loc.GetString("crew-monitoring-console-ping-mode-set", ("mode", text)),
             ent.Owner,
             user);
     }

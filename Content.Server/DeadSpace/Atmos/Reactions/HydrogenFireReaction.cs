@@ -19,13 +19,13 @@ public sealed partial class HydrogenFireReaction : IGasReactionEffect
     public float ExplosionThresholdMoles = 1f;
 
     [DataField]
-    public float ExplosionIntensityPerMole = 0.75f;
+    public float ExplosionIntensityPerMole = 0.25f;
 
     [DataField]
-    public float MaxExplosionIntensity = 75f;
+    public float MaxExplosionIntensity = 25f;
 
     [DataField]
-    public float ExplosionSlope = 0.75f;
+    public float ExplosionSlope = 3f;
 
     [DataField]
     public float MaxTileIntensity = 6f;

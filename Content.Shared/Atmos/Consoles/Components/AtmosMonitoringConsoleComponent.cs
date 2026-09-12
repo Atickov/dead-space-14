@@ -46,11 +46,11 @@ public sealed partial class AtmosMonitoringConsoleComponent : Component
     public Color NavMapWallColor;
 
     /// <summary>
-    /// All recipients whose baseline predates this tick need the full pipe map. // DS14
+    /// The next time this component is dirtied, it will force the full state
+    /// to be sent to the client, instead of just the delta state
     /// </summary>
     [ViewVariables]
-    // public bool ForceFullUpdate = false; // DS14: a one-shot flag only serves the first recipient.
-    public GameTick ForceFullUpdateTick; // DS14
+    public bool ForceFullUpdate = false;
 }
 
 [Serializable, NetSerializable]

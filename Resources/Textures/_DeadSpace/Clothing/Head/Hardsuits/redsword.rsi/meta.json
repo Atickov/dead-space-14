@@ -1,20 +1,28 @@
 {
   "version": 1,
-  "license": "CC-BY-3.0",
-  "copyright": "made by ayanami_prime (discord) for Space Station 14 server Мёртвый Космос, resprirte by sastr. (discord) for Space Station 14 server Мёртвый Космос",
+  "license": "CC-BY-SA-3.0",
+  "copyright": "Made by x_muted_x (discord) for Space Station 14 server Мёртвый Космос. Resprite by skazhennyi_ravlik (discord) for Space Station 14 server Мёртвый Космос",
   "size": {
     "x": 32,
     "y": 32
   },
   "states": [
     {
-      "name": "telescope_on"
+      "name": "on-equipped-HELMET",
+      "directions": 4
     },
     {
-      "name": "telescope_off"
+      "name": "icon"
     },
-	{
-      "name": "off-inhand-left",
+    {
+      "name": "icon-flash"
+    },
+    {
+      "name": "off-equipped-HELMET",
+      "directions": 4
+    },
+    {
+      "name": "on-equipped-HELMET-reptilian",
       "directions": 4
     },
     {
@@ -22,11 +30,11 @@
       "directions": 4
     },
     {
-      "name": "on-inhand-left",
+      "name": "on-equipped-HELMET-vulpkanin",
       "directions": 4
     },
     {
-      "name": "on-inhand-right",
+      "name": "off-equipped-HELMET-vulpkanin",
       "directions": 4
     }
   ]

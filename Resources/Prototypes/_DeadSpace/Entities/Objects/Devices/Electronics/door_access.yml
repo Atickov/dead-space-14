@@ -5,11 +5,3 @@
   components:
   - type: AccessReader
     access: [["SOD"]]
-
-- type: entity
-  parent: DoorElectronics
-  id: DoorElectronicsBlueShield
-  suffix: Офицер "Синий Щит", Закрыт
-  components:
-  - type: AccessReader
-    access: [["BlueShield"]]

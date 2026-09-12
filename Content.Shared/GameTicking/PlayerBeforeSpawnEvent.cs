@@ -17,9 +17,6 @@ public sealed class PlayerBeforeSpawnEvent : HandledEntityEventArgs
     public string? JobId { get; }
     public bool LateJoin { get; }
     public EntityUid Station { get; }
-    public bool Cancelled { get; set; }
-    public bool Deferred { get; set; }
-    public string? Reason { get; set; }
 
     public PlayerBeforeSpawnEvent(ICommonSession player,
         HumanoidCharacterProfile profile,

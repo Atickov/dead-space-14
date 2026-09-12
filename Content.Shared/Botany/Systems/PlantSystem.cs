@@ -50,7 +50,7 @@ public sealed partial class PlantSystem : EntitySystem
             if (plantHolder.NextUpdate > _gameTiming.CurTime)
                 continue;
 
-            plantHolder.NextUpdate = _gameTiming.CurTime + plantHolder.CycleDelay; // DS14
+            plantHolder.NextUpdate = _gameTiming.CurTime;
             DirtyField(uid, plantHolder, nameof(plantHolder.NextUpdate));
             _holdersToUpdate.Add((uid, plantHolder));
         }

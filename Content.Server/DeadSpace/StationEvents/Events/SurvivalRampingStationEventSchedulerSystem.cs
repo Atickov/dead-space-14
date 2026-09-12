@@ -22,6 +22,7 @@ public sealed class SurvivalRampingStationEventSchedulerSystem : GameRuleSystem<
     [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly EventManagerSystem _event = default!;
     [Dependency] private readonly GameTicker _gameTicker = default!;
+    [Dependency] private readonly ChatSystem _chat = default!;
     [Dependency] private readonly EntityTableSystem _entityTable = default!;
     [Dependency] private readonly IPlayerManager _player = default!;
     [Dependency] private readonly IPrototypeManager _prototype = default!;
@@ -71,7 +72,7 @@ public sealed class SurvivalRampingStationEventSchedulerSystem : GameRuleSystem<
             if (!GameTicker.IsGameRuleActive(uid, gameRule))
                 continue;
 
-            TryPlayAlert(uid, scheduler);
+            TryPlayAlert(scheduler);
 
             if (scheduler.TimeUntilNextEvent > 0f)
             {
@@ -212,7 +213,7 @@ public sealed class SurvivalRampingStationEventSchedulerSystem : GameRuleSystem<
         return selected;
     }
 
-    private void TryPlayAlert(EntityUid uid, SurvivalRampingStationEventSchedulerComponent component)
+    private void TryPlayAlert(SurvivalRampingStationEventSchedulerComponent component)
     {
         if (component.AlertPlayed || component.AlertTime is not { } alertTime)
             return;
@@ -222,9 +223,9 @@ public sealed class SurvivalRampingStationEventSchedulerSystem : GameRuleSystem<
 
         if (component.AlertAnnouncement is { } announcement)
         {
-            RuleStation.Announce(uid,
+            _chat.DispatchGlobalAnnouncement(
                 Loc.GetString(announcement),
-                sender: component.AlertSender is { } sender ? Loc.GetString(sender) : null,
+                component.AlertSender is { } sender ? Loc.GetString(sender) : null,
                 playSound: component.AlertSound != null,
                 announcementSound: component.AlertSound,
                 colorOverride: component.AlertAnnouncementColor);

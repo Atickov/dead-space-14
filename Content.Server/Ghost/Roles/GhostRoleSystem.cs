@@ -588,7 +588,7 @@ public sealed class GhostRoleSystem : EntitySystem
         }
         // DS14-end
 
-        if (!_ghostRoles.TryGetValue(identifier, out var role) || !IsRoleAvailable(role.Owner, player))
+        if (!_ghostRoles.TryGetValue(identifier, out var role) || !IsRoleOnValidMap(role.Owner))
             return false;
 
         var ev = new TakeGhostRoleEvent(player);
@@ -610,7 +610,7 @@ public sealed class GhostRoleSystem : EntitySystem
             return;
 
         // DS14-start: avoid parenting observers to nullspace targets.
-        if (!IsRoleAvailable(role.Owner))
+        if (!IsRoleOnValidMap(role.Owner))
             return;
         // DS14-end
 
@@ -656,7 +656,7 @@ public sealed class GhostRoleSystem : EntitySystem
             if (metaQuery.GetComponent(uid).EntityPaused)
                 continue;
 
-            if (!IsRoleAvailable(uid))
+            if (!IsRoleOnValidMap(uid))
                 continue;
 
             count++;
@@ -683,7 +683,7 @@ public sealed class GhostRoleSystem : EntitySystem
                 continue;
 
             // DS14-start: hidden roles on invalid maps are not safely available.
-            if (!IsRoleAvailable(uid))
+            if (!IsRoleOnValidMap(uid))
                 continue;
             // DS14-end
 
@@ -819,7 +819,7 @@ public sealed class GhostRoleSystem : EntitySystem
     private void OnSpawnerTakeRole(EntityUid uid, GhostRoleMobSpawnerComponent component, ref TakeGhostRoleEvent args)
     {
         if (!TryComp(uid, out GhostRoleComponent? ghostRole) ||
-            !CanTakeGhost(uid, ghostRole, args.Player))
+            !CanTakeGhost(uid, ghostRole))
         {
             args.TookRole = false;
             return;
@@ -855,40 +855,33 @@ public sealed class GhostRoleSystem : EntitySystem
         args.TookRole = true;
     }
 
-    public bool CanTakeGhost(EntityUid uid, GhostRoleComponent? component = null, ICommonSession? player = null)
+    private bool CanTakeGhost(EntityUid uid, GhostRoleComponent? component = null)
     {
         // DS14-start
         var canTake = Resolve(uid, ref component, false) &&
                       !component.Taken &&
                       !MetaData(uid).EntityPaused;
 
-        canTake &= IsRoleAvailable(uid, player);
+        canTake &= IsRoleOnValidMap(uid);
         return canTake;
 
     }
 
-    private bool IsRoleAvailable(EntityUid uid, ICommonSession? player = null)
+    private bool IsRoleOnValidMap(EntityUid uid)
     {
-        if (TerminatingOrDeleted(uid) ||
-            EntityManager.IsQueuedForDeletion(uid) ||
-            !TryComp(uid, out TransformComponent? xform))
+        if (!TryComp(uid, out TransformComponent? xform))
             return false;
 
-        if (xform.MapUid == null ||
-            xform.MapID == MapId.Nullspace ||
-            _prison.IsPrisonMap(xform.MapID))
-            return false;
-
-        var ev = new GhostRoleAvailabilityEvent(player);
-        RaiseLocalEvent(uid, ev);
-        return !ev.Cancelled;
+        return xform.MapUid != null &&
+               xform.MapID != MapId.Nullspace &&
+               !_prison.IsPrisonMap(xform.MapID);
     }
     // DS14-end
 
     private void OnTakeoverTakeRole(EntityUid uid, GhostTakeoverAvailableComponent component, ref TakeGhostRoleEvent args)
     {
         if (!TryComp(uid, out GhostRoleComponent? ghostRole) ||
-            !CanTakeGhost(uid, ghostRole, args.Player))
+            !CanTakeGhost(uid, ghostRole))
         {
             args.TookRole = false;
             return;

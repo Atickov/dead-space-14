@@ -24,7 +24,7 @@ public sealed class SpaceSpawnRule : StationEventSystem<SpaceSpawnRuleComponent>
     {
         base.Added(uid, comp, gameRule, args);
 
-        if (!TryGetRandomStation(out var station, rule: uid)) // DS14
+        if (!TryGetRandomStation(out var station))
         {
             ForceEndSelf(uid, gameRule);
             return;

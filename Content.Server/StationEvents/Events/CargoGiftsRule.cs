@@ -43,7 +43,7 @@ public sealed class CargoGiftsRule : StationEventSystem<CargoGiftsRuleComponent>
 
         component.TimeUntilNextGifts += 30f;
 
-        if (!TryGetRandomStation(out var station, HasComp<StationCargoOrderDatabaseComponent>, rule: uid) || // DS14
+        if (!TryGetRandomStation(out var station, HasComp<StationCargoOrderDatabaseComponent>) ||
                 !TryComp<StationDataComponent>(station, out var stationData))
             return;
 

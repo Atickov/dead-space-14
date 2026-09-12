@@ -5,7 +5,4 @@ public sealed partial class SpreaderGridComponent : Component
 {
     [DataField]
     public float UpdateAccumulator = SpreaderSystem.SpreadCooldownSeconds;
-
-    [ViewVariables]
-    public readonly HashSet<EntityUid> ActiveSpreaders = [];
 }

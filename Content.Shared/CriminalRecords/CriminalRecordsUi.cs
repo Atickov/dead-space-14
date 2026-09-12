@@ -41,10 +41,6 @@ public sealed class CriminalRecordsConsoleState : BoundUserInterfaceState
     public readonly Dictionary<uint, string>? RecordListing;
     public readonly StationRecordsFilter? Filter;
 
-    // DS14-start
-    public bool CanPrint;
-    // DS14-end
-
     public CriminalRecordsConsoleState(Dictionary<uint, string>? recordListing, StationRecordsFilter? newFilter)
     {
         RecordListing = recordListing;
@@ -70,17 +66,10 @@ public sealed class CriminalRecordChangeStatus : BoundUserInterfaceMessage
     public readonly SecurityStatus Status;
     public readonly string? Reason;
 
-    // DS14-start
-    public readonly string? Articles;
-    public readonly string? Sentence;
-    // DS14-end
-
-    public CriminalRecordChangeStatus(SecurityStatus status, string? reason, string? articles = null, string? sentence = null)
+    public CriminalRecordChangeStatus(SecurityStatus status, string? reason)
     {
         Status = status;
         Reason = reason;
-        Articles = articles; // DS14
-        Sentence = sentence; // DS14
     }
 }
 
@@ -127,11 +116,4 @@ public sealed class CriminalRecordSetStatusFilter : BoundUserInterfaceMessage
         FilterStatus = newFilterStatus;
     }
 }
-
-// DS14-start
-[Serializable, NetSerializable]
-public sealed class CriminalRecordPrintDocument : BoundUserInterfaceMessage
-{
-}
-// DS14-end
 

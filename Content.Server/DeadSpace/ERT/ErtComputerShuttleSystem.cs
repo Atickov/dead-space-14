@@ -78,7 +78,7 @@ public sealed class ErtComputerShuttleSystem : EntitySystem
                         continue;
 
                     if (!_shuttleSystem.CanFTL(shuttleUid.Value, out _))
-                        continue;
+                        return;
 
                     var xform = Transform(shuttleUid.Value);
 

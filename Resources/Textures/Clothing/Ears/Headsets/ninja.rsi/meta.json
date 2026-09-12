@@ -19,6 +19,28 @@
             ]
         },
         {
+            "name": "red-icon",
+            "delays": [
+                [
+                0.5,
+                0.35,
+                0.3,
+                0.3
+                ]
+            ]
+        },
+        {
+            "name": "blue-icon",
+            "delays": [
+                [
+                0.5,
+                0.35,
+                0.3,
+                0.3
+                ]
+            ]
+        },
+        {
             "name": "equipped-EARS",
             "directions": 4
         },

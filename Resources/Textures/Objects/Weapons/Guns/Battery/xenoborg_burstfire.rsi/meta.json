@@ -6,6 +6,11 @@
         "x": 32,
         "y": 32
     },
+<<<<<<<< HEAD:Resources/Textures/_DeadSpace/Objects/Weapons/Guns/Ammunition/Magazine/LightRifle_drum.rsi/meta.json
+    "license": "CC-BY-SA-3.0",
+    "copyright": "made by mutemaid. (discord) for Space Station 14 server Мёртвый Космос",
+========
+>>>>>>>> master:Resources/Textures/Objects/Weapons/Guns/Battery/xenoborg_burstfire.rsi/meta.json
     "states": [
         {
             "name": "icon"
@@ -14,6 +19,32 @@
             "name": "base"
         },
         {
+<<<<<<<< HEAD:Resources/Textures/_DeadSpace/Objects/Weapons/Guns/Ammunition/Magazine/LightRifle_drum.rsi/meta.json
+            "name": "mag-1"
+        },
+        {
+            "name": "inhand-left-mag",
+            "directions": 4
+        },
+        {
+            "name": "inhand-right-mag",
+            "directions": 4
+        },
+        {
+            "name": "base-icon"
+        },
+		{
+            "name": "incendiary"
+        },
+		{
+            "name": "practice"
+        },
+		{
+            "name": "stripe"
+        },
+		{
+            "name": "uranium"
+========
             "name": "mag-unshaded-0"
         },
         {
@@ -27,6 +58,7 @@
         },
         {
             "name": "mag-unshaded-4"
+>>>>>>>> master:Resources/Textures/Objects/Weapons/Guns/Battery/xenoborg_burstfire.rsi/meta.json
         }
     ]
 }

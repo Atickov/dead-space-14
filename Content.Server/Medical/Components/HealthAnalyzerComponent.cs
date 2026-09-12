@@ -1,7 +1,10 @@
 using Robust.Shared.Audio;
 using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom;
-using Content.Shared.MedicalScanner; //DS14
-using Content.Shared.FixedPoint; //DS14
+//DS14-start
+using Content.Shared.MedicalScanner;
+using Content.Shared.FixedPoint;
+using Content.Server.DeadSpace.Ninja.Systems;
+//DS14-end
 
 namespace Content.Server.Medical.Components;
 

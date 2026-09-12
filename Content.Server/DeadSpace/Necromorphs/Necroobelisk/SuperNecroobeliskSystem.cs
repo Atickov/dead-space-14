@@ -215,8 +215,7 @@ public sealed class SuperNecroobeliskSystem : SharedSuperNecroobeliskSystem
             requester: null,
             checkCooldown: false,
             text: "uni-centcomm-announcement-obelisk-was-destroyed",
-            name: "round-end-system-shuttle-sender-announcement",
-            announcementSource: uid
+            name: "round-end-system-shuttle-sender-announcement"
         );
     }
 

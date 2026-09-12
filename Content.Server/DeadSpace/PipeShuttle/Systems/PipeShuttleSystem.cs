@@ -61,7 +61,12 @@ public sealed class PipeShuttleSystem : EntitySystem
         while (shuttleQuery.MoveNext(out var uid, out var shuttle, out var xform))
         {
             if (shuttle.FlightMode == PipeShuttleFlightMode.Manual)
+            {
+                EnableManualMode(uid, shuttle);
                 continue;
+            }
+
+            DisableManualMode(uid, shuttle);
 
             if (!shuttle.Travelling || string.IsNullOrEmpty(shuttle.TargetDestId))
                 continue;
@@ -119,18 +124,15 @@ public sealed class PipeShuttleSystem : EntitySystem
             _physics.SetCanCollide(uid, false, body: body);
         }
 
-        if (!string.IsNullOrEmpty(component.CurrentDestId))
-        {
-            var dest = FindDestination(component, component.CurrentDestId);
-            if (dest != null)
-            {
-                var gridPos = _transform.GetWorldPosition(uid);
-                component.PositionOffset = gridPos - dest.Position;
-            }
-        }
+        if (string.IsNullOrEmpty(component.CurrentDestId))
+            return;
 
-        if (component.FlightMode == PipeShuttleFlightMode.Manual)
-            EnableManualBody(uid, component);
+        var dest = FindDestination(component, component.CurrentDestId);
+        if (dest != null)
+        {
+            var gridPos = _transform.GetWorldPosition(uid);
+            component.PositionOffset = gridPos - dest.Position;
+        }
     }
 
     private void OnShuttleShutdown(EntityUid uid, PipeShuttleComponent component, ComponentShutdown args)
@@ -172,11 +174,11 @@ public sealed class PipeShuttleSystem : EntitySystem
         if (newMode == PipeShuttleFlightMode.Manual)
         {
             CancelShuttle(shuttleUid, shuttle);
-            EnableManualBody(shuttleUid, shuttle);
+            EnableManualBody(shuttleUid);
         }
         else
         {
-            DisableManualBody(shuttleUid, shuttle);
+            DisableManualBody(shuttleUid);
             shuttle.DoorsSecured = false;
         }
 
@@ -191,33 +193,33 @@ public sealed class PipeShuttleSystem : EntitySystem
         args.Handled = true;
     }
 
-    private void EnableManualBody(EntityUid uid, PipeShuttleComponent shuttle)
+    private void EnableManualMode(EntityUid uid, PipeShuttleComponent shuttle)
     {
-        if (shuttle.ManualBodyActive)
-            return;
-
-        shuttle.ManualBodyActive = true;
-        Dirty(uid, shuttle);
-
-        EnsureComp<ShuttleComponent>(uid);
-
-        if (TryComp<PhysicsComponent>(uid, out var body))
+        if (shuttle.DoorsSecured)
         {
-            _physics.SetCanCollide(uid, true, body: body);
+            ReleaseDoors(uid);
+            shuttle.DoorsSecured = false;
+            Dirty(uid, shuttle);
         }
 
+        EnableManualBody(uid);
+    }
+
+    private void EnableManualBody(EntityUid uid)
+    {
+        EnsureComp<ShuttleComponent>(uid);
         _shuttle.Enable(uid);
+
         RegisterThrusters(uid);
     }
 
-    private void DisableManualBody(EntityUid uid, PipeShuttleComponent shuttle)
+    private void DisableManualMode(EntityUid uid, PipeShuttleComponent shuttle)
     {
-        if (!shuttle.ManualBodyActive)
-            return;
+        DisableManualBody(uid);
+    }
 
-        shuttle.ManualBodyActive = false;
-        Dirty(uid, shuttle);
-
+    private void DisableManualBody(EntityUid uid)
+    {
         if (HasComp<ShuttleComponent>(uid))
             _shuttle.Disable(uid);
 
@@ -232,9 +234,9 @@ public sealed class PipeShuttleSystem : EntitySystem
     }
 
     /// <summary>
-    /// Registers all thrusters on the grid onto the ShuttleComponent.
-    /// Thrusters may not have been initialized through ThrusterSystem (ShuttleComponent
-    /// was removed before thruster init), so we register them directly.
+    /// Re-registers all thrusters on the grid onto the (re)added ShuttleComponent.
+    /// Thrusters were enabled before the ShuttleComponent existed, so they were registered
+    /// on a now-removed component. Repopulate the fresh ShuttleComponent's thrust lists.
     /// </summary>
     private void RegisterThrusters(EntityUid uid)
     {
@@ -244,25 +246,26 @@ public sealed class PipeShuttleSystem : EntitySystem
         var query = AllEntityQuery<ThrusterComponent, TransformComponent>();
         while (query.MoveNext(out var thrusterUid, out var thruster, out var xform))
         {
-            if (xform.GridUid != uid)
+            if (xform.GridUid != uid || !thruster.IsOn)
                 continue;
 
-            if (thruster.Type == ThrusterType.Angular)
+            switch (thruster.Type)
             {
-                if (!shuttle.AngularThrusters.Contains(thrusterUid))
-                {
-                    shuttle.AngularThrust += thruster.Thrust;
-                    shuttle.AngularThrusters.Add(thrusterUid);
-                }
-            }
-            else
-            {
-                var direction = (int)xform.LocalRotation.GetCardinalDir() / 2;
-                if (!shuttle.LinearThrusters[direction].Contains(thrusterUid))
-                {
-                    shuttle.LinearThrust[direction] += thruster.Thrust;
-                    shuttle.LinearThrusters[direction].Add(thrusterUid);
-                }
+                case ThrusterType.Linear:
+                    var direction = (int)xform.LocalRotation.GetCardinalDir() / 2;
+                    if (!shuttle.LinearThrusters[direction].Contains(thrusterUid))
+                    {
+                        shuttle.LinearThrust[direction] += thruster.Thrust;
+                        shuttle.LinearThrusters[direction].Add(thrusterUid);
+                    }
+                    break;
+                case ThrusterType.Angular:
+                    if (!shuttle.AngularThrusters.Contains(thrusterUid))
+                    {
+                        shuttle.AngularThrust += thruster.Thrust;
+                        shuttle.AngularThrusters.Add(thrusterUid);
+                    }
+                    break;
             }
         }
     }

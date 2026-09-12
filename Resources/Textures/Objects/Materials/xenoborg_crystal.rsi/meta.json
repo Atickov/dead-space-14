@@ -8,7 +8,13 @@
     },
     "states": [
         {
-            "name": "toy"
+            "name": "crystal-1"
+        },
+        {
+            "name": "crystal-2"
+        },
+        {
+            "name": "crystal-3"
         }
     ]
 }

@@ -71,7 +71,7 @@ public sealed partial class IngestionSystem
         if (args.Cancelled || args.Solution != null)
             return;
 
-        if (args.RequireUtensils && entity.Comp.UtensilRequired && !HasRequiredUtensils(args.User, entity.Comp.Utensil))
+        if (entity.Comp.UtensilRequired && !HasRequiredUtensils(args.User, entity.Comp.Utensil))
         {
             args.Cancelled = true;
             return;

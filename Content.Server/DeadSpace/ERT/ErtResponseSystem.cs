@@ -82,7 +82,6 @@ public sealed class ApprovedErtRequestData
 // Работает для одной станции, потому что пока нет смысла делать для множества
 public sealed class ErtResponseSystem : SharedErtResponseSystem
 {
-    [Dependency] private readonly Content.Server.DeadSpace.CentComm.GameRuleStationSystem _ruleStation = default!;
     [Dependency] private readonly ChatSystem _chatSystem = default!;
     [Dependency] private readonly StationSystem _stationSystem = default!;
     [Dependency] private readonly IChatManager _chatManager = default!;
@@ -369,7 +368,7 @@ public sealed class ErtResponseSystem : SharedErtResponseSystem
 
         if (msg.SendNotification)
         {
-            _chatSystem.DispatchAdminFilteredAnnouncement(_ruleStation.GetStationPlayers(),
+            _chatSystem.DispatchGlobalAnnouncement(
                 Loc.GetString("ert-console-request-rejected-announcement"),
                 sender: Loc.GetString("ert-response-cso-sender"),
                 announcementSound: DecisionSound,
@@ -482,7 +481,7 @@ public sealed class ErtResponseSystem : SharedErtResponseSystem
             return;
         }
 
-        if (HasActiveRequest(prototype, request.PinpointerTarget, msg.RequestId))
+        if (HasActiveRequestForTeam(newTeam, msg.RequestId))
         {
             RaiseNetworkEvent(new ErtAdminActionResult(false, Loc.GetString("ert-call-fail-already-waiting")), args.SenderSession.Channel);
             return;
@@ -723,7 +722,7 @@ public sealed class ErtResponseSystem : SharedErtResponseSystem
 
             if (prototype.CancelMessage != null && !settings.SuppressAnnouncements)
             {
-                _chatSystem.DispatchAdminFilteredAnnouncement(_ruleStation.GetStationPlayers(),
+                _chatSystem.DispatchGlobalAnnouncement(
                     message: prototype.CancelMessage,
                     sender: Loc.GetString("chat-manager-sender-announcement"),
                     colorOverride: Color.FromHex("#1d8bad"),
@@ -782,7 +781,7 @@ public sealed class ErtResponseSystem : SharedErtResponseSystem
     {
         reason = "Вызван успешно.";
 
-        if (!TryReserveCall(team, station, out var prototype, out reason, toPay, needCooldown, pinpointerTarget))
+        if (!TryReserveCall(team, station, out var prototype, out reason, toPay, needCooldown))
             return false;
 
         if (needWarn)
@@ -857,25 +856,19 @@ public sealed class ErtResponseSystem : SharedErtResponseSystem
         var ruleComp = EnsureComp<ErtSpawnRuleComponent>(ruleEntity);
 
         if (!_prototypeManager.TryIndex(ruleComp.Shuttle, out var shuttle))
-        {
-            QueueDel(ruleEntity);
             return null;
-        }
 
         var opts = DeserializationOptions.Default with { InitializeMaps = true };
-        var mapEntity = _mapSystem.CreateMap(out var mapId);
+        _mapSystem.CreateMap(out var mapId);
         if (!_mapLoaderSystem.TryLoadGrid(mapId, shuttle.Path, out var grid, opts))
         {
             Log.Error($"Failed to load grid from {shuttle.Path}!");
-            QueueDel(mapEntity);
-            QueueDel(ruleEntity);
             return null;
         }
 
         var grids = new List<EntityUid> { grid.Value };
 
         ruleComp.Team = team;
-        ruleComp.ShuttleEntity = grid.Value;
         ruleComp.CallReason = callReason;
         ruleComp.PinpointerTarget = pinpointerTarget;
         ruleComp.SuppressAnnouncements = !announce;
@@ -890,7 +883,7 @@ public sealed class ErtResponseSystem : SharedErtResponseSystem
 
         if (announce && !string.IsNullOrEmpty(prototype.StartAnnouncement))
         {
-            _chatSystem.DispatchAdminFilteredAnnouncement(_ruleStation.GetStationPlayers(),
+            _chatSystem.DispatchGlobalAnnouncement(
                 message: Loc.GetString(prototype.StartAnnouncement),
                 sender: string.IsNullOrEmpty(prototype.Sender)
                     ? Loc.GetString("chat-manager-sender-announcement")
@@ -916,10 +909,16 @@ public sealed class ErtResponseSystem : SharedErtResponseSystem
         out ErtTeamPrototype prototype,
         out string? reason,
         bool toPay,
-        bool needCooldown,
-        EntityUid? pinpointerTarget = null)
+        bool needCooldown)
     {
         reason = "Вызван успешно.";
+
+        if (HasActiveRequestForTeam(team))
+        {
+            prototype = default!;
+            reason = Loc.GetString("ert-call-fail-already-waiting");
+            return false;
+        }
 
         if (!_prototypeManager.TryIndex(team, out var indexedPrototype))
         {
@@ -929,14 +928,6 @@ public sealed class ErtResponseSystem : SharedErtResponseSystem
         }
 
         prototype = indexedPrototype;
-
-        if (HasActiveRequest(prototype, pinpointerTarget))
-        {
-            reason = Loc.GetString(prototype.DispatchPerTarget && pinpointerTarget != null
-                ? "ert-call-fail-patient-assigned"
-                : "ert-call-fail-already-waiting");
-            return false;
-        }
 
         if (station != null && prototype.CodeBlackList != null)
         {
@@ -981,17 +972,17 @@ public sealed class ErtResponseSystem : SharedErtResponseSystem
         return true;
     }
 
-    private bool HasActiveRequest(ErtTeamPrototype team, EntityUid? target = null, int? ignoredApprovedRequestId = null)
+    private bool HasActiveRequestForTeam(ProtoId<ErtTeamPrototype> team, int? ignoredApprovedRequestId = null)
     {
         foreach (var pending in _pendingRequests.Values)
         {
-            if (pending.RequestedTeamId == team.ID && (!team.DispatchPerTarget || target == null))
+            if (pending.RequestedTeamId == team)
                 return true;
         }
 
         foreach (var manualApproved in _manualApprovedRequests.Values)
         {
-            if (manualApproved.TeamId == team.ID && (!team.DispatchPerTarget || manualApproved.PinpointerTarget == target))
+            if (manualApproved.TeamId == team)
                 return true;
         }
 
@@ -1000,18 +991,7 @@ public sealed class ErtResponseSystem : SharedErtResponseSystem
             if (ignoredApprovedRequestId != null && approved.RequestId == ignoredApprovedRequestId.Value)
                 continue;
 
-            if (approved.TeamId == team.ID && (!team.DispatchPerTarget || approved.PinpointerTarget == target))
-                return true;
-        }
-
-        if (!team.DispatchPerTarget)
-            return false;
-
-        var query = EntityQueryEnumerator<ErtSpawnRuleComponent>();
-        while (query.MoveNext(out _, out var rule))
-        {
-            if (rule.Team == team.ID && rule.PinpointerTarget == target &&
-                rule.ShuttleEntity is { } shuttle && !TerminatingOrDeleted(shuttle))
+            if (approved.TeamId == team)
                 return true;
         }
 
@@ -1086,7 +1066,7 @@ public sealed class ErtResponseSystem : SharedErtResponseSystem
         if (!prototype.AnnounceOnApproval)
             return;
 
-        _chatSystem.DispatchAdminFilteredAnnouncement(_ruleStation.GetStationPlayers(),
+        _chatSystem.DispatchGlobalAnnouncement(
             message: string.IsNullOrEmpty(prototype.Notification)
                 ? Loc.GetString("ert-response-caused-messager", ("team", prototype.Name))
                 : Loc.GetString(prototype.Notification),
@@ -1102,7 +1082,7 @@ public sealed class ErtResponseSystem : SharedErtResponseSystem
 
     private void AnnounceChangedApprovedTeam(ErtTeamPrototype prototype)
     {
-        _chatSystem.DispatchAdminFilteredAnnouncement(_ruleStation.GetStationPlayers(),
+        _chatSystem.DispatchGlobalAnnouncement(
             message: Loc.GetString("ert-response-team-changed-announcement", ("team", FormatTeamNameForAnnouncement(prototype))),
             sender: Loc.GetString("ert-response-cso-sender"),
             colorOverride: Color.FromHex("#1d8bad"),
@@ -1124,7 +1104,7 @@ public sealed class ErtResponseSystem : SharedErtResponseSystem
 
     private void AnnounceConsoleRequestReceived()
     {
-        _chatSystem.DispatchAdminFilteredAnnouncement(_ruleStation.GetStationPlayers(),
+        _chatSystem.DispatchGlobalAnnouncement(
             message: Loc.GetString("ert-console-request-submitted-announcement"),
             sender: Loc.GetString("ert-response-cso-sender"),
             colorOverride: Color.FromHex("#1d8bad"),
@@ -1136,7 +1116,7 @@ public sealed class ErtResponseSystem : SharedErtResponseSystem
 
     private void PlayGlobalSound(SoundSpecifier sound)
     {
-        _audio.PlayGlobal(sound, _ruleStation.GetStationPlayers(), true);
+        _audio.PlayGlobal(sound, Filter.Broadcast(), true);
     }
 }
 

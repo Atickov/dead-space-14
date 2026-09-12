@@ -298,12 +298,10 @@ public sealed partial class IngestionSystem
     /// <param name="user">The entity trying to make the ingestion happening, not necessarily the one eating</param>
     /// <param name="solution">Solution we're returning</param>
     /// <param name="time">The time it takes us to eat this entity</param>
-    /// <param name="requireUtensils">Whether accessing the food requires eating utensils.</param>
     public bool CanAccessSolution(Entity<SolutionContainerManagerComponent?> ingested,
         EntityUid user,
         [NotNullWhen(true)] out Entity<SolutionComponent>? solution,
-        out TimeSpan? time,
-        bool requireUtensils = true)
+        out TimeSpan? time)
     {
         solution = null;
         time = null;
@@ -314,7 +312,7 @@ public sealed partial class IngestionSystem
             return false;
         }
 
-        var ev = new EdibleEvent(user) { RequireUtensils = requireUtensils };
+        var ev = new EdibleEvent(user);
         RaiseLocalEvent(ingested, ref ev);
 
         solution = ev.Solution;

@@ -93,21 +93,6 @@ public abstract class AirAlarmModeExecutor : IAirAlarmMode
         DeviceNetworkSystem = EntityManager.System<DeviceNetworkSystem>();
         AirAlarmSystem = EntityManager.System<AirAlarmSystem>();
     }
-
-    protected void SetScrubberPreset(EntityUid uid, string addr, GasVentScrubberData current, GasVentScrubberData preset)
-    {
-        AirAlarmSystem.SetData(uid, addr, new GasVentScrubberData
-        {
-            Enabled = preset.Enabled,
-            Dirty = preset.Dirty,
-            IgnoreAlarms = preset.IgnoreAlarms,
-            FilterGases = new HashSet<Gas>(current.FilterGases),
-            PumpDirection = preset.PumpDirection,
-            VolumeRate = preset.VolumeRate,
-            WideNet = preset.WideNet,
-            AirAlarmPanicWireCut = current.AirAlarmPanicWireCut,
-        });
-    }
 }
 
 public sealed class AirAlarmNoneMode : AirAlarmModeExecutor
@@ -145,7 +130,7 @@ public sealed class AirAlarmFilterMode : AirAlarmModeExecutor
 
         foreach (var (addr, device) in alarm.ScrubberData)
         {
-            SetScrubberPreset(uid, addr, device, GasVentScrubberData.FilterModePreset); // DS-14
+            AirAlarmSystem.SetData(uid, addr, GasVentScrubberData.FilterModePreset);
         }
     }
 }
@@ -164,7 +149,7 @@ public sealed class AirAlarmWideFilterMode : AirAlarmModeExecutor
 
         foreach (var (addr, device) in alarm.ScrubberData)
         {
-            SetScrubberPreset(uid, addr, device, GasVentScrubberData.WideFilterModePreset); // DS-14
+            AirAlarmSystem.SetData(uid, addr, GasVentScrubberData.WideFilterModePreset);
         }
     }
 }
@@ -183,7 +168,7 @@ public sealed class AirAlarmPanicMode : AirAlarmModeExecutor
 
         foreach (var (addr, device) in alarm.ScrubberData)
         {
-            SetScrubberPreset(uid, addr, device, GasVentScrubberData.PanicModePreset);
+            AirAlarmSystem.SetData(uid, addr, GasVentScrubberData.PanicModePreset);
         }
     }
 }
@@ -202,7 +187,7 @@ public sealed class AirAlarmFillMode : AirAlarmModeExecutor
 
         foreach (var (addr, device) in alarm.ScrubberData)
         {
-            SetScrubberPreset(uid, addr, device, GasVentScrubberData.FillModePreset);
+            AirAlarmSystem.SetData(uid, addr, GasVentScrubberData.FillModePreset);
         }
     }
 }

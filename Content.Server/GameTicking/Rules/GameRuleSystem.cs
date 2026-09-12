@@ -1,5 +1,4 @@
 using Content.Server.Atmos.EntitySystems;
-using Content.Server.DeadSpace.CentComm;
 using Content.Server.Chat.Managers;
 using Content.Shared.GameTicking.Components;
 using Robust.Server.GameObjects;
@@ -21,8 +20,6 @@ public abstract partial class GameRuleSystem<T> : EntitySystem where T : ICompon
     [Dependency] private readonly IPlayerManager _playerManager = default!;
     [Dependency] private readonly IConfigurationManager _cfg = default!;
     // DS14-end
-
-    [Dependency] protected readonly GameRuleStationSystem RuleStation = default!; // DS14
 
     // Not protected, just to be used in utility methods
     [Dependency] private readonly AtmosphereSystem _atmosphere = default!;

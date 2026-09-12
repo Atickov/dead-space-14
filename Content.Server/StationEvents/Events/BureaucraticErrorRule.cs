@@ -18,7 +18,7 @@ public sealed class BureaucraticErrorRule : StationEventSystem<BureaucraticError
     {
         base.Started(uid, component, gameRule, args);
 
-        if (!TryGetRandomStation(out var chosenStation, HasComp<StationJobsComponent>, rule: uid)) // DS14
+        if (!TryGetRandomStation(out var chosenStation, HasComp<StationJobsComponent>))
             return;
 
         var jobList = _stationJobs.GetJobs(chosenStation.Value).Keys.ToList();

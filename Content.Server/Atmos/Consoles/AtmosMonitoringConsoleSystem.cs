@@ -71,7 +71,7 @@ public sealed class AtmosMonitoringConsoleSystem : SharedAtmosMonitoringConsoleS
 
     private void OnConsoleParentChanged(EntityUid uid, AtmosMonitoringConsoleComponent component, EntParentChangedMessage args)
     {
-        component.ForceFullUpdateTick = _gameTiming.CurTick; // DS14
+        component.ForceFullUpdate = true;
         InitializeAtmosMonitoringConsole(uid, component);
     }
 

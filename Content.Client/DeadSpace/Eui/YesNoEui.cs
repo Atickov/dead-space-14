@@ -12,7 +12,6 @@ namespace Content.Client.DeadSpace.Eui
     public sealed class YesNoEui : BaseEui
     {
         private readonly YesNoWindow _window;
-        private bool _closed;
 
         // Parameterless ctor is required for dynamic activation via IoC/Reflection.
         public YesNoEui() : this(state: null)
@@ -26,19 +25,19 @@ namespace Content.Client.DeadSpace.Eui
 
             _window = new YesNoWindow(title, text);
 
-            _window.NoButton.OnPressed += _ => Reply(YesNoUiButton.No);
-            _window.YesButton.OnPressed += _ => Reply(YesNoUiButton.Yes);
-            _window.OnClose += () => Reply(YesNoUiButton.No);
-        }
+            _window.NoButton.OnPressed += _ =>
+            {
+                SendMessage(new YesNoChoiceMessage(YesNoUiButton.No));
+                _window.Close();
+            };
 
-        private void Reply(YesNoUiButton choice)
-        {
-            if (_closed)
-                return;
+            _window.OnClose += () => SendMessage(new YesNoChoiceMessage(YesNoUiButton.No));
 
-            _closed = true;
-            SendMessage(new YesNoChoiceMessage(choice));
-            _window.Close();
+            _window.YesButton.OnPressed += _ =>
+            {
+                SendMessage(new YesNoChoiceMessage(YesNoUiButton.Yes));
+                _window.Close();
+            };
         }
 
         public override void Opened()
@@ -52,13 +51,12 @@ namespace Content.Client.DeadSpace.Eui
             if (state is YesNoEuiState s)
             {
                 _window.Title = s.Title;
-                _window.MessageLabel.SetMessage(s.Text);
+                _window.MessageLabel.Text = s.Text;
             }
         }
 
         public override void Closed()
         {
-            _closed = true;
             _window.Close();
         }
     }

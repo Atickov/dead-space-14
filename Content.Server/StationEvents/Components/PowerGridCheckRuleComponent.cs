@@ -5,7 +5,6 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Server.StationEvents.Components;
 
-[Content.Server.DeadSpace.CentComm.AllowedGameRuleOnCentComm] // DS14
 [RegisterComponent, Access(typeof(PowerGridCheckRule))]
 public sealed partial class PowerGridCheckRuleComponent : Component
 {

@@ -8,7 +8,6 @@ namespace Content.Server.StationEvents.Components;
 /// <summary>
 ///     Greytide Virus event specific configuration
 /// </summary>
-[Content.Server.DeadSpace.CentComm.AllowedGameRuleOnCentComm] // DS14
 [RegisterComponent, Access(typeof(GreytideVirusRule))]
 public sealed partial class GreytideVirusRuleComponent : Component
 {

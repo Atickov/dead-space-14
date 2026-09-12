@@ -84,8 +84,7 @@ public sealed class CombatModeSystem : SharedCombatModeSystem
                 EntityManager,
                 _eye,
                 this,
-                EntityManager.System<HandsSystem>(),
-                _playerManager)); //DS14
+                EntityManager.System<HandsSystem>()));
         }
         else
         {

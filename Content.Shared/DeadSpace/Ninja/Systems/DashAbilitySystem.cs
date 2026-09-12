@@ -7,10 +7,11 @@ using Content.Shared.Movement.Pulling.Systems;
 using Content.Shared.DeadSpace.Ninja.Components;
 using Content.Shared.Popups;
 using Content.Shared.Examine;
+using Robust.Shared.Random;
+using Content.Shared.Inventory;
+using Content.Shared.Tag;
+using Robust.Shared.Prototypes;
 using Robust.Shared.Map;
-using Robust.Shared.Physics;
-using Robust.Shared.Physics.Components;
-using Robust.Shared.Physics.Systems;
 
 namespace Content.Shared.DeadSpace.Ninja.Systems;
 
@@ -26,12 +27,11 @@ public abstract class SharedDashAbilitySystem : EntitySystem
     [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly PullingSystem _pullingSystem = default!;
     [Dependency] private readonly SharedTransformSystem _transform = default!;
-    // DS14-start: semantic #45041 port for the legacy dash system on the current engine baseline.
-    [Dependency] private readonly EntityLookupSystem _lookup = default!;
-    [Dependency] private readonly SharedPhysicsSystem _physics = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly InventorySystem _inventory = default!;
+    [Dependency] private readonly TagSystem _tagSystem = default!;
 
-    private readonly HashSet<Entity<PhysicsComponent>> _intersecting = new();
-    // DS14-end
+    private static readonly ProtoId<TagPrototype> CorruptTeleportTag = "CorruptTeleportItem";
 
     public override void Initialize()
     {
@@ -80,15 +80,6 @@ public abstract class SharedDashAbilitySystem : EntitySystem
             return;
         }
 
-        // DS14-start: #45041 destination collision check adapted without the newer TeleportAction refactor.
-        var targetRotation = _transform.GetWorldRotation(args.Target.EntityId);
-        if (IsDestinationBlocked(user, target, targetRotation))
-        {
-            _popup.PopupClient(Loc.GetString("dash-ability-blocked"), user, user);
-            return;
-        }
-        // DS14-end
-
         if (!_sharedCharges.TryUseCharge(uid))
         {
             _popup.PopupClient(Loc.GetString("dash-ability-no-charges", ("item", uid)), user, user);
@@ -125,53 +116,7 @@ public abstract class SharedDashAbilitySystem : EntitySystem
         //DS14-end
     }
 
-    // DS14-start: #45041 collision helper adapted to the legacy DashAbility API.
-    private bool IsDestinationBlocked(
-        EntityUid user,
-        MapCoordinates target,
-        Angle rotation,
-        FixturesComponent? fixtures = null,
-        PhysicsComponent? physics = null)
-    {
-        if (!Resolve(user, ref fixtures, ref physics, false) ||
-            !physics.CanCollide ||
-            !physics.Hard)
-        {
-            return false;
-        }
-
-        var destinationTransform = new Transform(target.Position, rotation);
-
-        foreach (var fixture in fixtures.Fixtures.Values)
-        {
-            if (!fixture.Hard)
-                continue;
-
-            _intersecting.Clear();
-            _lookup.GetEntitiesIntersecting(
-                target.MapId,
-                fixture.Shape,
-                destinationTransform,
-                _intersecting,
-                LookupFlags.Dynamic | LookupFlags.Static);
-
-            foreach (var other in _intersecting)
-            {
-                if (other.Owner == user)
-                    continue;
-
-                if (_physics.IsCurrentlyHardCollidable(
-                        (other.Owner, null, other.Comp),
-                        (user, fixtures, physics)))
-                {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-    // DS14-end
+    protected virtual void DoTeleport(EntityUid user, EntityCoordinates target, string? beam = null) { } //DS14
 
     public bool CheckDash(EntityUid uid, EntityUid user)
     {

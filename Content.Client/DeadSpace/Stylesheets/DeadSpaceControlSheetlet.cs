@@ -18,8 +18,6 @@ public sealed class DeadSpaceControlSheetlet : Sheetlet<NanotrasenStylesheet>
 {
     public override StyleRule[] GetRules(NanotrasenStylesheet sheet, object config)
     {
-        // Dark and light separate controls from their parent through fill, not permanent frames. Retaining the
-        // one-pixel transparent edge keeps existing layout geometry stable and leaves the gold edge for hover.
         var normalBorder = DeadSpaceStylePalette.ClassicChrome
             ? DeadSpaceStylePalette.BorderControl
             : Color.Transparent;
@@ -41,7 +39,7 @@ public sealed class DeadSpaceControlSheetlet : Sheetlet<NanotrasenStylesheet>
         var actionPressed = new StyleBoxFlat(action)
         {
             BackgroundColor = DeadSpaceStylePalette.ActionPressed,
-            BorderColor = normalBorder,
+            BorderColor = DeadSpaceStylePalette.PressedOutline,
         };
         var actionDisabled = new StyleBoxFlat(action)
         {
@@ -63,7 +61,7 @@ public sealed class DeadSpaceControlSheetlet : Sheetlet<NanotrasenStylesheet>
         var topActionPressed = new StyleBoxFlat(topAction)
         {
             BackgroundColor = DeadSpaceStylePalette.ActionPressed,
-            BorderColor = normalBorder,
+            BorderColor = DeadSpaceStylePalette.PressedOutline,
         };
         var topActionDisabled = new StyleBoxFlat(topAction)
         {
@@ -85,7 +83,7 @@ public sealed class DeadSpaceControlSheetlet : Sheetlet<NanotrasenStylesheet>
         var dangerControlPressed = new StyleBoxFlat(dangerControl)
         {
             BackgroundColor = DeadSpaceStylePalette.ControlPressed,
-            BorderColor = normalBorder,
+            BorderColor = DeadSpaceStylePalette.PressedOutline,
         };
         var dangerControlDisabled = new StyleBoxFlat(dangerControl)
         {
@@ -107,7 +105,7 @@ public sealed class DeadSpaceControlSheetlet : Sheetlet<NanotrasenStylesheet>
         var baseControlPressed = new StyleBoxFlat(baseControl)
         {
             BackgroundColor = DeadSpaceStylePalette.ControlPressed,
-            BorderColor = normalBorder,
+            BorderColor = DeadSpaceStylePalette.PressedOutline,
         };
         var baseControlDisabled = new StyleBoxFlat(baseControl)
         {
@@ -139,7 +137,13 @@ public sealed class DeadSpaceControlSheetlet : Sheetlet<NanotrasenStylesheet>
         var listItemPressed = new StyleBoxFlat(listItem)
         {
             BackgroundColor = DeadSpaceStylePalette.ListItemPressed,
-            BorderColor = normalBorder,
+            BorderColor = DeadSpaceStylePalette.PressedOutline,
+        };
+        // ItemList rasterizes the lower edge exactly on the next row boundary. Give only its selected
+        // background one extra bottom pixel so the outline remains closed at fractional UI scales.
+        var selectedListItem = new StyleBoxFlat(listItemPressed)
+        {
+            BorderThickness = new Thickness(1, 1, 1, 2),
         };
         var listItemDisabled = new StyleBoxFlat(listItem)
         {
@@ -157,25 +161,18 @@ public sealed class DeadSpaceControlSheetlet : Sheetlet<NanotrasenStylesheet>
 
         var input = DeadSpaceStyleBoxes.Flat(
             DeadSpaceStylePalette.Input,
-            normalBorder,
-            new Thickness(1),
+            DeadSpaceStylePalette.BorderControl,
+            DeadSpaceStylePalette.ClassicChrome ? new Thickness(1) : new Thickness(0, 0, 0, 1),
             7,
             4);
         var inputDisabled = new StyleBoxFlat(input)
         {
             BackgroundColor = DeadSpaceStylePalette.ControlDisabled,
-            BorderColor = disabledBorder,
+            BorderColor = DeadSpaceStylePalette.BorderDisabled,
         };
-        // OutputPanel content commonly contains channel/name markup authored for a dark transcript. Keep this
-        // surface dark in both themes instead of applying a destructive tint to arbitrary markup colors.
-        var textArea = DeadSpaceStyleBoxes.Flat(
-            DeadSpaceStylePalette.SurfaceTranscript,
-            normalBorder,
-            new Thickness(1),
-            7,
-            6);
-        var chatPanel = DeadSpaceStyleBoxes.Flat(
-            DeadSpaceStylePalette.SurfaceTranscript.WithAlpha(221f / 255f));
+        var textArea = new StyleBoxFlat(input);
+        textArea.ContentMarginTopOverride = 6;
+        textArea.ContentMarginBottomOverride = 6;
 
         var rules = new List<StyleRule>
         {
@@ -199,15 +196,12 @@ public sealed class DeadSpaceControlSheetlet : Sheetlet<NanotrasenStylesheet>
                     .Prop(ItemList.StylePropertyBackground, input)
                     .Prop(ItemList.StylePropertyItemBackground, listItem)
                     .Prop(ItemList.StylePropertyDisabledItemBackground, inputDisabled)
-                    .Prop(ItemList.StylePropertySelectedItemBackground, listItemPressed)
-                    .Prop("font-color", DeadSpaceStylePalette.Text),
+                    .Prop(ItemList.StylePropertySelectedItemBackground, selectedListItem),
                 E<OutputPanel>()
                     .Prop(OutputPanel.StylePropertyStyleBox, textArea),
                 E<LineEdit>()
                     .Prop(LineEdit.StylePropertyStyleBox, input)
-                    .Prop("font-color", DeadSpaceStylePalette.Text)
-                    .Prop(LineEdit.StylePropertyCursorColor, DeadSpaceStylePalette.Amber)
-                    .Prop(LineEdit.StylePropertySelectionColor, DeadSpaceStylePalette.CyanSelection),
+                    .Prop("font-color", DeadSpaceStylePalette.Text),
                 E<LineEdit>()
                     .Class(LineEdit.StyleClassLineEditNotEditable)
                     .Prop(LineEdit.StylePropertyStyleBox, inputDisabled)
@@ -222,17 +216,6 @@ public sealed class DeadSpaceControlSheetlet : Sheetlet<NanotrasenStylesheet>
                 E<TextEdit>()
                     .Pseudo(TextEdit.StylePseudoClassPlaceholder)
                     .Prop("font-color", DeadSpaceStylePalette.TextPlaceholder),
-                E<PanelContainer>()
-                    .Class(ChatInputBox.StyleClassChatPanel)
-                    .Prop(PanelContainer.StylePropertyPanel, chatPanel),
-                E<LineEdit>()
-                    .Class(ChatInputBox.StyleClassChatLineEdit)
-                    .Prop(LineEdit.StylePropertyStyleBox, new StyleBoxEmpty())
-                    .Prop("font-color", DeadSpaceStylePalette.TextOnTranscript),
-                E<LineEdit>()
-                    .Class(ChatInputBox.StyleClassChatLineEdit)
-                    .Pseudo(LineEdit.StylePseudoClassPlaceholder)
-                    .Prop("font-color", DeadSpaceStylePalette.TextOnTranscriptPlaceholder),
             ]);
 
             AddBareContainerButtonRules(

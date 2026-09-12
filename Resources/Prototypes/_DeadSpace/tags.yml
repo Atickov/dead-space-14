@@ -281,9 +281,6 @@
   id: MagazineCarbineSKS
 
 - type: Tag
-  id: MagazineSmartWeaponShingen
-
-- type: Tag
   id: Magmite
 
 - type: Tag
@@ -508,14 +505,5 @@
 
 - type: Tag
   id: YellowFlower
-
-- type: Tag
-  id: GasGrenadeShell
-
-- type: Tag
-  id: GasGrenadeShellRed
-
-- type: Tag
-  id: GasGrenadeShellBlue
 
   # Обязательно в алфавитном порядке
