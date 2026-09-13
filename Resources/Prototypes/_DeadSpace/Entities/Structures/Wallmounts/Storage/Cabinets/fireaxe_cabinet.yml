@@ -43,7 +43,7 @@
     sprite: _DeadSpace/Structures/Wallmounts/samurai.rsi
     layers:
     - state: cabinet
-    - state: fireaxe
+    - state: katana
       map: ["enum.ItemCabinetVisuals.Layer"]
       visible: true
     - state: glass
