@@ -60,8 +60,10 @@ public abstract class SharedNinjaSuitSystem : EntitySystem
     /// </summary>
     private void OnGetItemActions(Entity<NinjaSuitComponent> ent, ref GetItemActionsEvent args)
     {
-        var comp = ent.Comp;
-        args.AddAction(ref comp.OpenSpiderOSActionEntity, comp.OpenSpiderOSAction);
+        if (args.InHands)
+            return;
+
+        args.AddAction(ent.Comp.OpenSpiderOSActionEntity);
     }
 
     /// <summary>
