@@ -1,6 +1,7 @@
 using Content.Shared.Actions;
 using Content.Shared.DeadSpace.Ninja.Components;
 using Content.Shared.Interaction.Events;
+using Content.Shared.Popups;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Network;
 
@@ -12,6 +13,7 @@ public abstract class SharedNinjaSpiritFormSystem : EntitySystem
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedSpaceNinjaSystem _ninja = default!;
     [Dependency] private readonly INetManager _net = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
 
     public override void Initialize()
     {
@@ -67,7 +69,10 @@ public abstract class SharedNinjaSpiritFormSystem : EntitySystem
             var cost = maxCharge * ent.Comp.EnergyDrainPercent;
 
             if (!_ninja.HasCharge(args.Performer, cost))
+            {
+                _popup.PopupClient(Loc.GetString("ninja-no-power"), args.Performer, args.Performer);
                 return;
+            }
 
             ActivateSpirit(ent, args.Performer);
         }
