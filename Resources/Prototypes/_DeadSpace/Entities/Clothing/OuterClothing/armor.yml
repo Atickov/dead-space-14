@@ -60,9 +60,9 @@
   description: Кустарный нагрудник из кусков металлолома. Защищает жизненно важные органы
   components:
   - type: Sprite
-    sprite: _DeadSpace/Clothing/OuterClothing/Armor/ArmorBasicSlim.rsi
+    sprite: _DeadSpace/Clothing/OuterClothing/Armor/samurai_armor.rsi
   - type: Clothing
-    sprite: _DeadSpace/Clothing/OuterClothing/Armor/ArmorBasicSlim.rsi
+    sprite: _DeadSpace/Clothing/OuterClothing/Armor/samurai_armor.rsi
   - type: Armor
     modifiers:
       coefficients:
