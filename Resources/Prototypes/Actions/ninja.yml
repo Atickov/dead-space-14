@@ -1,4 +1,4 @@
-# gloves
+﻿# gloves
 - type: entity
   parent: BaseToggleAction
   id: ActionToggleNinjaGloves
@@ -333,4 +333,14 @@
     itemIconStyle: BigAction
   - type: InstantAction
     event: !type:NinjaSpiritFormEvent
+
+- type: entity
+  id: ActionCycleNinjaVisor
+  name: cменить режим визора
+  description: Переключает между защитным, тепловым и режимом ночного видения.
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Action
+  - type: InstantAction
+    event: !type:CycleNinjaVisorActionEvent
 #DS-14 End
