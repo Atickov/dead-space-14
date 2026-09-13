@@ -1,4 +1,5 @@
 using Content.Client.UserInterface.Controls;
+using Content.Client.DeadSpace.Stylesheets;
 using Content.Shared.DeadSpace.Ninja.Components;
 using Content.Shared.DeadSpace.Ninja.Prototypes;
 using Content.Client.Stylesheets;
@@ -28,6 +29,10 @@ public sealed partial class SpiderOSWindow : FancyWindow
 
     private static readonly Color HeaderColor = Color.FromHex("#1bcc15");
 
+    public static readonly Color BootLogColor = Color.FromHex("#1bcc15");
+
+    public static readonly Color BootErrorColor = Color.FromHex("#cc1515");
+
     private static readonly Dictionary<string, Color> CategoryColors = new()
     {
         ["Ghost"] = Color.FromHex("#000038"),
@@ -50,9 +55,25 @@ public sealed partial class SpiderOSWindow : FancyWindow
 
     private OptionButton _hoodOrScarfOption = default!;
 
+    private ProgressBar _loadProgressBar = default!;
+
     private TextureRect _stylePreview = default!;
 
+    private BoxContainer _mainView = default!;
+
+    private LayoutContainer _loadView = default!;
+
+    private OutputPanel _loadOutput = default!;
+
+    private readonly List<(TextureButton Button, int Tier)> _moduleButtons = new();
+
     private bool _suitActivated;
+
+    private bool _bootActive;
+
+    private HashSet<int> _lockedTiers = new();
+
+    private Dictionary<int, NinjaSkillsCategory> _selectedModules = new();
 
     public event Action<int, NinjaSkillsCategory>? OnModuleSelected;
 
@@ -64,6 +85,9 @@ public sealed partial class SpiderOSWindow : FancyWindow
     {
         IoCManager.InjectDependencies(this);
         RobustXamlLoader.Load(this);
+
+        AddStyleClass(DeadSpaceStyleClass.SpiderOSWindow);
+        HeaderClass = DeadSpaceStyleClass.SpiderOSWindowHeader;
 
         _moduleGrid = FindControl<GridContainer>("ModuleGrid");
         _moduleGrid.HSeparationOverride = 0;
@@ -86,6 +110,67 @@ public sealed partial class SpiderOSWindow : FancyWindow
         _stylePreview = FindControl<TextureRect>("StylePreview");
         _stylePreview.TextureScale = new Vector2(4, 4);
         UpdatePreview(NinjaColorway.Green, true);
+
+        _mainView = FindControl<BoxContainer>("MainSpiderOS");
+        _loadView = FindControl<LayoutContainer>("LoadSpiderOS");
+        _loadOutput = FindControl<OutputPanel>("LoadOutput");
+
+        _loadProgressBar = FindControl<ProgressBar>("LoadProgressBar");
+        _loadProgressBar.Value = 0f;
+
+        _bootActive = false;
+        ShowMainView();
+    }
+
+    public void ShowBootView()
+    {
+        _bootActive = true;
+
+        _mainView.Visible = false;
+        _loadView.Visible = true;
+
+        _loadOutput.Clear();
+        _loadProgressBar.Value = 0f;
+
+        _activateButton.Disabled = true;
+        _colorOption.Disabled = true;
+        _hoodOrScarfOption.Disabled = true;
+        SetModulesEnabled(false);
+    }
+
+    public void ShowMainView()
+    {
+        _bootActive = false;
+
+        _mainView.Visible = true;
+        _loadView.Visible = false;
+
+        _loadOutput.Clear();
+        _loadProgressBar.Value = 0f;
+
+        _activateButton.Disabled = false;
+        _colorOption.Disabled = _suitActivated;
+        _hoodOrScarfOption.Disabled = _suitActivated;
+        SetModulesEnabled(!_suitActivated);
+    }
+
+    public void AppendBootLog(string text, Color color)
+    {
+        _loadOutput.AddMessage(FormattedMessage.FromMarkupOrThrow($"[color={color.ToHex()}]{text}[/color]"));
+        _loadOutput.ScrollToBottom();
+    }
+
+    public void SetBootProgress(float value)
+    {
+        _loadProgressBar.Value = Math.Clamp(value, 0f, 1f);
+    }
+
+    private void SetModulesEnabled(bool enabled)
+    {
+        foreach (var (button, tier) in _moduleButtons)
+        {
+            button.Disabled = !enabled || _lockedTiers.Contains(tier) || _selectedModules.ContainsKey(tier);
+        }
     }
 
     public void UpdateState(
@@ -98,6 +183,8 @@ public sealed partial class SpiderOSWindow : FancyWindow
         bool suitActivated)
     {
         _suitActivated = suitActivated;
+        _lockedTiers = lockedTiers;
+        _selectedModules = selectedModules;
 
         RebuildSkills(skills, lockedTiers, selectedModules, suitActivated);
 
@@ -105,10 +192,10 @@ public sealed partial class SpiderOSWindow : FancyWindow
             ? "spider-os-personalization-deactivate"
             : "spider-os-personalization-activate");
 
-        _colorOption.Disabled = suitActivated;
+        _colorOption.Disabled = suitActivated || _bootActive;
         _colorOption.SelectId(IndexFromColor(pendingColorway));
 
-        _hoodOrScarfOption.Disabled = suitActivated;
+        _hoodOrScarfOption.Disabled = suitActivated || _bootActive;
         _hoodOrScarfOption.SelectId(pendingHelmet ? 0 : 1);
 
         UpdatePreview(pendingColorway, pendingHelmet);
@@ -121,6 +208,7 @@ public sealed partial class SpiderOSWindow : FancyWindow
         bool suitActivated)
     {
         _moduleGrid.RemoveAllChildren();
+        _moduleButtons.Clear();
 
         foreach (var category in Categories)
         {
@@ -196,12 +284,13 @@ public sealed partial class SpiderOSWindow : FancyWindow
 
         var iconOk = ApplyIcon(button, s);
         button.ToolTip = BuildTooltip(s);
-        button.Disabled = !iconOk || lockedTiers.Contains(tier) || selectedModules.ContainsKey(tier) || suitActivated;
+        button.Disabled = !iconOk || lockedTiers.Contains(tier) || selectedModules.ContainsKey(tier) || suitActivated || _bootActive;
 
         var capturedTier = tier;
         button.OnPressed += _ => OnModuleSelected?.Invoke(capturedTier, s.Category);
 
         holder.AddChild(button);
+        _moduleButtons.Add((button, tier));
         return holder;
     }
 
@@ -236,18 +325,6 @@ public sealed partial class SpiderOSWindow : FancyWindow
         }
 
         button.TextureNormal = texture;
-        return true;
-    }
-
-    private bool TryLoadTexture(string state, out Texture texture)
-    {
-        texture = default!;
-        if (!_resCache.TryGetResource<TextureResource>(new ResPath($"{RsiIconBasePath}{state}.png"), out var resource))
-        {
-            return false;
-        }
-
-        texture = resource.Texture;
         return true;
     }
 

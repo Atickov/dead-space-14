@@ -1,0 +1,9 @@
+- type: entity
+  id: ActionCycleNinjaVisor
+  name: cменить режим визора
+  description: Переключает между защитным, тепловым и режимом ночного видения.
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Action
+  - type: InstantAction
+    event: !type:CycleNinjaVisorActionEvent

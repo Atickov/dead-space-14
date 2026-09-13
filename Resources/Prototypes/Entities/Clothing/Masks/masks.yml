@@ -804,6 +804,7 @@
   - type: Item
     storedRotation: -90
   - type: NinjaAppearanceItem
+  - type: NinjaSuitItem
   - type: EyeProtection
   - type: BreathMask
   - type: IdentityBlocker

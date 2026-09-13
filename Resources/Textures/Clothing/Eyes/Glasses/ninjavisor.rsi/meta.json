@@ -11,11 +11,33 @@
       "name": "icon"
     },
     {
+      "name": "icon-night"
+    },
+    {
+      "name": "icon-thermal"
+    },
+    {
       "name": "equipped-EYES",
+      "directions": 4
+    },
+     {
+      "name": "equipped-EYES-night",
+      "directions": 4
+    },
+     {
+      "name": "equipped-EYES-thermal",
       "directions": 4
     },
     {
       "name": "equipped-EYES-arachnid",
+      "directions": 4
+    },
+    {
+      "name": "equipped-EYES-arachnid-night",
+      "directions": 4
+    },
+    {
+      "name": "equipped-EYES-arachnid-thermal",
       "directions": 4
     },
     {

@@ -75,6 +75,9 @@ public sealed class AutoDustSystem : SharedAutoDustSystem
 
     public void ActivateAutoDust(EntityUid uid, AutoDustMarkerComponent component)
     {
+        TryComp<SpiderOSComponent>(component.AutoDustItem, out var spiderOS);
+        var ev = new AutoDustEvent(uid, spiderOS);
+        RaiseLocalEvent(component.AutoDustItem, ref ev);
         var mapCoords = _transform.GetMapCoordinates(uid);
         if (!TryComp<AutoDustComponent>(component.AutoDustItem, out var dust))
             return;
@@ -92,3 +95,6 @@ public sealed class AutoDustSystem : SharedAutoDustSystem
         _gibbing.Gib(uid);
     }
 }
+
+[ByRefEvent]
+public record struct AutoDustEvent(EntityUid Target, SpiderOSComponent? SpiderOS);

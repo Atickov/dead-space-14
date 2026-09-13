@@ -1,0 +1,13 @@
+- type: entity
+  id: NinjaRespawnCapsule
+  parent: BaseItem
+  name: ninja respawn capsule
+  components:
+  - type: NinjaRespawnCapsule
+
+- type: cloningSettings
+  id: NinjaSecondChanceClone
+  parent: BaseClone
+  copyEquipment: null
+  copyInternalStorage: false
+  copyImplants: false

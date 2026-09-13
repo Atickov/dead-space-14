@@ -99,6 +99,9 @@ public sealed class DeadSpaceSurfaceSheetlet : Sheetlet<NanotrasenStylesheet>
             classicThickness,
             horizontalMargin: 18,
             verticalMargin: 7);
+        var spiderOSBackground = DeadSpaceStyleBoxes.Flat(Color.FromHex("#182019"));
+        var spiderOSHeader = DeadSpaceStyleBoxes.Flat(Color.FromHex("#202B23"));
+        var spiderOSDivider = DeadSpaceStyleBoxes.Flat(Color.FromHex("#1bcc15"));
 
         var accent = DeadSpaceStyleBoxes.Flat(DeadSpaceStylePalette.Amber);
         accent.ContentMarginLeftOverride = 2;
@@ -191,6 +194,14 @@ public sealed class DeadSpaceSurfaceSheetlet : Sheetlet<NanotrasenStylesheet>
             E<PanelContainer>().Class(DeadSpaceStyleClass.SurfaceFlat).Panel(flatBody),
             E<PanelContainer>().Class(DeadSpaceStyleClass.SectionHeader).Panel(header),
             E<PanelContainer>().Class(DeadSpaceStyleClass.Inset).Panel(inset),
+            E().Class(DeadSpaceStyleClass.SpiderOSWindow)
+                .ParentOf(E<PanelContainer>().Class(StyleClass.BackgroundPanel))
+                .Panel(spiderOSBackground),
+            E().Class(DeadSpaceStyleClass.SpiderOSWindow)
+                .ParentOf(E<BoxContainer>())
+                .ParentOf(E<PanelContainer>().Class(StyleClass.LowDivider))
+                .Panel(spiderOSDivider),
+            E<PanelContainer>().Class(DeadSpaceStyleClass.SpiderOSWindowHeader).Panel(spiderOSHeader),
             E<PanelContainer>().Class(DeadSpaceStyleClass.RoundStatus).Panel(roundStatus),
             E<PanelContainer>().Class(DeadSpaceStyleClass.Accent).Panel(accent),
             E<PanelContainer>().Class(DeadSpaceStyleClass.AccentDim).Panel(accentDim),

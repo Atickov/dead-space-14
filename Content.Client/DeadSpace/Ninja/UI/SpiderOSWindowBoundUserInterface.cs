@@ -1,3 +1,4 @@
+using Content.Client.DeadSpace.Ninja.Systems;
 using Content.Shared.DeadSpace.Ninja.Components;
 using Content.Shared.DeadSpace.Ninja.Prototypes;
 using Robust.Shared.Prototypes;
@@ -7,9 +8,15 @@ namespace Content.Client.DeadSpace.Ninja.UI;
 public sealed class SpiderOSWindowBoundUserInterface : BoundUserInterface
 {
     [Dependency] private readonly IPrototypeManager _proto = default!;
+    [Dependency] private readonly IEntitySystemManager _systems = default!;
 
     [ViewVariables]
     private SpiderOSWindow? _window;
+
+    private SpiderOSSystem? _bootSystem;
+    private bool _bootActive;
+
+    private bool _lockActive;
 
     public SpiderOSWindowBoundUserInterface(EntityUid owner, Enum uiKey) : base(owner, uiKey)
     {
@@ -35,11 +42,84 @@ public sealed class SpiderOSWindowBoundUserInterface : BoundUserInterface
 
         _window.OnSuitPowerChanged += activated =>
         {
-            SendMessage(new SpiderOSSetSuitPowerMessage(activated));
+            if (!_bootActive)
+            {
+                StartBoot(activated);
+            }
         };
 
         _window.OnClose += Close;
         _window.OpenCentered();
+    }
+
+    private void StartBoot(bool activated)
+    {
+        _bootSystem ??= _systems.GetEntitySystem<SpiderOSSystem>();
+
+        if (_window == null || !EntMan.TryGetComponent(Owner, out SpiderOSComponent? comp))
+        {
+            return;
+        }
+
+        var bootId = activated ? comp.ActivationBootScript : comp.DeactivationBootScript;
+
+        if (!_proto.TryIndex(bootId, out SpiderOSBootPrototype? boot))
+        {
+            return;
+        }
+
+        _bootActive = true;
+        _window.ShowBootView();
+
+        _bootSystem.StartBoot(Owner, boot, activated, new SpiderOSSystem.SpiderOSBootCallbacks
+        {
+            OnLog = (log, args) =>
+            {
+                _window.AppendBootLog(args is { Length: > 0 } ? Loc.GetString(log, args) : Loc.GetString(log), SpiderOSWindow.BootLogColor);
+            },
+            OnProgress = progress =>
+            {
+                _window.SetBootProgress(progress);
+            },
+            OnCheckFailed = failReason =>
+            {
+                _window.AppendBootLog(Loc.GetString(failReason), SpiderOSWindow.BootErrorColor);
+                _window.AppendBootLog(Loc.GetString("spider-os-boot-rollback"), SpiderOSWindow.BootLogColor);
+            },
+            OnSecureRequest = (secure, check) =>
+            {
+                SendMessage(new SpiderOSSecureRequestMessage(secure, check));
+                _lockActive = secure;
+            },
+            OnLockRollback = () =>
+            {
+                SendMessage(new SpiderOSSecureRequestMessage(false, SpiderOSBootCheck.VisorSecure));
+                _lockActive = false;
+            },
+            OnFinished = () =>
+            {
+                SendMessage(new SpiderOSSetSuitPowerMessage(activated));
+            },
+            OnConfirmed = FinishBoot,
+            OnRolledBack = FinishBoot,
+        });
+    }
+
+    private void FinishBoot()
+    {
+        _bootActive = false;
+        _lockActive = false;
+        _window?.ShowMainView();
+    }
+
+    protected override void ReceiveMessage(BoundUserInterfaceMessage message)
+    {
+        base.ReceiveMessage(message);
+
+        if (message is SpiderOSSecureConfirmedMessage confirm)
+        {
+            _bootSystem?.ConfirmSecure(Owner, confirm.Success, confirm.FailReason);
+        }
     }
 
     protected override void UpdateState(BoundUserInterfaceState state)
@@ -68,6 +148,11 @@ public sealed class SpiderOSWindowBoundUserInterface : BoundUserInterface
         if (!disposing)
             return;
 
+        _bootSystem?.CancelBoot(Owner);
+        if (_lockActive)
+        {
+            SendMessage(new SpiderOSSecureRequestMessage(false, SpiderOSBootCheck.VisorSecure));
+        }
         _window?.Close();
         _window = null;
     }

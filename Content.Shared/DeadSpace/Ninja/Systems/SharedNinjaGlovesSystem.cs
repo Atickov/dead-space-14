@@ -3,9 +3,11 @@ using Content.Shared.CombatMode;
 using Content.Shared.Examine;
 using Content.Shared.Hands.EntitySystems;
 using Content.Shared.Interaction;
+using Content.Shared.Inventory;
 using Content.Shared.Item.ItemToggle;
 using Content.Shared.Item.ItemToggle.Components;
 using Content.Shared.DeadSpace.Ninja.Components;
+using Content.Shared.DeadSpace.Ninja.Systems;
 using Content.Shared.Popups;
 using Robust.Shared.Timing;
 
@@ -22,6 +24,7 @@ public abstract class SharedNinjaGlovesSystem : EntitySystem
     [Dependency] private readonly ItemToggleSystem _toggle = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly SharedSpaceNinjaSystem _ninja = default!;
+    [Dependency] private readonly InventorySystem _inventory = default!;
 
     public override void Initialize()
     {
@@ -31,6 +34,7 @@ public abstract class SharedNinjaGlovesSystem : EntitySystem
         SubscribeLocalEvent<NinjaGlovesComponent, ItemToggleActivateAttemptEvent>(OnActivateAttempt);
         SubscribeLocalEvent<NinjaGlovesComponent, ItemToggledEvent>(OnToggled);
         SubscribeLocalEvent<NinjaGlovesComponent, ExaminedEvent>(OnExamined);
+        SubscribeLocalEvent<SpiderOSComponent, SpiderOSPowerChangedEvent>(OnSpiderOSPowerChanged);
     }
 
     /// <summary>
@@ -41,7 +45,7 @@ public abstract class SharedNinjaGlovesSystem : EntitySystem
         var (uid, comp) = ent;
 
         // already disabled?
-        if (comp.User is not {} user)
+        if (comp.User is not { } user)
             return;
 
         comp.User = null;
@@ -76,7 +80,7 @@ public abstract class SharedNinjaGlovesSystem : EntitySystem
 
     private void OnActivateAttempt(Entity<NinjaGlovesComponent> ent, ref ItemToggleActivateAttemptEvent args)
     {
-        if (args.User is not {} user
+        if (args.User is not { } user
             || !_ninja.NinjaQuery.TryComp(user, out var ninja)
             // need to wear suit to enable gloves
             || !HasComp<NinjaSuitComponent>(ninja.Suit))
@@ -85,11 +89,32 @@ public abstract class SharedNinjaGlovesSystem : EntitySystem
             args.Popup = Loc.GetString("ninja-gloves-not-wearing-suit");
             return;
         }
+
+        // gloves only work while the Spider OS is running
+        if (!TryComp<SpiderOSComponent>(ninja.Suit, out var os) || !os.SuitActivated)
+        {
+            args.Cancelled = true;
+            args.Popup = Loc.GetString("ninja-gloves-spider-os-inactive");
+        }
+    }
+
+    private void OnSpiderOSPowerChanged(EntityUid suit, SpiderOSComponent component, ref SpiderOSPowerChangedEvent args)
+    {
+        if (args.Activated)
+            return;
+
+        if (!_inventory.TryGetSlotEntity(args.Wearer, "gloves", out var glovesUid) || glovesUid is not { } gloves
+            || !TryComp<NinjaGlovesComponent>(gloves, out _))
+        {
+            return;
+        }
+
+        _toggle.TryDeactivate(gloves, user: args.Wearer, predicted: false, showPopup: false);
     }
 
     private void OnToggled(Entity<NinjaGlovesComponent> ent, ref ItemToggledEvent args)
     {
-        if ((args.User ?? ent.Comp.User) is not {} user)
+        if ((args.User ?? ent.Comp.User) is not { } user)
             return;
 
         var message = Loc.GetString(args.Activated ? "ninja-gloves-on" : "ninja-gloves-off");

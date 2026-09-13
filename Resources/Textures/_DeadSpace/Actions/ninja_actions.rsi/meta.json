@@ -68,7 +68,13 @@
       "name": "scanner"
     },
     {
+      "name": "redspider"
+    },
+    {
       "name": "nullaction"
+    },
+    {
+      "name": "ninjasecondchance"
     }
   ]
 }

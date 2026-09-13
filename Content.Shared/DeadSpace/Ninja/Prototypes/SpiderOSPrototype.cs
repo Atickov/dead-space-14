@@ -35,6 +35,9 @@ public partial record struct NinjaSkill()
     public SpriteSpecifier Icon = new SpriteSpecifier.Rsi(new ResPath("/Textures/_DeadSpace/Actions/ninja_actions.rsi"), "nullaction");
 
     [DataField]
+    public bool TransferOnSecondChance = true;
+
+    [DataField]
     public ComponentRegistry Components = new();
 
     [DataField]

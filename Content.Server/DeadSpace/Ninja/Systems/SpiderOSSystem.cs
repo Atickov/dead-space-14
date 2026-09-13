@@ -1,23 +1,20 @@
-using System.Diagnostics.CodeAnalysis;
 using Content.Shared.Actions;
 using Content.Shared.Actions.Components;
 using Content.Shared.DeadSpace.Ninja.Components;
 using Content.Shared.DeadSpace.Ninja.Prototypes;
 using Content.Shared.DeadSpace.Ninja.Systems;
+using Content.Shared.Interaction.Components;
 using Robust.Server.GameObjects;
 using Robust.Shared.Prototypes;
 
 namespace Content.Server.DeadSpace.Ninja.Systems;
 
-public sealed class SpiderOSSystem : EntitySystem
+public sealed class SpiderOSSystem : SharedSpiderOSSystem
 {
     [Dependency] private readonly UserInterfaceSystem _ui = default!;
     [Dependency] private readonly ActionContainerSystem _actionContainer = default!;
     [Dependency] private readonly SharedActionsSystem _actions = default!;
-    [Dependency] private readonly SharedTransformSystem _transform = default!;
     [Dependency] private readonly SharedNinjaAppearanceSystem _appearance = default!;
-    [Dependency] private readonly SpaceNinjaSystem _ninja = default!;
-    [Dependency] private readonly IPrototypeManager _proto = default!;
 
     public override void Initialize()
     {
@@ -28,6 +25,7 @@ public sealed class SpiderOSSystem : EntitySystem
             subs.Event<SpiderOSSelectModuleMessage>(OnSelectModule);
             subs.Event<SpiderOSSetAppearanceMessage>(OnSetAppearance);
             subs.Event<SpiderOSSetSuitPowerMessage>(OnSetSuitPower);
+            subs.Event<SpiderOSSecureRequestMessage>(OnSecureRequest);
         });
 
         SubscribeLocalEvent<SpiderOSComponent, BoundUIOpenedEvent>(OnBuiOpened);
@@ -114,6 +112,12 @@ public sealed class SpiderOSSystem : EntitySystem
                 return;
             }
 
+            if (!Proto.TryIndex(comp.ActivationBootScript, out SpiderOSBootPrototype? boot) ||
+                !RunBootScriptChecks(suitUid, args.Actor, boot))
+            {
+                return;
+            }
+
             comp.SuitActivated = true;
             ApplyPendingAppearance(suitUid, comp);
 
@@ -129,10 +133,14 @@ public sealed class SpiderOSSystem : EntitySystem
                 comp.ActivatedTiers.Add(tier);
             }
 
-            var wearer = _transform.GetParentUid(suitUid);
+            var wearer = Transform.GetParentUid(suitUid);
             if (wearer.IsValid())
             {
+                SetAllLocked(wearer, suitUid, true);
                 _actions.GrantContainedActions(wearer, suitUid);
+
+                var powerChanged = new SpiderOSPowerChangedEvent(suitUid, wearer, true);
+                RaiseLocalEvent(suitUid, ref powerChanged);
             }
         }
         else
@@ -144,10 +152,14 @@ public sealed class SpiderOSSystem : EntitySystem
 
             comp.SuitActivated = false;
 
-            var wearer = _transform.GetParentUid(suitUid);
+            var wearer = Transform.GetParentUid(suitUid);
             if (wearer.IsValid())
             {
+                SetAllLocked(wearer, suitUid, false);
                 RemoveGrantedActions(suitUid, wearer, comp);
+
+                var powerChanged = new SpiderOSPowerChangedEvent(suitUid, wearer, false);
+                RaiseLocalEvent(suitUid, ref powerChanged);
             }
         }
 
@@ -163,41 +175,34 @@ public sealed class SpiderOSSystem : EntitySystem
         }
     }
 
-    private bool IsAuthorized(EntityUid suitUid, EntityUid actor)
+    public void RestoreState(EntityUid suitUid, SpiderOSComponent source)
     {
-        if (!actor.IsValid() || actor != _transform.GetParentUid(suitUid))
-            return false;
+        var comp = EnsureComp<SpiderOSComponent>(suitUid);
+        comp.LockedTiers = new HashSet<int>(source.LockedTiers);
+        comp.SelectedModules = new Dictionary<int, NinjaSkillsCategory>(source.SelectedModules);
+        comp.ActivatedTiers = new HashSet<int>();
+        comp.Skills = source.Skills;
 
-        if (!_ninja.NinjaQuery.TryComp(actor, out var ninja))
-            return false;
-
-        return ninja.Suit == suitUid;
-    }
-
-    private bool TryGetSkill(SpiderOSComponent comp, NinjaSkillsCategory category, int tier, [NotNullWhen(true)] out NinjaSkill skill)
-    {
-        skill = default;
-
-        if (tier < 1 || !Enum.IsDefined(typeof(NinjaSkillsCategory), category))
+        foreach (var (tier, category) in source.SelectedModules)
         {
-            return false;
-        }
-
-        if (!_proto.TryIndex(comp.Skills.Id, out SpiderOSPrototype? proto))
-        {
-            return false;
-        }
-
-        foreach (var candidate in proto.AllSkills)
-        {
-            if (candidate.Category == category && candidate.Tier == tier)
+            if (TryGetSkill(comp, category, tier, out var skill) && !skill.TransferOnSecondChance)
             {
-                skill = candidate;
-                return true;
+                comp.SelectedModules.Remove(tier);
             }
         }
 
-        return false;
+        comp.Actions = new List<EntProtoId>(source.Actions);
+        comp.PendingColorway = source.PendingColorway;
+        comp.PendingHelmet = source.PendingHelmet;
+        comp.SuitActivated = false;
+        Dirty(suitUid, comp);
+
+        ApplyPendingAppearance(suitUid, comp);
+
+        foreach (var action in comp.Actions)
+        {
+            AddActionToContainer(suitUid, action);
+        }
     }
 
     private void GrantSkillComponents(EntityUid suitUid, NinjaSkill skill)
@@ -205,7 +210,7 @@ public sealed class SpiderOSSystem : EntitySystem
         var toAdd = new ComponentRegistry();
         foreach (var (name, entry) in skill.Components)
         {
-            if (!EntityManager.HasComponent(suitUid, entry.Component.GetType()))
+            if (!HasComp(suitUid, entry.Component.GetType()))
             {
                 toAdd[name] = entry;
             }
@@ -248,6 +253,13 @@ public sealed class SpiderOSSystem : EntitySystem
     private void RemoveGrantedActions(EntityUid suitUid, EntityUid wearer, SpiderOSComponent comp)
     {
         var grantedProtos = new HashSet<string>();
+
+        // Katana recall is only usable while the suit is activated.
+        if (TryComp<NinjaSuitComponent>(suitUid, out var suitComp))
+        {
+            grantedProtos.Add(suitComp.RecallKatanaAction);
+        }
+
         foreach (var action in comp.Actions)
         {
             grantedProtos.Add(action.Id);
@@ -276,6 +288,110 @@ public sealed class SpiderOSSystem : EntitySystem
             if (MetaData(contained).EntityPrototype?.ID is { } protoId && grantedProtos.Contains(protoId))
             {
                 _actions.RemoveProvidedAction(wearer, suitUid, contained);
+            }
+        }
+    }
+
+    private void OnSecureRequest(Entity<SpiderOSComponent> suit, ref SpiderOSSecureRequestMessage args)
+    {
+        var (suitUid, comp) = suit;
+
+        if (!IsAuthorized(suitUid, args.Actor))
+        {
+            _ui.ServerSendUiMessage(suitUid, SpiderOSUiKey.Key,
+                new SpiderOSSecureConfirmedMessage(false, Loc.GetString("spider-os-boot-fail-auth")), args.Actor);
+            return;
+        }
+
+        var wearer = Transform.GetParentUid(suitUid);
+        if (!wearer.IsValid())
+        {
+            _ui.ServerSendUiMessage(suitUid, SpiderOSUiKey.Key,
+                new SpiderOSSecureConfirmedMessage(false, Loc.GetString("spider-os-boot-fail-not-worn")), args.Actor);
+            return;
+        }
+
+        if (args.Secure)
+        {
+            if (!RunBootCheck(suitUid, args.Actor, args.Check, out var reason))
+            {
+                _ui.ServerSendUiMessage(suitUid, SpiderOSUiKey.Key,
+                    new SpiderOSSecureConfirmedMessage(false, Loc.GetString(reason)));
+                return;
+            }
+
+            SetLocked(wearer, suitUid, args.Check, true);
+            _ui.ServerSendUiMessage(suitUid, SpiderOSUiKey.Key,
+                new SpiderOSSecureConfirmedMessage(true));
+        }
+        else
+        {
+            if (!comp.SuitActivated)
+            {
+                SetAllLocked(wearer, suitUid, false);
+            }
+
+            _ui.ServerSendUiMessage(suitUid, SpiderOSUiKey.Key,
+                new SpiderOSSecureConfirmedMessage(true));
+        }
+    }
+
+    private void SetAllLocked(EntityUid wearer, EntityUid suitUid, bool locked)
+    {
+        ApplyLock(suitUid);
+
+        foreach (var slot in SuitHardwareSlots.Values)
+        {
+            if (Inventory.TryGetSlotEntity(wearer, slot, out var item))
+            {
+                ApplyLock(item.Value);
+            }
+        }
+
+        return;
+
+        void ApplyLock(EntityUid uid)
+        {
+            if (locked)
+            {
+                if (!HasComp<UnremoveableComponent>(uid))
+                    AddComp(uid, new UnremoveableComponent { DeleteOnDrop = false }, true);
+            }
+            else
+            {
+                RemComp<UnremoveableComponent>(uid);
+            }
+        }
+    }
+
+    private void SetLocked(EntityUid wearer, EntityUid suitUid, SpiderOSBootCheck check, bool locked)
+    {
+        if (check == SpiderOSBootCheck.SuitFasten)
+        {
+            ApplyLock(suitUid);
+            return;
+        }
+
+        if (!SuitHardwareSlots.TryGetValue(check, out var slot))
+            return;
+
+        if (Inventory.TryGetSlotEntity(wearer, slot, out var item))
+        {
+            ApplyLock(item.Value);
+        }
+
+        return;
+
+        void ApplyLock(EntityUid uid)
+        {
+            if (locked)
+            {
+                if (!HasComp<UnremoveableComponent>(uid))
+                    AddComp(uid, new UnremoveableComponent { DeleteOnDrop = false }, true);
+            }
+            else
+            {
+                RemComp<UnremoveableComponent>(uid);
             }
         }
     }

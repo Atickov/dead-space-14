@@ -245,6 +245,7 @@
 #DS14-end
   - type: NinjaAppearanceItem
     itemType: Helmet
+  - type: NinjaSuitItem
   - type: Tag
     tags:
     - WhitelistChameleon

@@ -56,15 +56,12 @@ public abstract class SharedNinjaSuitSystem : EntitySystem
 
     /// <summary>
     /// Add all the actions when a suit is equipped by a ninja.
+    /// The katana recall action is granted separately while the suit is activated.
     /// </summary>
     private void OnGetItemActions(Entity<NinjaSuitComponent> ent, ref GetItemActionsEvent args)
     {
         var comp = ent.Comp;
         args.AddAction(ref comp.OpenSpiderOSActionEntity, comp.OpenSpiderOSAction);
-        if (!_ninja.IsNinja(args.User))
-            return;
-
-        args.AddAction(ref comp.RecallKatanaActionEntity, comp.RecallKatanaAction);
     }
 
     /// <summary>

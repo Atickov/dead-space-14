@@ -299,6 +299,7 @@
     action: ActionToggleNinjaGloves
     disableOnUnequip: true
   - type: NinjaAppearanceItem
+  - type: NinjaSuitItem
   - type: NinjaGloves
     abilities:
     - components:

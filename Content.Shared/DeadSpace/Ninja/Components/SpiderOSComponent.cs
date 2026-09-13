@@ -21,6 +21,12 @@ public sealed partial class SpiderOSComponent : Component
     public ProtoId<SpiderOSPrototype> Skills = "SpiderOS";
 
     [DataField, AutoNetworkedField]
+    public ProtoId<SpiderOSBootPrototype> ActivationBootScript = "SpiderOSActivationBoot";
+
+    [DataField, AutoNetworkedField]
+    public ProtoId<SpiderOSBootPrototype> DeactivationBootScript = "SpiderOSDeactivationBoot";
+
+    [DataField, AutoNetworkedField]
     public List<EntProtoId> Actions = new();
 
     [DataField, AutoNetworkedField]
@@ -95,6 +101,42 @@ public sealed class SpiderOSSetSuitPowerMessage : BoundUserInterfaceMessage
     public SpiderOSSetSuitPowerMessage(bool activated)
     {
         Activated = activated;
+    }
+}
+
+[Serializable, NetSerializable]
+public sealed class SpiderOSSecureRequestMessage : BoundUserInterfaceMessage
+{
+    public bool Secure;
+
+    public SpiderOSBootCheck Check;
+
+    public SpiderOSSecureRequestMessage()
+    {
+    }
+
+    public SpiderOSSecureRequestMessage(bool secure, SpiderOSBootCheck check)
+    {
+        Secure = secure;
+        Check = check;
+    }
+}
+
+[Serializable, NetSerializable]
+public sealed class SpiderOSSecureConfirmedMessage : BoundUserInterfaceMessage
+{
+    public bool Success;
+
+    public string FailReason = string.Empty;
+
+    public SpiderOSSecureConfirmedMessage()
+    {
+    }
+
+    public SpiderOSSecureConfirmedMessage(bool success, string failReason = "")
+    {
+        Success = success;
+        FailReason = failReason;
     }
 }
 

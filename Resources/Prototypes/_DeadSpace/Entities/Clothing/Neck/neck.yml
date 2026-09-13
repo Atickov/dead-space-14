@@ -129,7 +129,7 @@
   parent: [ClothingScarfBase, BaseHighlyIllegalContraband]
   id: ClothingNeckScarfNinja
   name: шарф ниндзя
-  description: A flowing scarf of the Spider Clan, woven with nano-fibers. Its color matches the rest of your gear.
+  description: Шарф клана Паука, сотканный из нановолокон. Его цвет гармонирует с остальным вашим снаряжением.
   components:
   - type: Sprite
     sprite: _DeadSpace/Clothing/Neck/spaceninja.rsi
