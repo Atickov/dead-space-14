@@ -1,5 +1,6 @@
 using Content.Shared.DeadSpace.Ninja.Systems;
 using Content.Shared.DeadSpace.Ninja.Components;
+using Content.Shared.Actions;
 using Content.Server.Power.EntitySystems;
 using Content.Shared.Containers.ItemSlots;
 
@@ -10,6 +11,18 @@ public sealed class NinjaCloakSystem : SharedNinjaCloakSystem
     [Dependency] private readonly NinjaSmokeAbilitySystem _ninjaSmoke = default!;
     [Dependency] private readonly BatterySystem _battery = default!;
     [Dependency] private readonly ItemSlotsSystem _itemSlots = default!;
+    [Dependency] private readonly SharedActionsSystem _actions = default!;
+
+    public override void Initialize()
+    {
+        base.Initialize();
+        SubscribeLocalEvent<NinjaCloakComponent, MapInitEvent>(OnMapInit);
+    }
+
+    private void OnMapInit(Entity<NinjaCloakComponent> ent, ref MapInitEvent args)
+    {
+        _actions.AddAction(ent.Owner, ref ent.Comp.ActionEntity, ent.Comp.Action);
+    }
 
     protected override void AfterToggleCloak(Entity<SpaceNinjaComponent> ent, EntityUid suitUid, NinjaCloakComponent cloak)
     {

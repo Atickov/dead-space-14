@@ -8,7 +8,6 @@
 - type: entity
   name: след блинка
   id: NinjaBeam
-  parent: BaseLightning
   categories: [ HideSpawnMenu ]
   components:
   - type: Sprite
@@ -21,3 +20,15 @@
     sound: null
   - type: TimedDespawn
     lifetime: 1
+  - type: Tag
+    tags:
+      - HideContextMenu
+  - type: Physics
+    canCollide: false
+  - type: PointLight
+    enabled: true
+    color: "#77FF49"
+    radius: 3.5
+    softness: 1
+    autoRot: true
+    castShadows: false
