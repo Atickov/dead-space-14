@@ -53,8 +53,8 @@
       ItemCabinet:
         ejectOnInteract: true
         whitelist:
-          prototypes:
-          - ToyEnergyKatana
+          tags:
+          - EnergyKatana
   - type: Lock
   - type: AccessReader
     access: [["Ninja"]]
