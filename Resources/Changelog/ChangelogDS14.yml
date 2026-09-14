@@ -7757,3 +7757,13 @@ Entries:
   changes:
   - type: Tweak
     message: Спрайты винтовки мосина на спине приведены к единой цветовой гамме.
+- id: 742
+  author: trefasv
+  time: '2026-09-14T16:41:28.852791+00:00'
+  pr: 2344
+  changes:
+  - type: Add
+    message: Церемониальные винтовки Кардашёв-мосин для проведения мероприятий (В
+      основном для казней, сегодня я увидел что винтовки для казни на ЦК это тупо
+      мосины. Лол. ) <img width="858" height="887" alt="image" src="https://github.com/user-attachments/assets/7480929c-1e7d-4b12-ba7f-66e7adfd270e"
+      />
