@@ -90,11 +90,16 @@ public abstract class SharedDashAbilitySystem : EntitySystem
         if (TryComp<PullableComponent>(user, out var pull) && _pullingSystem.IsPulled(user, pull))
             _pullingSystem.TryStopPull(user, pull);
 
-        // Check if the user is pulling anything, and drop it if so
-        if (TryComp<PullerComponent>(user, out var puller) && TryComp<PullableComponent>(puller.Pulling, out var pullable))
-            _pullingSystem.TryStopPull(puller.Pulling.Value, pullable);
-
         //DS14-start
+        EntityUid? pulledUid = null;
+        if (TryComp<PullerComponent>(user, out var puller) && TryComp<PullableComponent>(puller.Pulling, out var pullable))
+        {
+            if (ent.Comp.TeleportPulledEntity)
+                pulledUid = puller.Pulling;
+            else
+                _pullingSystem.TryStopPull(puller.Pulling.Value, pullable);
+        }
+
         bool corrupted = false;
         if (ent.Comp.CorruptByBluespaceItems)
         {
@@ -111,12 +116,12 @@ public abstract class SharedDashAbilitySystem : EntitySystem
 
         var offset = _random.NextVector2(ent.Comp.CorruptMinDistance, ent.Comp.CorruptMaxDistance);
         var targetFinal = corrupted ? args.Target.Offset(offset) : args.Target;
-        DoTeleport(user, targetFinal, ent.Comp.BeamProto);
+        DoTeleport(user, targetFinal, ent.Comp.BeamProto, pulledUid);
         args.Handled = true;
         //DS14-end
     }
 
-    protected virtual void DoTeleport(EntityUid user, EntityCoordinates target, string? beam = null) { } //DS14
+    protected virtual void DoTeleport(EntityUid user, EntityCoordinates target, string? beam = null, EntityUid? pulled = null) { } //DS14
 
     public bool CheckDash(EntityUid uid, EntityUid user)
     {

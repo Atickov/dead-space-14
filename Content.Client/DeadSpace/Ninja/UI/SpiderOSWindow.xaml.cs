@@ -21,10 +21,6 @@ public sealed partial class SpiderOSWindow : FancyWindow
 
     private static readonly string[] Categories = { "Ghost", "Snake", "Steel" };
 
-    private const string PlaceholderIconState = "nullaction";
-
-    private const string RsiIconBasePath = "/Textures/_DeadSpace/Actions/ninja_actions.rsi/";
-
     private const string PreviewBasePath = "/Textures/_DeadSpace/Interface/SpiderOS/";
 
     private static readonly Color HeaderColor = Color.FromHex("#1bcc15");
@@ -294,7 +290,7 @@ public sealed partial class SpiderOSWindow : FancyWindow
         return holder;
     }
 
-    private NinjaSkill? FindSkill(List<NinjaSkill> skills, string column, int tier)
+    private static NinjaSkill? FindSkill(List<NinjaSkill> skills, string column, int tier)
     {
         foreach (var skill in skills)
         {
