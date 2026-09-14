@@ -7781,3 +7781,13 @@ Entries:
   changes:
   - type: Add
     message: Эхо при наркотиках в организме изменено
+- id: 745
+  author: sastr457
+  time: '2026-09-14T16:50:43.876792+00:00'
+  pr: 2338
+  changes:
+  - type: Tweak
+    message: Дастер прайм ликвидирован на шаттле ОБР "Красный". @karasutenshi полный
+      дурак.
+  - type: Fix
+    message: Дастер прайм ликвидирован. Я тя породил, я тя и убью. @karasutenshi дурак.
