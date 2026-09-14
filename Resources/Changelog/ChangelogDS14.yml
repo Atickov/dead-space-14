@@ -7725,3 +7725,12 @@ Entries:
     message: Баги, связанные с новой системой Центрального Командования.
   - type: Fix
     message: Тюлени в стенах...
+- id: 738
+  author: trefasv
+  time: '2026-09-14T16:18:07.500765+00:00'
+  pr: 2350
+  changes:
+  - type: Fix
+    message: Отображение одноствольного дробовика-багета на спине. Теперь, вместо
+      двухстволки там реально багет. <img width="402" height="533" alt="image" src="https://github.com/user-attachments/assets/553b9c73-9a9a-4831-ac3b-9221c6a1230c"
+      />
