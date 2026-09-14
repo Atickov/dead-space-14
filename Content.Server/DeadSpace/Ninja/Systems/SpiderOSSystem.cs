@@ -4,6 +4,8 @@ using Content.Shared.DeadSpace.Ninja.Components;
 using Content.Shared.DeadSpace.Ninja.Prototypes;
 using Content.Shared.DeadSpace.Ninja.Systems;
 using Content.Shared.Interaction.Components;
+using Content.Server.Power.EntitySystems;
+using Content.Shared.Containers.ItemSlots;
 using Robust.Server.GameObjects;
 using Robust.Shared.Prototypes;
 
@@ -15,6 +17,8 @@ public sealed class SpiderOSSystem : SharedSpiderOSSystem
     [Dependency] private readonly ActionContainerSystem _actionContainer = default!;
     [Dependency] private readonly SharedActionsSystem _actions = default!;
     [Dependency] private readonly SharedNinjaAppearanceSystem _appearance = default!;
+    [Dependency] private readonly BatterySystem _battery = default!;
+    [Dependency] private readonly ItemSlotsSystem _itemSlots = default!;
 
     public override void Initialize()
     {
@@ -30,6 +34,25 @@ public sealed class SpiderOSSystem : SharedSpiderOSSystem
 
         SubscribeLocalEvent<SpiderOSComponent, BoundUIOpenedEvent>(OnBuiOpened);
         SubscribeLocalEvent<SpiderOSComponent, MapInitEvent>(OnMapInit);
+    }
+
+    public override void Update(float frameTime)
+    {
+        base.Update(frameTime);
+
+        var query = EntityQueryEnumerator<SpiderOSComponent>();
+        while (query.MoveNext(out var suitUid, out var comp))
+        {
+            if (!comp.SuitActivated)
+                continue;
+
+            if (!_itemSlots.TryGetSlot(suitUid, "cell_slot", out var slot) || slot.Item is not { } batteryUid)
+            {
+                continue;
+            }
+
+            _battery.TryUseCharge(batteryUid, comp.EnergyConsumption * frameTime);
+        }
     }
 
     private void OnMapInit(Entity<SpiderOSComponent> ent, ref MapInitEvent args)

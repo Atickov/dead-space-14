@@ -28,8 +28,8 @@
     icon:
       sprite: /Textures/_DeadSpace/Actions/ninja_actions.rsi
       state: clones
-    #components:
-    #
+    components:
+    - type: NinjaHolographicClones
   - category: Ghost
     tier: 4
     name: spider-os-module-ghost-4
@@ -137,5 +137,6 @@
     icon:
       sprite: /Textures/_DeadSpace/Actions/ninja_actions.rsi
       state: redspider
-    #components:
+    components:
+    - type: NinjaMartialArt
     

@@ -173,6 +173,20 @@
     event: !type:NinjaSmokeAbilityActionEvent
 
 - type: entity
+  id: NinjaHolographicClonesAction
+  name: голографические клоны
+  description: Создает вокруг вас несколько голографических клонов, сбивающих противников с толку.
+  components:
+  - type: Action
+    icon:
+      sprite: _DeadSpace/Actions/ninja_actions.rsi
+      state: clones
+    useDelay: 5.0
+    itemIconStyle: BigAction
+  - type: InstantAction
+    event: !type:NinjaHolographicClonesActionEvent
+
+- type: entity
   parent: BaseAction
   id: ToggleNinjaAutoSmokeAction
   name: автоматический режим дымовой завесы.

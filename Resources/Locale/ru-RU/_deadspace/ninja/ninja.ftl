@@ -131,3 +131,8 @@ ninja-action-refill = Костюм переработал материал. За
 
 ninja-inject-adrenal = Костюм впрыскивает в вас реагент. Сердце забилось быстрее.
 ninja-inject-healing-cocktail = Костюм впрыскивает в вас реагент. Ваши раны затягиваются.
+
+# Ninja Concentration
+
+alerts-concentration-name = Концентрация
+description: alerts-concentration-desc = ...
