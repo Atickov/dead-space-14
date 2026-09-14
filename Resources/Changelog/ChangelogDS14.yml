@@ -7734,3 +7734,12 @@ Entries:
     message: Отображение одноствольного дробовика-багета на спине. Теперь, вместо
       двухстволки там реально багет. <img width="402" height="533" alt="image" src="https://github.com/user-attachments/assets/553b9c73-9a9a-4831-ac3b-9221c6a1230c"
       />
+- id: 739
+  author: trefasv
+  time: '2026-09-14T16:22:45.731786+00:00'
+  pr: 2349
+  changes:
+  - type: Add
+    message: Консерва аммиачной рыбки - великий сюрстремминг. Нигде не заказывается,
+      просто есть в игре. <img width="695" height="543" alt="image" src="https://github.com/user-attachments/assets/46b058ac-8964-4865-b916-782321878405"
+      />
