@@ -298,11 +298,13 @@ namespace Content.Client.Access.UI
             if (targetList.Count == 0)
                 return;
 
-            SetAllAccess(false);
+            // Preserve the accesses already on the card: the preset only adds to them.
+            var access = _currentAccess.ToHashSet();
+            access.UnionWith(targetList);
 
-            foreach (var access in targetList)
+            foreach (var accessLevel in access)
             {
-                if (_accessButtons.ButtonsList.TryGetValue(access, out var button) && !button.Disabled)
+                if (_accessButtons.ButtonsList.TryGetValue(accessLevel, out var button) && !button.Disabled)
                     button.Pressed = true;
             }
 
