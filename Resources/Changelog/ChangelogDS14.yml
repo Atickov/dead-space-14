@@ -7743,3 +7743,10 @@ Entries:
     message: Консерва аммиачной рыбки - великий сюрстремминг. Нигде не заказывается,
       просто есть в игре. <img width="695" height="543" alt="image" src="https://github.com/user-attachments/assets/46b058ac-8964-4865-b916-782321878405"
       />
+- id: 740
+  author: IvanKuvalda
+  time: '2026-09-14T16:37:26.992083+00:00'
+  pr: 2345
+  changes:
+  - type: Fix
+    message: Теперь базовые и расширенные доступы ДОБАВЛЯЮТСЯ
