@@ -195,8 +195,6 @@
     shape:
     - 0,0,0,3
   - type: EnergyKatana
-  - type: EnergyKatanaMartialArt
-    reflectProbBonus: 0.1
   - type: NinjaAppearanceItem
   # DS14-start
   - type: Parry

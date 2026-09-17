@@ -130,13 +130,4 @@
       state: energynet
     #actions:
     #- ActionNinjaAdrenal
-  - category: Steel
-    tier: 5
-    name: spider-os-module-steel-5
-    description: spider-os-module-steel-5-desc
-    icon:
-      sprite: /Textures/_DeadSpace/Actions/ninja_actions.rsi
-      state: redspider
-    components:
-    - type: NinjaMartialArt
     
