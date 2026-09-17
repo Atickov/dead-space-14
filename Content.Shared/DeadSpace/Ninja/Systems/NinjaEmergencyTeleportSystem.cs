@@ -26,6 +26,7 @@ public sealed class NinjaEmergencyTeleportSystem : EntitySystem
     [Dependency] private readonly TurfSystem _turfSystem = default!;
     [Dependency] private readonly SharedSpaceNinjaSystem _ninja = default!;
     [Dependency] private readonly ActionContainerSystem _actionContainer = default!;
+    [Dependency] private readonly SharedActionsSystem _actions = default!;
     [Dependency] private readonly SharedNinjaSmokeAbilitySystem _smoke = default!;
     [Dependency] private readonly EntityLookupSystem _entityLookup = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
@@ -39,6 +40,8 @@ public sealed class NinjaEmergencyTeleportSystem : EntitySystem
         SubscribeLocalEvent<NinjaEmergencyTeleportComponent, NinjaEmergencyTeleportEvent>(OnTeleport);
         SubscribeLocalEvent<NinjaEmergencyTeleportComponent, MapInitEvent>(OnMapInit);
         SubscribeLocalEvent<NinjaEmergencyTeleportComponent, GetItemActionsEvent>(OnGetActions);
+
+        SubscribeLocalEvent<NinjaEmergencyTeleportComponent, SpiderOSPowerChangedEvent>(OnSpiderOSPowerChanged);
     }
 
     private void OnMapInit(Entity<NinjaEmergencyTeleportComponent> ent, ref MapInitEvent args)
@@ -52,7 +55,19 @@ public sealed class NinjaEmergencyTeleportSystem : EntitySystem
     {
         if (args.InHands)
             return;
+
+        if (!TryComp<SpiderOSComponent>(ent.Owner, out var os) || !os.SuitActivated)
+            return;
+
         args.AddAction(ent.Comp.TeleportActionEntity);
+    }
+
+    private void OnSpiderOSPowerChanged(Entity<NinjaEmergencyTeleportComponent> ent, ref SpiderOSPowerChangedEvent args)
+    {
+        if (!args.Activated)
+        {
+            _actions.RemoveAction(ent.Comp.TeleportActionEntity);
+        }
     }
 
     private void OnTeleport(Entity<NinjaEmergencyTeleportComponent> ent, ref NinjaEmergencyTeleportEvent args)

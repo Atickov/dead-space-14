@@ -32,6 +32,8 @@ public sealed class NinjaSmokeAbilitySystem : SharedNinjaSmokeAbilitySystem
         SubscribeLocalEvent<NinjaSmokeAbilityComponent, MapInitEvent>(OnMapInit);
         SubscribeLocalEvent<NinjaSmokeAbilityComponent, GetItemActionsEvent>(OnGetActions);
 
+        SubscribeLocalEvent<NinjaSmokeAbilityComponent, SpiderOSPowerChangedEvent>(OnSpiderOSPowerChanged);
+
         SubscribeLocalEvent<NinjaSmokeAbilityComponent, NinjaSmokeAbilityActionEvent>(OnSmokeAction);
         SubscribeLocalEvent<NinjaSmokeAbilityComponent, NinjaToggleAutoSmokeActionEvent>(OnSmokeAutoModeToggleAction);
     }
@@ -48,8 +50,21 @@ public sealed class NinjaSmokeAbilitySystem : SharedNinjaSmokeAbilitySystem
     {
         if (args.InHands)
             return;
+
+        if (!TryComp<SpiderOSComponent>(ent.Owner, out var os) || !os.SuitActivated)
+            return;
+
         args.AddAction(ent.Comp.ActionSmokeEntity);
         args.AddAction(ent.Comp.ActionAutoSmokeEntity);
+    }
+
+    private void OnSpiderOSPowerChanged(Entity<NinjaSmokeAbilityComponent> ent, ref SpiderOSPowerChangedEvent args)
+    {
+        if (!args.Activated)
+        {
+            _actions.RemoveAction(ent.Comp.ActionSmokeEntity);
+            _actions.RemoveAction(ent.Comp.ActionAutoSmokeEntity);
+        }
     }
 
     private void OnSmokeAction(Entity<NinjaSmokeAbilityComponent> ent, ref NinjaSmokeAbilityActionEvent args)

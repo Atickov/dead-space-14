@@ -10,6 +10,7 @@ namespace Content.Shared.DeadSpace.Ninja.Systems;
 public abstract class SharedNinjaSpiritFormSystem : EntitySystem
 {
     [Dependency] private readonly ActionContainerSystem _actionContainer = default!;
+    [Dependency] private readonly SharedActionsSystem _actions = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedSpaceNinjaSystem _ninja = default!;
     [Dependency] private readonly INetManager _net = default!;
@@ -22,6 +23,8 @@ public abstract class SharedNinjaSpiritFormSystem : EntitySystem
         SubscribeLocalEvent<NinjaSpiritFormComponent, MapInitEvent>(OnMapInit);
         SubscribeLocalEvent<NinjaSpiritFormComponent, GetItemActionsEvent>(OnGetActions);
         SubscribeLocalEvent<NinjaSpiritFormComponent, NinjaSpiritFormEvent>(OnSpiritAction);
+
+        SubscribeLocalEvent<NinjaSpiritFormComponent, SpiderOSPowerChangedEvent>(OnSpiderOSPowerChanged);
 
         SubscribeLocalEvent<NinjaSpiritFormComponent, AttackAttemptEvent>(OnAttackAttempt);
         SubscribeLocalEvent<NinjaSpiritFormComponent, UseAttemptEvent>(OnUseAttempt);
@@ -45,6 +48,9 @@ public abstract class SharedNinjaSpiritFormSystem : EntitySystem
         ref GetItemActionsEvent args)
     {
         if (args.InHands)
+            return;
+
+        if (!TryComp<SpiderOSComponent>(ent.Owner, out var os) || !os.SuitActivated)
             return;
 
         args.AddAction(ent.Comp.SpiritFormActionEntity);
@@ -78,6 +84,17 @@ public abstract class SharedNinjaSpiritFormSystem : EntitySystem
         }
 
         args.Handled = true;
+    }
+
+    private void OnSpiderOSPowerChanged(
+        Entity<NinjaSpiritFormComponent> ent,
+        ref SpiderOSPowerChangedEvent args)
+    {
+        if (!args.Activated)
+        {
+            _actions.RemoveAction(ent.Comp.SpiritFormActionEntity);
+            DeactivateSpirit(ent, args.Wearer);
+        }
     }
 
     public void ActivateSpirit(
