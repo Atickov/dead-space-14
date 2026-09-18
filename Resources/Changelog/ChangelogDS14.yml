@@ -7926,3 +7926,14 @@ Entries:
   changes:
   - type: Fix
     message: Немые теперь не издают звуки критического состояния
+- id: 755
+  author: trefasv
+  time: '2026-09-18T19:27:38.593161+00:00'
+  pr: 2353
+  changes:
+  - type: Add
+    message: Рация ЦК и противогаз офицера ЦК для офицеров Центрального Командования.
+  - type: Tweak
+    message: Поясы Офицеров ЦК теперь вмещают рацию ЦК (Раньше была рация СБ), а противогаз
+      заменен на противогаз ЦК. <img width="798" height="534" alt="image" src="https://github.com/user-attachments/assets/a4a3ba63-b030-4162-a8ec-2fa11325ec08"
+      />
