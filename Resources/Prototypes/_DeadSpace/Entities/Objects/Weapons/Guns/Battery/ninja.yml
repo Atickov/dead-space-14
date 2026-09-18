@@ -1,7 +1,7 @@
 - type: entity
   id: WeaponNinjaShuriken
   name: эммитер энергетических сюрикенов
-  description: Позволит вам не сделать гок-гок-гок.
+  description: Отличная штука, чтобы оглушить оппонента... Ну или оборвать его жизнь — тут уж как вам угодно.
   parent: BaseItem
   components:
   - type: Sprite
@@ -114,3 +114,56 @@
   - type: RemoveComponentsOnTrigger
     components: 
     - type: TimedDespawn
+
+- type: entity
+  id: WeaponNinjaNet
+  name: эммитер энергетической сети
+  description: Выпускает энергетическую сеть, которая не позволит врагу далеко от вас убежать.
+  parent: BaseItem
+  components:
+  - type: Sprite
+    sprite: _DeadSpace/Objects/Weapons/Guns/ninja.rsi
+    layers:
+    - state: net_emitter
+  - type: Appearance
+  - type: NinjaEnergyNetGun
+    
+
+- type: entity
+  id: NinjaNet
+  name: энергетическая сеть
+  components:
+  - type: Animateable
+  - type: Clickable
+  - type: InteractionOutline
+  - type: Physics
+    bodyType: Static
+  - type: Fixtures
+    fixtures:
+      fix1:
+        shape:
+          !type:PhysShapeCircle
+          radius: 0.2
+        density: 100
+        mask:
+        - TableMask
+  - type: Sprite
+    sprite: _DeadSpace/Objects/Weapons/Guns/ninja.rsi
+    state: net
+    noRot: true
+  - type: Strap
+    position: Stand
+  - type: Damageable
+    damageContainer: Inorganic
+  - type: Destructible
+    thresholds:
+    - trigger:
+        !type:DamageTrigger
+        damage: 50
+      behaviors:
+      - !type:DoActsBehavior
+        acts: ["Destruction"]
+  - type: TimedDespawn
+    lifetime: 5
+  - type: NinjaEnergyNet
+      

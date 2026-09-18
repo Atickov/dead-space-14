@@ -8,6 +8,7 @@ using Content.Server.Power.EntitySystems;
 using Content.Shared.Containers.ItemSlots;
 using Robust.Server.GameObjects;
 using Robust.Shared.Prototypes;
+using Content.Shared.RetractableItemAction;
 
 namespace Content.Server.DeadSpace.Ninja.Systems;
 
@@ -19,6 +20,7 @@ public sealed class SpiderOSSystem : SharedSpiderOSSystem
     [Dependency] private readonly SharedNinjaAppearanceSystem _appearance = default!;
     [Dependency] private readonly BatterySystem _battery = default!;
     [Dependency] private readonly ItemSlotsSystem _itemSlots = default!;
+    [Dependency] private readonly RetractableItemActionSystem _retractableItemAction = default!;
 
     public override void Initialize()
     {
@@ -310,6 +312,10 @@ public sealed class SpiderOSSystem : SharedSpiderOSSystem
         {
             if (MetaData(contained).EntityPrototype?.ID is { } protoId && grantedProtos.Contains(protoId))
             {
+                if (TryComp<RetractableItemActionComponent>(contained, out var retractableActionComponent) && retractableActionComponent.ActionItemUid != null)
+                {
+                    _retractableItemAction.RetractRetractableItem(wearer, retractableActionComponent.ActionItemUid.Value, contained);
+                }
                 _actions.RemoveProvidedAction(wearer, suitUid, contained);
             }
         }

@@ -82,8 +82,8 @@
     icon:
       sprite: /Textures/_DeadSpace/Actions/ninja_actions.rsi
       state: caltrop
-    #components:
-    #- type: NinjaEmergencyTeleport
+    components:
+    - type: NinjaCaltrop
   - category: Snake
     tier: 5
     name: spider-os-module-snake-5
@@ -128,6 +128,6 @@
     icon:
       sprite: /Textures/_DeadSpace/Actions/ninja_actions.rsi
       state: energynet
-    #actions:
-    #- ActionNinjaAdrenal
+    actions:
+    - ToggleNinjaNetAbility
     
