@@ -388,17 +388,34 @@ public sealed partial class SpiderOSWindow : FancyWindow
         };
 
         var head = helmet ? "helmet" : "scarf";
-        var path = new ResPath($"{PreviewBasePath}preview-{color}-{head}.png");
 
-        // The new style has no preview art yet, so show it as unknown.
-        if (style == NinjaStyle.New || !_resCache.TryGetResource<TextureResource>(path, out var preview))
+        if (style == NinjaStyle.New)
         {
-            if (_resCache.TryGetResource<TextureResource>(new ResPath($"{PreviewBasePath}no-preview.png"), out var noPreview))
-                _stylePreview.Texture = noPreview.Texture;
+            var newPath = new ResPath($"{PreviewBasePath}preview-{color}-new-helmet.png");
+            if (_resCache.TryGetResource<TextureResource>(newPath, out var newPreview))
+            {
+                _stylePreview.Texture = newPreview.Texture;
+                return;
+            }
+
+            ShowNoPreview();
             return;
         }
 
-        _stylePreview.Texture = preview.Texture;
+        var path = new ResPath($"{PreviewBasePath}preview-{color}-{head}.png");
+        if (_resCache.TryGetResource<TextureResource>(path, out var preview))
+        {
+            _stylePreview.Texture = preview.Texture;
+            return;
+        }
+
+        ShowNoPreview();
+    }
+
+    private void ShowNoPreview()
+    {
+        if (_resCache.TryGetResource<TextureResource>(new ResPath($"{PreviewBasePath}no-preview.png"), out var noPreview))
+            _stylePreview.Texture = noPreview.Texture;
     }
 
     private static NinjaColorway ColorFromIndex(int index) => index switch

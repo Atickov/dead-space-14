@@ -22,6 +22,8 @@ public sealed partial class NinjaAppearanceSystem : SharedNinjaAppearanceSystem
 {
     private static readonly string[] ColorPrefixes = { "red-", "blue-", "green-" };
 
+    private const string StylePrefix = "new-";
+
     private const string DeactivatedIconState = "deactivated-icon";
 
     private readonly Dictionary<EntityUid, string?[]> _savedIconStates = new();
@@ -150,7 +152,7 @@ public sealed partial class NinjaAppearanceSystem : SharedNinjaAppearanceSystem
         else if (TryComp(item, out SpriteComponent? sprite))
             rsi = sprite.BaseRSI;
 
-        if (TryGetFirstState(rsi, GetColorCandidates(StripColorPrefix(state), prefix, style), out var candidate))
+        if (TryGetFirstState(rsi, GetColorCandidates(StripPrefixes(state), prefix, style), out var candidate))
             layer.State = candidate;
     }
 
@@ -234,7 +236,7 @@ public sealed partial class NinjaAppearanceSystem : SharedNinjaAppearanceSystem
             if (!string.IsNullOrEmpty(state))
             {
                 var rsi = layer.ActualRsi ?? sprite.BaseRSI;
-                if (rsi != null && TryGetFirstState(rsi, GetColorCandidates(StripColorPrefix(state), prefix, style), out var candidate) &&
+                if (rsi != null && TryGetFirstState(rsi, GetColorCandidates(StripPrefixes(state), prefix, style), out var candidate) &&
                     candidate != state)
                 {
                     _sprite.LayerSetRsiState((item, sprite), layerIndex, candidate);
@@ -304,6 +306,16 @@ public sealed partial class NinjaAppearanceSystem : SharedNinjaAppearanceSystem
 
         return state;
     }
+
+    private static string StripStylePrefix(string state)
+    {
+        if (state.StartsWith(StylePrefix, StringComparison.Ordinal))
+            return state.Substring(StylePrefix.Length);
+
+        return state;
+    }
+
+    private static string StripPrefixes(string state) => StripStylePrefix(StripColorPrefix(state));
 
     private (EntityUid Uid, NinjaAppearanceComponent Comp)? FindSuit(TransformComponent xform)
     {
