@@ -12,3 +12,5 @@ ent-MassArrestObjective = Set everyone to wanted
     .desc = Use your gloves to hack a criminal records console, setting the entire station to be wanted!
 ent-NinjaKillRandomPersonObjective = { ent-BaseNinjaObjective }
     .desc = Do it however you like, just make sure they don't make it to centcom.
+ent-NinjaProtectPersonObjective = Protect
+    .desc = The clan demands that one of the station's crew members survives. Keep an eye on them, they must not die.
