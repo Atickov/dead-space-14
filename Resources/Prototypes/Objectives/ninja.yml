@@ -130,6 +130,7 @@
     # if ce flies a shittle to centcom you better find a way onto it
     requireDead: true
 
+- type: entity
   parent: [BaseNinjaObjective, BaseTargetObjective]
   id: NinjaProtectPersonObjective
   components:
