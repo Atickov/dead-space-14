@@ -1,17 +1,14 @@
 using Content.Shared.DeadSpace.Ninja.Systems;
 using Content.Shared.DeadSpace.Ninja.Components;
 using Content.Shared.Actions;
-using Content.Server.Power.EntitySystems;
-using Content.Shared.Containers.ItemSlots;
 
 namespace Content.Server.DeadSpace.Ninja.Systems;
 
 public sealed class NinjaCloakSystem : SharedNinjaCloakSystem
 {
     [Dependency] private readonly NinjaSmokeAbilitySystem _ninjaSmoke = default!;
-    [Dependency] private readonly BatterySystem _battery = default!;
-    [Dependency] private readonly ItemSlotsSystem _itemSlots = default!;
     [Dependency] private readonly SharedActionsSystem _actions = default!;
+    [Dependency] private readonly SpaceNinjaSystem _ninja = default!;
 
     public override void Initialize()
     {
@@ -47,21 +44,13 @@ public sealed class NinjaCloakSystem : SharedNinjaCloakSystem
             if (!cloak.Enabled)
                 continue;
 
-            if (!_itemSlots.TryGetSlot(uid, "cell_slot", out var slot) || slot.Item is not { } batteryUid)
-            {
-                cloak.Enabled = false;
-                Dirty(uid, cloak);
-                continue;
-            }
-
             float cost = cloak.DrainRate * frameTime;
 
-            if (!_battery.TryUseCharge(batteryUid, cost))
+            if (!_ninja.TryUseCharge(uid, cost))
             {
                 cloak.Enabled = false;
                 Dirty(uid, cloak);
             }
         }
     }
-
 }
