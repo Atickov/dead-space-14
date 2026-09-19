@@ -17,6 +17,13 @@ public sealed partial class DashAbilityComponent : Component
     [DataField]
     public bool CorruptByBluespaceItems = false;
 
+    /// <summary>
+    /// If true, the entity the user is pulling is teleported along with them,
+    /// preserving the distance joint instead of breaking the pull.
+    /// </summary>
+    [DataField]
+    public bool TeleportPulledEntity = false;
+
     [DataField]
     public float CorruptMaxDistance = 3f;
 

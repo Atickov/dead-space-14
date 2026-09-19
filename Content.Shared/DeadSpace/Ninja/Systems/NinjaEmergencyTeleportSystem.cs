@@ -3,10 +3,13 @@ using Content.Shared.Maps;
 using Content.Shared.Movement.Pulling.Components;
 using Content.Shared.Movement.Pulling.Systems;
 using Content.Shared.Physics;
-using Robust.Shared.Map;
-using Robust.Shared.Network;
-using Robust.Shared.Physics.Components;
+using Content.Shared.Popups;
 using Robust.Shared.Audio.Systems;
+using Robust.Shared.Map;
+using Robust.Shared.Map.Components;
+using Robust.Shared.Network;
+using Robust.Shared.Physics;
+using Robust.Shared.Physics.Components;
 using Robust.Shared.Random;
 using Content.Shared.DeadSpace.Ninja.Components;
 using Content.Shared.Actions;
@@ -23,7 +26,12 @@ public sealed class NinjaEmergencyTeleportSystem : EntitySystem
     [Dependency] private readonly TurfSystem _turfSystem = default!;
     [Dependency] private readonly SharedSpaceNinjaSystem _ninja = default!;
     [Dependency] private readonly ActionContainerSystem _actionContainer = default!;
+    [Dependency] private readonly SharedActionsSystem _actions = default!;
     [Dependency] private readonly SharedNinjaSmokeAbilitySystem _smoke = default!;
+    [Dependency] private readonly EntityLookupSystem _entityLookup = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
+
+    private static readonly Vector2 TeleportCheckExtents = new(0.475f, 0.475f);
 
     public override void Initialize()
     {
@@ -32,6 +40,8 @@ public sealed class NinjaEmergencyTeleportSystem : EntitySystem
         SubscribeLocalEvent<NinjaEmergencyTeleportComponent, NinjaEmergencyTeleportEvent>(OnTeleport);
         SubscribeLocalEvent<NinjaEmergencyTeleportComponent, MapInitEvent>(OnMapInit);
         SubscribeLocalEvent<NinjaEmergencyTeleportComponent, GetItemActionsEvent>(OnGetActions);
+
+        SubscribeLocalEvent<NinjaEmergencyTeleportComponent, SpiderOSPowerChangedEvent>(OnSpiderOSPowerChanged);
     }
 
     private void OnMapInit(Entity<NinjaEmergencyTeleportComponent> ent, ref MapInitEvent args)
@@ -45,7 +55,19 @@ public sealed class NinjaEmergencyTeleportSystem : EntitySystem
     {
         if (args.InHands)
             return;
+
+        if (!TryComp<SpiderOSComponent>(ent.Owner, out var os) || !os.SuitActivated)
+            return;
+
         args.AddAction(ent.Comp.TeleportActionEntity);
+    }
+
+    private void OnSpiderOSPowerChanged(Entity<NinjaEmergencyTeleportComponent> ent, ref SpiderOSPowerChangedEvent args)
+    {
+        if (!args.Activated)
+        {
+            _actions.RemoveAction(ent.Comp.TeleportActionEntity);
+        }
     }
 
     private void OnTeleport(Entity<NinjaEmergencyTeleportComponent> ent, ref NinjaEmergencyTeleportEvent args)
@@ -56,26 +78,29 @@ public sealed class NinjaEmergencyTeleportSystem : EntitySystem
         if (TryComp<PullerComponent>(args.Performer, out var puller) && TryComp<PullableComponent>(puller.Pulling, out var pullable))
             _pulling.TryStopPull(puller.Pulling.Value, pullable);
 
-        _audio.PlayPredicted(ent.Comp.TeleportSound, ent, args.Performer);
-
         if (_net.IsClient)
             return;
 
-        var targetCoords = SelectRandomTileInFacingArea(args.Performer, ent.Comp.TeleportRadius);
+        var targetCoords = SelectRandomTeleportPosition(args.Performer, ent.Comp.TeleportRadius);
 
         if (targetCoords == null)
             return;
 
         if (!_ninja.TryUseCharge(args.Performer, ent.Comp.EnergyCost))
+        {
+            _popup.PopupEntity(Loc.GetString("ninja-no-power"), args.Performer, args.Performer);
             return;
+        }
 
         if (TryComp<NinjaSmokeAbilityComponent>(ent, out var smokeComp))
             _smoke.TrySpawnNinjaSmoke((ent.Owner, smokeComp), true);
 
         _transform.SetCoordinates(args.Performer, targetCoords.Value);
+        _audio.PlayPvs(ent.Comp.TeleportSound, args.Performer);
         args.Handled = true;
     }
-    private EntityCoordinates? SelectRandomTileInFacingArea(EntityUid uid, Vector2 radius, int tries = 80, PhysicsComponent? physicsComponent = null)
+
+    private EntityCoordinates? SelectRandomTeleportPosition(EntityUid uid, Vector2 radius, int tries = 80, PhysicsComponent? physicsComponent = null)
     {
         var userXform = Transform(uid);
         var userCoords = userXform.Coordinates;
@@ -89,10 +114,10 @@ public sealed class NinjaEmergencyTeleportSystem : EntitySystem
         var maxDistance = MathF.Max(minDistance, radius.Y);
         var collisionMask = (CollisionGroup)physicsComponent.CollisionMask;
 
-        return TryPickTile(minDistance, maxDistance)
-               ?? (minDistance > 1f ? TryPickTile(1f, minDistance) : null);
+        return TryPickPosition(minDistance, maxDistance)
+               ?? (minDistance > 1f ? TryPickPosition(1f, minDistance) : null);
 
-        EntityCoordinates? TryPickTile(float min, float max)
+        EntityCoordinates? TryPickPosition(float min, float max)
         {
             for (var i = 0; i < tries; i++)
             {
@@ -101,15 +126,57 @@ public sealed class NinjaEmergencyTeleportSystem : EntitySystem
                 var lateralOffset = _random.NextFloat(-distance / 2f, distance / 2f);
                 var candidateCoords = userCoords.Offset(forward * distance + side * lateralOffset);
 
-                if (!_turfSystem.TryGetTileRef(candidateCoords, out var tileRef)
-                    || tileRef.Value.Tile.IsEmpty
-                    || _turfSystem.IsTileBlocked(tileRef.Value, collisionMask))
+                if (IsTeleportPositionBlocked(candidateCoords, collisionMask))
                     continue;
 
-                return _turfSystem.GetTileCenter(tileRef.Value);
+                if (_turfSystem.TryGetTileRef(candidateCoords, out var tileRef) && !tileRef.Value.Tile.IsEmpty)
+                    return _turfSystem.GetTileCenter(tileRef.Value);
+
+                return candidateCoords;
             }
 
             return null;
         }
+    }
+
+    private bool IsTeleportPositionBlocked(EntityCoordinates candidate, CollisionGroup collisionMask)
+    {
+        if (_turfSystem.TryGetTileRef(candidate, out var tileRef) && !tileRef.Value.Tile.IsEmpty)
+            return _turfSystem.IsTileBlocked(tileRef.Value, collisionMask);
+
+        var mapCoords = _transform.ToMapCoordinates(candidate);
+        if (mapCoords.MapId == MapId.Nullspace)
+            return true;
+
+        var box = new Box2(mapCoords.Position - TeleportCheckExtents, mapCoords.Position + TeleportCheckExtents);
+
+        foreach (var ent in _entityLookup.GetEntitiesIntersecting(mapCoords.MapId, box, LookupFlags.Dynamic | LookupFlags.Static))
+        {
+            if (HasComp<MapGridComponent>(ent))
+                continue;
+
+            if (!TryComp<FixturesComponent>(ent, out var fixtures))
+                continue;
+
+            var (pos, rot) = _transform.GetWorldPositionRotation(ent);
+            var worldXform = new Transform(pos, (float)rot.Theta);
+
+            foreach (var fixture in fixtures.Fixtures.Values)
+            {
+                if (!fixture.Hard)
+                    continue;
+
+                if ((fixture.CollisionLayer & (int)collisionMask) == 0)
+                    continue;
+
+                for (var i = 0; i < fixture.Shape.ChildCount; i++)
+                {
+                    if (fixture.Shape.ComputeAABB(worldXform, i).Intersects(box))
+                        return true;
+                }
+            }
+        }
+
+        return false;
     }
 }

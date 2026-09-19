@@ -38,6 +38,9 @@ public sealed partial class SpiderOSComponent : Component
     [DataField, AutoNetworkedField]
     public bool SuitActivated = false;
 
+    [DataField]
+    public float EnergyConsumption = 2;
+
     public TimeSpan LastMessage;
 }
 
@@ -86,6 +89,14 @@ public sealed class SpiderOSSetAppearanceMessage : BoundUserInterfaceMessage
     {
         Colorway = colorway;
         Helmet = helmet;
+    }
+}
+
+[Serializable, NetSerializable]
+public sealed class SpiderOSShuttleControlMessage : BoundUserInterfaceMessage
+{
+    public SpiderOSShuttleControlMessage()
+    {
     }
 }
 

@@ -98,7 +98,7 @@ public abstract class SharedSpaceNinjaSystem : EntitySystem
     /// </summary>
     private void OnNinjaAttacked(Entity<SpaceNinjaComponent> ent, ref AttackedEvent args)
     {
-        TryRevealNinja(ent, disable: true);
+        TryRevealNinja(ent);
     }
 
     /// <summary>
@@ -107,13 +107,13 @@ public abstract class SharedSpaceNinjaSystem : EntitySystem
     /// </summary>
     private void OnNinjaAttack(Entity<SpaceNinjaComponent> ent, ref MeleeAttackEvent args)
     {
-        TryRevealNinja(ent, disable: false);
+        TryRevealNinja(ent);
     }
 
-    private void TryRevealNinja(Entity<SpaceNinjaComponent> ent, bool disable)
+    private void TryRevealNinja(Entity<SpaceNinjaComponent> ent)
     {
         if (ent.Comp.Suit is {} uid && TryComp<NinjaSuitComponent>(ent.Comp.Suit, out var suit))
-            Suit.RevealNinja((uid, suit), ent, disable: disable);
+            Suit.RevealNinja((uid, suit), ent);
     }
 
     /// <summary>

@@ -6,12 +6,15 @@ namespace Content.Shared.DeadSpace.Ninja.Systems;
 
 public abstract class SharedNinjaCloakSystem : EntitySystem
 {
+    [Dependency] private readonly SharedActionsSystem _actions = default!;
     public override void Initialize()
     {
         base.Initialize();
         SubscribeLocalEvent<SpaceNinjaComponent, ToggleCloakNinjaEvent>(OnNinjaToggleCloak);
         SubscribeLocalEvent<NinjaCloakComponent, GetItemActionsEvent>(OnGetActions);
         SubscribeLocalEvent<NinjaCloakComponent, GotUnequippedEvent>(OnUnequipped);
+
+        SubscribeLocalEvent<NinjaCloakComponent, SpiderOSPowerChangedEvent>(OnSpiderOSPowerChanged);
     }
 
 
@@ -36,7 +39,19 @@ public abstract class SharedNinjaCloakSystem : EntitySystem
         if (args.InHands)
             return;
 
+        if (!TryComp<SpiderOSComponent>(ent.Owner, out var os) || !os.SuitActivated)
+            return;
+
         args.AddAction(ent.Comp.ActionEntity);
+    }
+
+    private void OnSpiderOSPowerChanged(Entity<NinjaCloakComponent> ent, ref SpiderOSPowerChangedEvent args)
+    {
+        if (!args.Activated)
+        {
+            _actions.RemoveAction(ent.Comp.ActionEntity);
+            ent.Comp.Enabled = false;
+        }
     }
 
     private void OnUnequipped(Entity<NinjaCloakComponent> ent, ref GotUnequippedEvent args)

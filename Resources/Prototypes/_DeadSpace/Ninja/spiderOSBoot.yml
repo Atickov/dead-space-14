@@ -20,7 +20,7 @@
   - delay: 3
     log: spider-os-boot-driver-setup-50
   - delay: 3
-    log: spider-os-boot-driver-setup-65
+    log: spider-os-boot-driver-setup-67
   - delay: 3
     log: spider-os-boot-driver-setup-70
   - delay: 3

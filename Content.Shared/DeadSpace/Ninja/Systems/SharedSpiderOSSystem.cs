@@ -129,8 +129,6 @@ public abstract partial class SharedSpiderOSSystem : EntitySystem
 
         foreach (var skill in proto.AllSkills)
         {
-            // A tier counts as filled when a module is selected for it, or it became
-            // permanently locked (e.g. a non-transferring module lost after Second Chance).
             if (!comp.SelectedModules.ContainsKey(skill.Tier) && !comp.LockedTiers.Contains(skill.Tier))
             {
                 return false;
@@ -167,8 +165,5 @@ public abstract partial class SharedSpiderOSSystem : EntitySystem
     }
 }
 
-/// <summary>
-/// Raised (directed at the suit) whenever the suit's Spider OS power state changes.
-/// </summary>
 [ByRefEvent]
 public readonly record struct SpiderOSPowerChangedEvent(EntityUid Suit, EntityUid Wearer, bool Activated);

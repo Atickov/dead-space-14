@@ -4,8 +4,8 @@ using Content.Shared.Clothing.Components;
 using Content.Shared.Inventory.Events;
 using Content.Shared.DeadSpace.Ninja.Components;
 using Content.Shared.Popups;
-using Content.Shared.Timing;
 using Robust.Shared.Audio.Systems;
+using Content.Shared.Actions.Components;
 
 namespace Content.Shared.DeadSpace.Ninja.Systems;
 
@@ -18,7 +18,7 @@ public abstract class SharedNinjaSuitSystem : EntitySystem
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] protected readonly SharedPopupSystem Popup = default!;
     [Dependency] private readonly SharedSpaceNinjaSystem _ninja = default!;
-    [Dependency] private readonly UseDelaySystem _useDelay = default!;
+    [Dependency] private readonly SharedActionsSystem _actions = default!;
 
     public override void Initialize()
     {
@@ -83,7 +83,7 @@ public abstract class SharedNinjaSuitSystem : EntitySystem
 
     private void OnCreateStarAttempt(Entity<NinjaSuitComponent> ent, ref CreateItemAttemptEvent args)
     {
-        if (CheckDisabled(ent, args.User))
+        if (TryComp<SpiderOSComponent>(ent, out var spiderOS) && !spiderOS.SuitActivated)
             args.Cancelled = true;
     }
 
@@ -100,7 +100,7 @@ public abstract class SharedNinjaSuitSystem : EntitySystem
     /// <summary>
     /// Force uncloaks the user and disables suit abilities.
     /// </summary>
-    public void RevealNinja(Entity<NinjaSuitComponent?> ent, EntityUid user, bool disable = true)
+    public void RevealNinja(Entity<NinjaSuitComponent?> ent, EntityUid user)
     {
         if (!Resolve(ent, ref ent.Comp))
             return;
@@ -113,37 +113,12 @@ public abstract class SharedNinjaSuitSystem : EntitySystem
 
         cloak.Enabled = false;
         Dirty(uid, cloak);
+        if (TryComp<ActionComponent>(cloak.ActionEntity, out var cloakaction) && cloakaction.UseDelay != null)
+            _actions.SetCooldown(cloak.ActionEntity, cloakaction.UseDelay.Value);
 
         // previously cloaked, disable abilities for a short time
         _audio.PlayPredicted(comp.RevealSound, uid, user);
         Popup.PopupClient(Loc.GetString("ninja-revealed"), user, user, PopupType.MediumCaution);
-
-        if (disable)
-        {
-            _useDelay.TryResetDelay(uid, id: comp.DisableDelayId);
-        }
-    }
-
-    /// <summary>
-    /// Returns true if the suit is currently disabled
-    /// </summary>
-    public bool IsDisabled(Entity<NinjaSuitComponent?, UseDelayComponent?> ent)
-    {
-        if (!Resolve(ent, ref ent.Comp1, ref ent.Comp2))
-            return false;
-
-        return _useDelay.IsDelayed((ent, ent.Comp2), ent.Comp1.DisableDelayId);
-    }
-
-    protected bool CheckDisabled(Entity<NinjaSuitComponent> ent, EntityUid user)
-    {
-        if (IsDisabled((ent, ent.Comp, null)))
-        {
-            Popup.PopupEntity(Loc.GetString("ninja-suit-cooldown"), user, user, PopupType.Medium);
-            return true;
-        }
-
-        return false;
     }
 
     /// <summary>

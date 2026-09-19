@@ -5,6 +5,7 @@ using Content.Shared.Chemistry.Components;
 using Content.Shared.Coordinates.Helpers;
 using Content.Shared.DeadSpace.Ninja.Components;
 using Content.Shared.Maps;
+using Content.Shared.Popups;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Map;
 using Content.Shared.DeadSpace.Ninja.Systems;
@@ -22,6 +23,7 @@ public sealed class NinjaSmokeAbilitySystem : SharedNinjaSmokeAbilitySystem
     [Dependency] private readonly TurfSystem _turf = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedSpaceNinjaSystem _ninja = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
 
     public override void Initialize()
     {
@@ -29,6 +31,8 @@ public sealed class NinjaSmokeAbilitySystem : SharedNinjaSmokeAbilitySystem
 
         SubscribeLocalEvent<NinjaSmokeAbilityComponent, MapInitEvent>(OnMapInit);
         SubscribeLocalEvent<NinjaSmokeAbilityComponent, GetItemActionsEvent>(OnGetActions);
+
+        SubscribeLocalEvent<NinjaSmokeAbilityComponent, SpiderOSPowerChangedEvent>(OnSpiderOSPowerChanged);
 
         SubscribeLocalEvent<NinjaSmokeAbilityComponent, NinjaSmokeAbilityActionEvent>(OnSmokeAction);
         SubscribeLocalEvent<NinjaSmokeAbilityComponent, NinjaToggleAutoSmokeActionEvent>(OnSmokeAutoModeToggleAction);
@@ -46,8 +50,21 @@ public sealed class NinjaSmokeAbilitySystem : SharedNinjaSmokeAbilitySystem
     {
         if (args.InHands)
             return;
+
+        if (!TryComp<SpiderOSComponent>(ent.Owner, out var os) || !os.SuitActivated)
+            return;
+
         args.AddAction(ent.Comp.ActionSmokeEntity);
         args.AddAction(ent.Comp.ActionAutoSmokeEntity);
+    }
+
+    private void OnSpiderOSPowerChanged(Entity<NinjaSmokeAbilityComponent> ent, ref SpiderOSPowerChangedEvent args)
+    {
+        if (!args.Activated)
+        {
+            _actions.RemoveAction(ent.Comp.ActionSmokeEntity);
+            _actions.RemoveAction(ent.Comp.ActionAutoSmokeEntity);
+        }
     }
 
     private void OnSmokeAction(Entity<NinjaSmokeAbilityComponent> ent, ref NinjaSmokeAbilityActionEvent args)
@@ -85,7 +102,11 @@ public sealed class NinjaSmokeAbilitySystem : SharedNinjaSmokeAbilitySystem
             return false;
 
         if (!_ninja.TryUseCharge(user, energyCost))
+        {
+            if (!autoMode)
+                _popup.PopupEntity(Loc.GetString("ninja-no-power"), user, user);
             return false;
+        }
 
         var coords = _map.MapToGrid(gridUid, mapCoords);
         var smoke = Spawn(ent.Comp.SmokePrototype, coords.SnapToGrid());

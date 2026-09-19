@@ -48,6 +48,9 @@ spider-os-personalization-color = цвет:
 spider-os-personalization-hood-or-scarf = капюшон/шарф:
 spider-os-personalization-activate = активировать костюм
 spider-os-personalization-deactivate = деактивировать костюм
+spider-os-shuttle-control = Управление шаттлом
+spider-os-shuttle-control-fail-not-worn = Ошибка: костюм не надет.
+spider-os-shuttle-control-fail = Ошибка: шаттл не найден.
 spider-os-color-green = Зелёный
 spider-os-color-red = Красный
 spider-os-color-blue = Синий
@@ -65,7 +68,7 @@ spider-os-boot-driver-setup-20 = 20%
 spider-os-boot-driver-setup-30 = 30%
 spider-os-boot-driver-setup-40 = 40%
 spider-os-boot-driver-setup-50 = 50%
-spider-os-boot-driver-setup-65 = 65%
+spider-os-boot-driver-setup-67 = 67%
 spider-os-boot-driver-setup-70 = 70%
 spider-os-boot-driver-setup-80 = 80%
 spider-os-boot-driver-setup-90 = 90%
@@ -131,3 +134,8 @@ ninja-action-refill = Костюм переработал материал. За
 
 ninja-inject-adrenal = Костюм впрыскивает в вас реагент. Сердце забилось быстрее.
 ninja-inject-healing-cocktail = Костюм впрыскивает в вас реагент. Ваши раны затягиваются.
+
+# Ninja Concentration
+
+alerts-concentration-name = Концентрация
+description: alerts-concentration-desc = ...

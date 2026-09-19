@@ -21,10 +21,6 @@ public sealed partial class SpiderOSWindow : FancyWindow
 
     private static readonly string[] Categories = { "Ghost", "Snake", "Steel" };
 
-    private const string PlaceholderIconState = "nullaction";
-
-    private const string RsiIconBasePath = "/Textures/_DeadSpace/Actions/ninja_actions.rsi/";
-
     private const string PreviewBasePath = "/Textures/_DeadSpace/Interface/SpiderOS/";
 
     private static readonly Color HeaderColor = Color.FromHex("#1bcc15");
@@ -50,6 +46,8 @@ public sealed partial class SpiderOSWindow : FancyWindow
     private GridContainer _moduleGrid = default!;
 
     private Button _activateButton = default!;
+
+    private Button _shuttleButton = default!;
 
     private OptionButton _colorOption = default!;
 
@@ -79,6 +77,8 @@ public sealed partial class SpiderOSWindow : FancyWindow
 
     public event Action<bool>? OnSuitPowerChanged;
 
+    public event Action? OnShuttleControl;
+
     public event Action<NinjaColorway, bool>? OnAppearanceChanged;
 
     public SpiderOSWindow()
@@ -95,6 +95,9 @@ public sealed partial class SpiderOSWindow : FancyWindow
 
         _activateButton = FindControl<Button>("ActivateButton");
         _activateButton.OnPressed += _ => OnSuitPowerChanged?.Invoke(!_suitActivated);
+
+        _shuttleButton = FindControl<Button>("ShuttleButton");
+        _shuttleButton.OnPressed += _ => OnShuttleControl?.Invoke();
 
         _colorOption = FindControl<OptionButton>("ColorOption");
         _colorOption.AddItem(Loc.GetString("spider-os-color-green"));
@@ -133,6 +136,7 @@ public sealed partial class SpiderOSWindow : FancyWindow
         _loadProgressBar.Value = 0f;
 
         _activateButton.Disabled = true;
+        _shuttleButton.Disabled = true;
         _colorOption.Disabled = true;
         _hoodOrScarfOption.Disabled = true;
         SetModulesEnabled(false);
@@ -149,6 +153,7 @@ public sealed partial class SpiderOSWindow : FancyWindow
         _loadProgressBar.Value = 0f;
 
         _activateButton.Disabled = false;
+        _shuttleButton.Disabled = false;
         _colorOption.Disabled = _suitActivated;
         _hoodOrScarfOption.Disabled = _suitActivated;
         SetModulesEnabled(!_suitActivated);
@@ -294,7 +299,7 @@ public sealed partial class SpiderOSWindow : FancyWindow
         return holder;
     }
 
-    private NinjaSkill? FindSkill(List<NinjaSkill> skills, string column, int tier)
+    private static NinjaSkill? FindSkill(List<NinjaSkill> skills, string column, int tier)
     {
         foreach (var skill in skills)
         {

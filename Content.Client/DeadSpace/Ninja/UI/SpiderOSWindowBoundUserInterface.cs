@@ -48,6 +48,11 @@ public sealed class SpiderOSWindowBoundUserInterface : BoundUserInterface
             }
         };
 
+        _window.OnShuttleControl += () =>
+        {
+            SendMessage(new SpiderOSShuttleControlMessage());
+        };
+
         _window.OnClose += Close;
         _window.OpenCentered();
     }

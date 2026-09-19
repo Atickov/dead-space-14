@@ -173,6 +173,20 @@
     event: !type:NinjaSmokeAbilityActionEvent
 
 - type: entity
+  id: NinjaHolographicClonesAction
+  name: голографические клоны
+  description: Создает вокруг вас несколько голографических клонов, сбивающих противников с толку.
+  components:
+  - type: Action
+    icon:
+      sprite: _DeadSpace/Actions/ninja_actions.rsi
+      state: clones
+    useDelay: 5.0
+    itemIconStyle: BigAction
+  - type: InstantAction
+    event: !type:NinjaHolographicClonesActionEvent
+
+- type: entity
   parent: BaseAction
   id: ToggleNinjaAutoSmokeAction
   name: автоматический режим дымовой завесы.
@@ -225,6 +239,24 @@
     event: !type:OnRetractableItemActionEvent
   - type: RetractableItemAction
     spawnedPrototype: NinjaJohyo
+
+- type: entity
+  parent: BaseAction
+  id: ToggleNinjaNetAbility
+  name: Энергосеть
+  description: Позволяет автоматически создавать дымовую завесу при использовании некоторых других способностей в ослабленном виде и за уменьшенную цену.
+  components:
+  - type: Action
+    icon:
+      sprite: _DeadSpace/Actions/ninja_actions.rsi
+      state: shuriken
+    useDelay: 1.0
+    itemIconStyle: BigAction
+    raiseOnAction: true
+  - type: InstantAction
+    event: !type:OnRetractableItemActionEvent
+  - type: RetractableItemAction
+    spawnedPrototype: WeaponNinjaNet
 
 - type: entity
   id: ActionNinjaScan
@@ -318,6 +350,21 @@
     itemIconStyle: BigAction
   - type: InstantAction
     event: !type:NinjaEmergencyTeleportEvent
+
+- type: entity
+  parent: BaseAction
+  id: NinjaCaltropAction
+  name: Энергочеснок
+  description: Расставляет за собой энергетические чесноки, задевшие их об противника наносят урон, ошеломляют и ломаются.
+  components:
+  - type: Action
+    icon:
+      sprite: _DeadSpace/Actions/ninja_actions.rsi
+      state: caltrop
+    useDelay: 10
+    itemIconStyle: BigAction
+  - type: InstantAction
+    event: !type:NinjaCaltropAbilityActionEvent
 
 - type: entity
   parent: BaseAction

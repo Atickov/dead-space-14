@@ -39,6 +39,7 @@ public sealed class NinjaScannerSystem : EntitySystem
         base.Initialize();
         SubscribeLocalEvent<NinjaScannerComponent, MapInitEvent>(OnMapInit);
         SubscribeLocalEvent<NinjaScannerComponent, GetItemActionsEvent>(OnGetActions);
+        SubscribeLocalEvent<NinjaScannerComponent, SpiderOSPowerChangedEvent>(OnSpiderOSPowerChanged);
         SubscribeLocalEvent<NinjaScannerComponent, NinjaScanActionEvent>(OnScan);
         SubscribeLocalEvent<NinjaScannerComponent, NinjaOpenScannerActionEvent>(OnOpenUi);
         SubscribeLocalEvent<NinjaScannerComponent, NinjaApplyDisguiseMessage>(OnApplyDisguise);
@@ -67,8 +68,21 @@ public sealed class NinjaScannerSystem : EntitySystem
     {
         if (args.InHands)
             return;
+
+        if (!TryComp<SpiderOSComponent>(ent.Owner, out var os) || !os.SuitActivated)
+            return;
+
         args.AddAction(ent.Comp.ScanActionEntity);
         args.AddAction(ent.Comp.OpenUiActionEntity);
+    }
+
+    private void OnSpiderOSPowerChanged(Entity<NinjaScannerComponent> ent, ref SpiderOSPowerChangedEvent args)
+    {
+        if (!args.Activated)
+        {
+            _actions.RemoveAction(ent.Comp.ScanActionEntity);
+            _actions.RemoveAction(ent.Comp.OpenUiActionEntity);
+        }
     }
 
     public override void Update(float frameTime)

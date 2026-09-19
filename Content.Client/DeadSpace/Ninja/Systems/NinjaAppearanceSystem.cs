@@ -14,7 +14,6 @@ using Robust.Client.GameObjects;
 using Robust.Client.Graphics;
 using Robust.Client.ResourceManagement;
 using Robust.Shared.Containers;
-using Robust.Shared.GameObjects;
 using Robust.Shared.Serialization.TypeSerializers.Implementations;
 
 namespace Content.Client.DeadSpace.Ninja.Systems;

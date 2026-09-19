@@ -303,6 +303,7 @@
     - MassArrestObjective
     - NinjaSurviveObjective
     - NinjaKillRandomPersonObjective # DS14 ninja balance
+    - NinjaProtectPersonObjective # DS14
   - type: AntagSelection
     agentName: ninja-round-end-agent-name
     definitions:

@@ -129,3 +129,37 @@
     # don't count missing evac as killing as heads are higher profile, so you really need to do the dirty work
     # if ce flies a shittle to centcom you better find a way onto it
     requireDead: true
+
+- type: entity
+  parent: [BaseNinjaObjective, BaseTargetObjective]
+  id: NinjaProtectPersonObjective
+  components:
+  - type: Objective
+    icon:
+      sprite: Objects/Weapons/Melee/buckler-shield.rsi
+      state: icon
+  - type: KeepAliveCondition
+  - type: TargetObjective
+    title: objective-condition-ninja-protect-title
+  - type: PickRandomPerson
+    filters:
+    - !type:TargetObjectiveMindFilter
+      blacklist:
+        components:
+        - KillPersonCondition
+        - KeepAliveCondition
+    - !type:BlacklistedJobsMindFilter
+      blacklist:
+      - Passenger
+      - TaipanAtmosphericsEngineer
+      - TaipanBotanist
+      - TaipanCargotech
+      - TaipanChef
+      - TaipanCommunicationsOfficer
+      - TaipanMedic
+      - TaipanParamedic
+      - TaipanRecruit
+      - TaipanResearchDirector
+      - TaipanResearcher
+      - TaipanTechnician
+      - TaipanTechnicalOperationsSupervisor

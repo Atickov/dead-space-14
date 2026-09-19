@@ -1,14 +1,19 @@
 using Content.Shared.Emp;
 using Content.Shared.Actions;
 using Content.Shared.DeadSpace.Ninja.Components;
+using Content.Shared.Popups;
+using Robust.Shared.Network;
 
 namespace Content.Shared.DeadSpace.Ninja.Systems;
 
 public sealed class SharedNinjaEmpAbilitySystem : EntitySystem
 {
     [Dependency] private readonly ActionContainerSystem _actionContainer = default!;
+    [Dependency] private readonly SharedActionsSystem _actions = default!;
     [Dependency] private readonly SharedEmpSystem _emp = default!;
     [Dependency] private readonly SharedSpaceNinjaSystem _ninja = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly INetManager _net = default!;
     public override void Initialize()
     {
         base.Initialize();
@@ -16,6 +21,8 @@ public sealed class SharedNinjaEmpAbilitySystem : EntitySystem
         SubscribeLocalEvent<NinjaEmpAbilityComponent, MapInitEvent>(OnMapInit);
         SubscribeLocalEvent<NinjaEmpAbilityComponent, GetItemActionsEvent>(OnGetActions);
         SubscribeLocalEvent<NinjaEmpAbilityComponent, NinjaEmpEvent>(OnEmp);
+
+        SubscribeLocalEvent<NinjaEmpAbilityComponent, SpiderOSPowerChangedEvent>(OnSpiderOSPowerChanged);
     }
 
     private void OnMapInit(Entity<NinjaEmpAbilityComponent> ent, ref MapInitEvent args)
@@ -29,16 +36,34 @@ public sealed class SharedNinjaEmpAbilitySystem : EntitySystem
     {
         if (args.InHands)
             return;
+
+        if (!TryComp<SpiderOSComponent>(ent.Owner, out var os) || !os.SuitActivated)
+            return;
+
         args.AddAction(ent.Comp.EmpActionEntity);
+    }
+
+    private void OnSpiderOSPowerChanged(Entity<NinjaEmpAbilityComponent> ent, ref SpiderOSPowerChangedEvent args)
+    {
+        if (!args.Activated)
+        {
+            _actions.RemoveAction(ent.Comp.EmpActionEntity);
+        }
     }
 
     private void OnEmp(Entity<NinjaEmpAbilityComponent> ent, ref NinjaEmpEvent args)
     {
-        if (!_ninja.TryUseCharge(args.Performer, ent.Comp.Charge))
+        if (_net.IsClient)
             return;
+
+        if (!_ninja.TryUseCharge(args.Performer, ent.Comp.Charge))
+        {
+            _popup.PopupEntity(Loc.GetString("ninja-no-power"), args.Performer, args.Performer);
+            return;
+        }
 
         args.Handled = true;
         var (uid, comp) = ent;
-        _emp.EmpPulse(Transform(uid).Coordinates, comp.EmpRange, comp.EmpConsumption, comp.EmpDuration, args.Performer);
+        _emp.EmpPulse(Transform(uid).Coordinates, comp.EmpRange, comp.EmpConsumption, comp.EmpDuration, args.Performer, false);
     }
 }

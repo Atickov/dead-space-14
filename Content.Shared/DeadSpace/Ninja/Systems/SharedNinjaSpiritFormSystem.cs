@@ -1,6 +1,7 @@
 using Content.Shared.Actions;
 using Content.Shared.DeadSpace.Ninja.Components;
 using Content.Shared.Interaction.Events;
+using Content.Shared.Popups;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Network;
 
@@ -9,9 +10,11 @@ namespace Content.Shared.DeadSpace.Ninja.Systems;
 public abstract class SharedNinjaSpiritFormSystem : EntitySystem
 {
     [Dependency] private readonly ActionContainerSystem _actionContainer = default!;
+    [Dependency] private readonly SharedActionsSystem _actions = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedSpaceNinjaSystem _ninja = default!;
     [Dependency] private readonly INetManager _net = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
 
     public override void Initialize()
     {
@@ -20,6 +23,8 @@ public abstract class SharedNinjaSpiritFormSystem : EntitySystem
         SubscribeLocalEvent<NinjaSpiritFormComponent, MapInitEvent>(OnMapInit);
         SubscribeLocalEvent<NinjaSpiritFormComponent, GetItemActionsEvent>(OnGetActions);
         SubscribeLocalEvent<NinjaSpiritFormComponent, NinjaSpiritFormEvent>(OnSpiritAction);
+
+        SubscribeLocalEvent<NinjaSpiritFormComponent, SpiderOSPowerChangedEvent>(OnSpiderOSPowerChanged);
 
         SubscribeLocalEvent<NinjaSpiritFormComponent, AttackAttemptEvent>(OnAttackAttempt);
         SubscribeLocalEvent<NinjaSpiritFormComponent, UseAttemptEvent>(OnUseAttempt);
@@ -45,6 +50,9 @@ public abstract class SharedNinjaSpiritFormSystem : EntitySystem
         if (args.InHands)
             return;
 
+        if (!TryComp<SpiderOSComponent>(ent.Owner, out var os) || !os.SuitActivated)
+            return;
+
         args.AddAction(ent.Comp.SpiritFormActionEntity);
     }
 
@@ -67,12 +75,26 @@ public abstract class SharedNinjaSpiritFormSystem : EntitySystem
             var cost = maxCharge * ent.Comp.EnergyDrainPercent;
 
             if (!_ninja.HasCharge(args.Performer, cost))
+            {
+                _popup.PopupClient(Loc.GetString("ninja-no-power"), args.Performer, args.Performer);
                 return;
+            }
 
             ActivateSpirit(ent, args.Performer);
         }
 
         args.Handled = true;
+    }
+
+    private void OnSpiderOSPowerChanged(
+        Entity<NinjaSpiritFormComponent> ent,
+        ref SpiderOSPowerChangedEvent args)
+    {
+        if (!args.Activated)
+        {
+            _actions.RemoveAction(ent.Comp.SpiritFormActionEntity);
+            DeactivateSpirit(ent, args.Wearer);
+        }
     }
 
     public void ActivateSpirit(
