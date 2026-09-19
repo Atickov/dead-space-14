@@ -15,6 +15,9 @@ public sealed partial class NinjaAppearanceItemComponent : Component
     [DataField, AutoNetworkedField]
     public NinjaColorway? FrozenColor;
 
+    [DataField, AutoNetworkedField]
+    public NinjaStyle? FrozenStyle;
+
     [ViewVariables]
     public Dictionary<HumanoidVisualLayers, SlotFlags>? SavedHideLayers;
 }

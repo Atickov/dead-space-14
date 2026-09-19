@@ -138,6 +138,39 @@
     {
       "name": "red-inhand-right",
       "directions": 4
+    },
+    {
+      "name": "new-icon"
+    },
+    {
+      "name": "red-new-icon"
+    },
+    {
+      "name": "blue-new-icon"
+    },
+    {
+      "name": "new-equipped-HELMET",
+      "directions": 4
+    },
+    {
+      "name": "red-new-equipped-HELMET",
+      "directions": 4
+    },
+    {
+      "name": "blue-new-equipped-HELMET",
+      "directions": 4
+    },
+    {
+      "name": "new-equipped-head-unshaded",
+      "directions": 4
+    },
+    {
+      "name": "red-new-equipped-head-unshaded",
+      "directions": 4
+    },
+    {
+      "name": "blue-new-equipped-head-unshaded",
+      "directions": 4
     }
   ]
 }

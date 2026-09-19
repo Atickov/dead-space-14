@@ -26,6 +26,7 @@ spider-os-module-steel-4 = Energy Net
 
 spider-os-personalization = Suit personalization
 spider-os-personalization-color = Color:
+spider-os-personalization-style = Style:
 spider-os-personalization-hood-or-scarf = Hood/Scarf:
 spider-os-personalization-activate = Activate suit
 spider-os-personalization-deactivate = Deactivate suit
@@ -35,6 +36,8 @@ spider-os-shuttle-control-fail = Failure: no shuttle found.
 spider-os-color-green = Green
 spider-os-color-red = Red
 spider-os-color-blue = Blue
+spider-os-style-old = Old
+spider-os-style-new = New
 spider-os-head-helmet = Helmet
 spider-os-head-scarf = Scarf
 

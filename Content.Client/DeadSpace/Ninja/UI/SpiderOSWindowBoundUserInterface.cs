@@ -35,9 +35,9 @@ public sealed class SpiderOSWindowBoundUserInterface : BoundUserInterface
             SendMessage(new SpiderOSSelectModuleMessage(tier, category));
         };
 
-        _window.OnAppearanceChanged += (colorway, helmet) =>
+        _window.OnAppearanceChanged += (colorway, helmet, style) =>
         {
-            SendMessage(new SpiderOSSetAppearanceMessage(colorway, helmet));
+            SendMessage(new SpiderOSSetAppearanceMessage(colorway, helmet, style));
         };
 
         _window.OnSuitPowerChanged += activated =>
@@ -144,6 +144,7 @@ public sealed class SpiderOSWindowBoundUserInterface : BoundUserInterface
             proto.AllSkills,
             cState.PendingColorway,
             cState.PendingHelmet,
+            cState.PendingStyle,
             cState.SuitActivated);
     }
 

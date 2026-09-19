@@ -45,6 +45,7 @@ spider-os-module-steel-5-desc =
 
 spider-os-personalization = персонализация костюма
 spider-os-personalization-color = цвет:
+spider-os-personalization-style = стиль:
 spider-os-personalization-hood-or-scarf = капюшон/шарф:
 spider-os-personalization-activate = активировать костюм
 spider-os-personalization-deactivate = деактивировать костюм
@@ -54,6 +55,8 @@ spider-os-shuttle-control-fail = Ошибка: шаттл не найден.
 spider-os-color-green = Зелёный
 spider-os-color-red = Красный
 spider-os-color-blue = Синий
+spider-os-style-old = Старый
+spider-os-style-new = Новый
 spider-os-head-helmet = Шлем
 spider-os-head-scarf = Шарф
 

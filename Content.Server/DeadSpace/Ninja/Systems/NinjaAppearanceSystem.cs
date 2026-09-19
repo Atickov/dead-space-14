@@ -127,6 +127,7 @@ public sealed partial class NinjaAppearanceSystem : SharedNinjaAppearanceSystem
         // items. Otherwise they would snap back to the default look the next time they are
         // re-rendered, because FrozenColor is only set when an item itself leaves the suit.
         var colorway = ent.Comp.Colorway;
+        var style = ent.Comp.Style;
 
         foreach (var item in EnumerateWearerItems(args.Equipee))
         {
@@ -140,9 +141,10 @@ public sealed partial class NinjaAppearanceSystem : SharedNinjaAppearanceSystem
                 continue;
             }
 
-            if (itemComp.FrozenColor != colorway)
+            if (itemComp.FrozenColor != colorway || itemComp.FrozenStyle != style)
             {
                 itemComp.FrozenColor = colorway;
+                itemComp.FrozenStyle = style;
                 Dirty(item, itemComp);
             }
         }
@@ -187,15 +189,24 @@ public sealed partial class NinjaAppearanceSystem : SharedNinjaAppearanceSystem
             return;
 
         NinjaColorway? color = null;
+        NinjaStyle? style = null;
 
         if (TryComp<NinjaAppearanceComponent>(ent.Owner, out var own))
+        {
             color = own.Colorway;
+            style = own.Style;
+        }
         else if (FindSuit(args.OldParent) is { } oldSuit)
+        {
             color = oldSuit.Comp.Colorway;
+            style = oldSuit.Comp.Style;
+        }
 
-        if (color is { } frozen && ent.Comp.FrozenColor != frozen)
+        if (color is { } frozen && style is { } frozenStyle &&
+            (ent.Comp.FrozenColor != frozen || ent.Comp.FrozenStyle != frozenStyle))
         {
             ent.Comp.FrozenColor = frozen;
+            ent.Comp.FrozenStyle = frozenStyle;
             Dirty(ent.Owner, ent.Comp);
         }
     }

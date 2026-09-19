@@ -4,6 +4,8 @@ using Content.Shared.DeadSpace.Ninja.Components;
 using Content.Shared.Inventory;
 using Content.Shared.Mind;
 using Content.Shared.Mobs;
+using Robust.Shared.Audio.Systems;
+using Robust.Shared.Containers;
 using Robust.Shared.Map;
 
 namespace Content.Server.DeadSpace.Ninja.Systems;
@@ -11,6 +13,7 @@ namespace Content.Server.DeadSpace.Ninja.Systems;
 public sealed class NinjaSecondChanceSystem : EntitySystem
 {
     private const string CloneSettingsId = "NinjaSecondChanceClone";
+    private const string BodyContainerId = "ninja_capsule_body";
     private const string GearId = "SpaceNinjaGear";
     private const string SurvivalLoadoutId = "RoleSurvivalSpaceNinja";
 
@@ -21,11 +24,28 @@ public sealed class NinjaSecondChanceSystem : EntitySystem
     [Dependency] private readonly SpaceNinjaSystem _ninja = default!;
     [Dependency] private readonly SpiderOSSystem _spiderOS = default!;
     [Dependency] private readonly LoadoutSystem _loadout = default!;
+    [Dependency] private readonly SharedContainerSystem _container = default!;
+    [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
 
     public override void Initialize()
     {
         base.Initialize();
+        SubscribeLocalEvent<NinjaSecondChanceComponent, MapInitEvent>(OnSecondChanceInit);
         SubscribeLocalEvent<NinjaSecondChanceComponent, AutoDustEvent>(OnAutoDust);
+        SubscribeLocalEvent<NinjaRespawnCapsuleComponent, ComponentInit>(OnCapsuleInit);
+    }
+
+    private void OnSecondChanceInit(Entity<NinjaSecondChanceComponent> ent, ref MapInitEvent args)
+    {
+        if (TryFindNearestCapsule(ent, out var capsuleUid))
+            ent.Comp.Capsule = capsuleUid;
+    }
+
+    private void OnCapsuleInit(Entity<NinjaRespawnCapsuleComponent> ent, ref ComponentInit args)
+    {
+        ent.Comp.BodyContainer = _container.EnsureContainer<ContainerSlot>(ent.Owner, BodyContainerId);
+        _appearance.SetData(ent.Owner, NinjaRespawnCapsuleVisuals.Full, false);
     }
 
     private void OnAutoDust(Entity<NinjaSecondChanceComponent> ent, ref AutoDustEvent args)
@@ -37,10 +57,14 @@ public sealed class NinjaSecondChanceSystem : EntitySystem
         if (!target.IsValid() || !_mind.TryGetMind(target, out var mindId, out var mind))
             return;
 
-        if (!TryFindNearestCapsule(target, out var capsuleUid, out var coords))
+        if (!Exists(ent.Comp.Capsule))
+            if (!TryFindNearestCapsule(target, out var capsuleUid))
+                ent.Comp.Capsule = capsuleUid;
+
+        if (!TryComp<NinjaRespawnCapsuleComponent>(ent.Comp.Capsule, out var capsule))
             return;
 
-        if (!_cloning.TryCloning(target, coords, CloneSettingsId, out var clone))
+        if (!_cloning.TryCloning(target, null, CloneSettingsId, out var clone))
             return;
 
         ent.Comp.Used = true;
@@ -48,7 +72,41 @@ public sealed class NinjaSecondChanceSystem : EntitySystem
 
         RestoreSuitOnClone(clone.Value, args.SpiderOS);
 
+        _container.Insert(clone.Value, capsule.BodyContainer, force: true);
+        capsule.Timer = 0f;
+        _appearance.SetData(ent.Comp.Capsule.Value, NinjaRespawnCapsuleVisuals.Full, true);
+        _audio.PlayPvs(capsule.EnterSound, ent.Comp.Capsule.Value);
+
         _mind.TransferTo(mindId, clone, ghostCheckOverride: true, mind: mind);
+    }
+
+    public override void Update(float frameTime)
+    {
+        base.Update(frameTime);
+
+        var query = EntityQueryEnumerator<NinjaRespawnCapsuleComponent>();
+        while (query.MoveNext(out var uid, out var capsule))
+        {
+            if (capsule.BodyContainer.ContainedEntity is not { Valid: true } contained || !Exists(contained))
+            {
+                if (capsule.Timer > 0f)
+                {
+                    capsule.Timer = 0f;
+                    _appearance.SetData(uid, NinjaRespawnCapsuleVisuals.Full, false);
+                }
+
+                continue;
+            }
+
+            capsule.Timer += frameTime;
+            if (capsule.Timer < capsule.RespawnTime)
+                continue;
+
+            _container.Remove(contained, capsule.BodyContainer, force: true);
+            capsule.Timer = 0f;
+            _appearance.SetData(uid, NinjaRespawnCapsuleVisuals.Full, false);
+            _audio.PlayPvs(capsule.ExitSound, uid);
+        }
     }
 
     private void RestoreSuitOnClone(EntityUid clone, SpiderOSComponent? source)
@@ -83,18 +141,20 @@ public sealed class NinjaSecondChanceSystem : EntitySystem
         return null;
     }
 
-    private bool TryFindNearestCapsule(EntityUid target, out EntityUid capsuleUid, out MapCoordinates coords)
+    private bool TryFindNearestCapsule(EntityUid target, out EntityUid capsuleUid)
     {
         capsuleUid = default;
-        coords = default;
 
         var targetPos = _transform.GetMapCoordinates(target).Position;
         var query = EntityQueryEnumerator<NinjaRespawnCapsuleComponent>();
         var found = false;
         var bestDistSqr = float.MaxValue;
 
-        while (query.MoveNext(out var uid, out _))
+        while (query.MoveNext(out var uid, out var capsule))
         {
+            if (capsule.BodyContainer.ContainedEntity != null)
+                continue;
+
             var capsulePos = _transform.GetMapCoordinates(uid).Position;
             var distSqr = (capsulePos - targetPos).LengthSquared();
             if (distSqr >= bestDistSqr)
@@ -102,7 +162,6 @@ public sealed class NinjaSecondChanceSystem : EntitySystem
 
             bestDistSqr = distSqr;
             capsuleUid = uid;
-            coords = _transform.GetMapCoordinates(uid);
             found = true;
         }
 

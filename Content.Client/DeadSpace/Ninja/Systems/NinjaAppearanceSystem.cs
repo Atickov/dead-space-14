@@ -26,7 +26,7 @@ public sealed partial class NinjaAppearanceSystem : SharedNinjaAppearanceSystem
 
     private readonly Dictionary<EntityUid, string?[]> _savedIconStates = new();
 
-    private readonly Dictionary<EntityUid, (string Prefix, bool Visible)> _applied = new();
+    private readonly Dictionary<EntityUid, (string Prefix, NinjaStyle Style, bool Visible)> _applied = new();
 
     [Dependency] private readonly InventorySystem _inventory = default!;
     [Dependency] private readonly SharedItemSystem _item = default!;
@@ -109,7 +109,7 @@ public sealed partial class NinjaAppearanceSystem : SharedNinjaAppearanceSystem
     private void OnGetEquipmentVisuals(EntityUid item, NinjaAppearanceItemComponent component,
         GetEquipmentVisualsEvent args)
     {
-        var (prefix, visible) = ResolveAppearance(item, component);
+        var (prefix, style, visible) = ResolveAppearance(item, component);
 
         if (!visible)
         {
@@ -120,7 +120,7 @@ public sealed partial class NinjaAppearanceSystem : SharedNinjaAppearanceSystem
         for (var i = 0; i < args.Layers.Count; i++)
         {
             var (key, layer) = args.Layers[i];
-            ApplyColorwayToLayerData(item, layer, prefix);
+            ApplyColorwayToLayerData(item, layer, prefix, style);
             args.Layers[i] = (key, layer);
         }
     }
@@ -128,17 +128,17 @@ public sealed partial class NinjaAppearanceSystem : SharedNinjaAppearanceSystem
     private void OnGetInhandVisuals(EntityUid item, NinjaAppearanceItemComponent component,
         GetInhandVisualsEvent args)
     {
-        var prefix = ResolveAppearance(item, component).Prefix;
+        var (prefix, style, _) = ResolveAppearance(item, component);
 
         for (var i = 0; i < args.Layers.Count; i++)
         {
             var (key, layer) = args.Layers[i];
-            ApplyColorwayToLayerData(item, layer, prefix);
+            ApplyColorwayToLayerData(item, layer, prefix, style);
             args.Layers[i] = (key, layer);
         }
     }
 
-    private void ApplyColorwayToLayerData(EntityUid item, PrototypeLayerData layer, string prefix)
+    private void ApplyColorwayToLayerData(EntityUid item, PrototypeLayerData layer, string prefix, NinjaStyle style)
     {
         var state = layer.State;
         if (string.IsNullOrEmpty(state))
@@ -150,37 +150,37 @@ public sealed partial class NinjaAppearanceSystem : SharedNinjaAppearanceSystem
         else if (TryComp(item, out SpriteComponent? sprite))
             rsi = sprite.BaseRSI;
 
-        if (TryGetFirstState(rsi, GetColorCandidates(StripColorPrefix(state), prefix), out var candidate))
+        if (TryGetFirstState(rsi, GetColorCandidates(StripColorPrefix(state), prefix, style), out var candidate))
             layer.State = candidate;
     }
 
     private void ResolveAndApply(EntityUid item, NinjaAppearanceItemComponent itemComp)
     {
-        var (prefix, visible) = ResolveAppearance(item, itemComp);
+        var (prefix, style, visible) = ResolveAppearance(item, itemComp);
 
         if (visible)
         {
             RestoreSpriteStates(item);
         }
 
-        ApplySpriteLayers(item, prefix, visible);
+        ApplySpriteLayers(item, prefix, style, visible);
 
-        if (!_applied.TryGetValue(item, out var applied) || applied != (prefix, visible))
+        if (!_applied.TryGetValue(item, out var applied) || applied != (prefix, style, visible))
         {
-            _applied[item] = (prefix, visible);
+            _applied[item] = (prefix, style, visible);
             _item.VisualsChanged(item);
         }
     }
 
-    private (string Prefix, bool Visible) ResolveAppearance(EntityUid item, NinjaAppearanceItemComponent itemComp)
+    private (string Prefix, NinjaStyle Style, bool Visible) ResolveAppearance(EntityUid item, NinjaAppearanceItemComponent itemComp)
     {
         if (TryComp<NinjaAppearanceComponent>(item, out var suit))
-            return (PrefixFor(suit.Colorway), ResolveVisible(suit, itemComp));
+            return (PrefixFor(suit.Colorway), suit.Style, ResolveVisible(suit, itemComp));
 
         if (FindSuit(Transform(item)) is { } claim)
-            return (PrefixFor(claim.Comp.Colorway), ResolveVisible(claim.Comp, itemComp));
+            return (PrefixFor(claim.Comp.Colorway), claim.Comp.Style, ResolveVisible(claim.Comp, itemComp));
 
-        return (PrefixFor(itemComp.FrozenColor), true);
+        return (PrefixFor(itemComp.FrozenColor), itemComp.FrozenStyle ?? NinjaStyle.Old, true);
     }
 
     private static string PrefixFor(NinjaColorway? colorway) => colorway switch
@@ -197,7 +197,7 @@ public sealed partial class NinjaAppearanceSystem : SharedNinjaAppearanceSystem
         _ => true,
     };
 
-    private void ApplySpriteLayers(EntityUid item, string prefix, bool visible)
+    private void ApplySpriteLayers(EntityUid item, string prefix, NinjaStyle style, bool visible)
     {
         if (!TryComp<SpriteComponent>(item, out var sprite))
             return;
@@ -234,7 +234,7 @@ public sealed partial class NinjaAppearanceSystem : SharedNinjaAppearanceSystem
             if (!string.IsNullOrEmpty(state))
             {
                 var rsi = layer.ActualRsi ?? sprite.BaseRSI;
-                if (rsi != null && TryGetFirstState(rsi, GetColorCandidates(StripColorPrefix(state), prefix), out var candidate) &&
+                if (rsi != null && TryGetFirstState(rsi, GetColorCandidates(StripColorPrefix(state), prefix, style), out var candidate) &&
                     candidate != state)
                 {
                     _sprite.LayerSetRsiState((item, sprite), layerIndex, candidate);
@@ -262,11 +262,17 @@ public sealed partial class NinjaAppearanceSystem : SharedNinjaAppearanceSystem
         }
     }
 
-    private static List<string> GetColorCandidates(string baseState, string prefix)
+    private static List<string> GetColorCandidates(string baseState, string prefix, NinjaStyle style)
     {
-        var candidates = new List<string>(2);
+        var candidates = new List<string>(4);
         if (string.IsNullOrEmpty(baseState))
             return candidates;
+
+        if (style == NinjaStyle.New)
+        {
+            candidates.Add($"{prefix}new-{baseState}");
+            candidates.Add($"new-{baseState}");
+        }
 
         candidates.Add(prefix + baseState);
         candidates.Add(baseState);
