@@ -1,5 +1,6 @@
 using Content.Shared.DeadSpace.Ninja.Components;
 using Content.Shared.DeadSpace.Ninja.Systems;
+using Content.Shared.DeadSpace.ThermalVision;
 using Robust.Client.GameObjects;
 using Robust.Shared.GameObjects;
 using Content.Shared.Inventory.Events;
@@ -31,5 +32,8 @@ public sealed class NinjaCloakSystem : SharedNinjaCloakSystem
         {
             _sprite.SetVisible((parent, parentSprite), true);
         }
+
+        if (TryComp<ThermalVisibleComponent>(parent, out var thermal))
+            thermal.DrawWhenInvisible = ent.Comp.Enabled;
     }
 }

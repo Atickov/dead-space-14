@@ -47,6 +47,8 @@ public sealed partial class SpiderOSWindow : FancyWindow
 
     private Button _activateButton = default!;
 
+    private Button _shuttleButton = default!;
+
     private OptionButton _colorOption = default!;
 
     private OptionButton _hoodOrScarfOption = default!;
@@ -75,6 +77,8 @@ public sealed partial class SpiderOSWindow : FancyWindow
 
     public event Action<bool>? OnSuitPowerChanged;
 
+    public event Action? OnShuttleControl;
+
     public event Action<NinjaColorway, bool>? OnAppearanceChanged;
 
     public SpiderOSWindow()
@@ -91,6 +95,9 @@ public sealed partial class SpiderOSWindow : FancyWindow
 
         _activateButton = FindControl<Button>("ActivateButton");
         _activateButton.OnPressed += _ => OnSuitPowerChanged?.Invoke(!_suitActivated);
+
+        _shuttleButton = FindControl<Button>("ShuttleButton");
+        _shuttleButton.OnPressed += _ => OnShuttleControl?.Invoke();
 
         _colorOption = FindControl<OptionButton>("ColorOption");
         _colorOption.AddItem(Loc.GetString("spider-os-color-green"));
@@ -129,6 +136,7 @@ public sealed partial class SpiderOSWindow : FancyWindow
         _loadProgressBar.Value = 0f;
 
         _activateButton.Disabled = true;
+        _shuttleButton.Disabled = true;
         _colorOption.Disabled = true;
         _hoodOrScarfOption.Disabled = true;
         SetModulesEnabled(false);
@@ -145,6 +153,7 @@ public sealed partial class SpiderOSWindow : FancyWindow
         _loadProgressBar.Value = 0f;
 
         _activateButton.Disabled = false;
+        _shuttleButton.Disabled = false;
         _colorOption.Disabled = _suitActivated;
         _hoodOrScarfOption.Disabled = _suitActivated;
         SetModulesEnabled(!_suitActivated);

@@ -17,6 +17,7 @@ public sealed class SharedNinjaEnergyNetSystem : EntitySystem
     [Dependency] private readonly MobStateSystem _mobState = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedSpaceNinjaSystem _ninja = default!;
+    [Dependency] protected readonly SharedNinjaSuitSystem _suit = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly INetManager _net = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
@@ -64,6 +65,9 @@ public sealed class SharedNinjaEnergyNetSystem : EntitySystem
         }
 
         args.Handled = true;
+
+        if (TryComp<SpaceNinjaComponent>(args.User, out var spaceNinja) && spaceNinja.Suit != null)
+            _suit.RevealNinja(spaceNinja.Suit.Value, args.User);
 
         component.RechargeTime = _timing.CurTime + component.Cooldown;
         Dirty(uid, component);

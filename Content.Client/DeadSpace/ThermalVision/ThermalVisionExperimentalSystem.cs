@@ -198,7 +198,7 @@ public sealed class ThermalVisionExperimentalOverlay : Overlay
         var entities = _lookup.GetEntitiesIntersecting(args.MapId, args.WorldBounds.Enlarged(1f));
         foreach (var uid in entities)
         {
-            if (!_entityManager.TryGetComponent<ThermalVisibleComponent>(uid, out _))
+            if (!_entityManager.TryGetComponent<ThermalVisibleComponent>(uid, out var thermal))
                 continue;
 
             if (!_entityManager.TryGetComponent<SpriteComponent>(uid, out var sprite))
@@ -207,7 +207,7 @@ public sealed class ThermalVisionExperimentalOverlay : Overlay
             if (!_entityManager.TryGetComponent<TransformComponent>(uid, out var xform))
                 continue;
 
-            if (!sprite.Visible)
+            if (!sprite.Visible && !thermal.DrawWhenInvisible)
                 continue;
 
             var drawUid = uid;

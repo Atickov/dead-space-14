@@ -93,6 +93,14 @@ public sealed class SpiderOSSetAppearanceMessage : BoundUserInterfaceMessage
 }
 
 [Serializable, NetSerializable]
+public sealed class SpiderOSShuttleControlMessage : BoundUserInterfaceMessage
+{
+    public SpiderOSShuttleControlMessage()
+    {
+    }
+}
+
+[Serializable, NetSerializable]
 public sealed class SpiderOSSetSuitPowerMessage : BoundUserInterfaceMessage
 {
     public bool Activated;

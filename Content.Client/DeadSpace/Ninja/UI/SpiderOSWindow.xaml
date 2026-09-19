@@ -125,6 +125,9 @@
                     <Button Name="ActivateButton"
                             Text="{Loc 'spider-os-personalization-activate'}"
                             Margin="0 0 0 5"/>
+                    <Button Name="ShuttleButton"
+                            Text="{Loc 'spider-os-shuttle-control'}"
+                            Margin="0 0 0 5"/>
                 </BoxContainer>
             </PanelContainer>
         </BoxContainer>

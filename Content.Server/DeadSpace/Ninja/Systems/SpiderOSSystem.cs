@@ -5,7 +5,11 @@ using Content.Shared.DeadSpace.Ninja.Prototypes;
 using Content.Shared.DeadSpace.Ninja.Systems;
 using Content.Shared.Interaction.Components;
 using Content.Server.Power.EntitySystems;
+using Content.Server.Shuttles.Components;
+using Content.Server.Shuttles.Systems;
 using Content.Shared.Containers.ItemSlots;
+using Content.Shared.Popups;
+using Content.Shared.Shuttles.Components;
 using Robust.Server.GameObjects;
 using Robust.Shared.Prototypes;
 using Content.Shared.RetractableItemAction;
@@ -21,6 +25,8 @@ public sealed class SpiderOSSystem : SharedSpiderOSSystem
     [Dependency] private readonly BatterySystem _battery = default!;
     [Dependency] private readonly ItemSlotsSystem _itemSlots = default!;
     [Dependency] private readonly RetractableItemActionSystem _retractableItemAction = default!;
+    [Dependency] private readonly ShuttleConsoleSystem _shuttleConsole = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
 
     public override void Initialize()
     {
@@ -32,6 +38,7 @@ public sealed class SpiderOSSystem : SharedSpiderOSSystem
             subs.Event<SpiderOSSetAppearanceMessage>(OnSetAppearance);
             subs.Event<SpiderOSSetSuitPowerMessage>(OnSetSuitPower);
             subs.Event<SpiderOSSecureRequestMessage>(OnSecureRequest);
+            subs.Event<SpiderOSShuttleControlMessage>(OnShuttleControl);
         });
 
         SubscribeLocalEvent<SpiderOSComponent, BoundUIOpenedEvent>(OnBuiOpened);
@@ -96,6 +103,51 @@ public sealed class SpiderOSSystem : SharedSpiderOSSystem
 
         Dirty(suitUid, comp);
         UpdateUi(suitUid, comp);
+    }
+
+    private void OnShuttleControl(Entity<SpiderOSComponent> suit, ref SpiderOSShuttleControlMessage args)
+    {
+        var suitUid = suit.Owner;
+
+        if (!IsAuthorized(suitUid, args.Actor))
+            return;
+
+        var wearer = Transform.GetParentUid(suitUid);
+        if (!wearer.IsValid())
+        {
+            _popup.PopupEntity(Loc.GetString("spider-os-shuttle-control-fail-not-worn"), suitUid, args.Actor);
+            return;
+        }
+
+        if (_ui.IsUiOpen(suitUid, ShuttleConsoleUiKey.Key))
+        {
+            _ui.CloseUi(suitUid, ShuttleConsoleUiKey.Key, args.Actor);
+            return;
+        }
+
+        if (!_shuttleConsole.TryRefreshDroneTarget(suitUid))
+        {
+            _popup.PopupEntity(Loc.GetString("spider-os-shuttle-control-fail"), suitUid, args.Actor);
+            return;
+        }
+
+        if (TryComp<ShuttleConsoleComponent>(suitUid, out _) &&
+            _shuttleConsole.GetShuttleConsole(suitUid) is { } target)
+        {
+            var grid = Transform(target).GridUid;
+            var isShuttle = grid != null && TryComp<ShuttleComponent>(grid.Value, out var shuttle) && shuttle.Enabled;
+            Log.Info($"SpiderOS: shuttle control resolved target \"{ToPrettyString(target)}\", grid \"{ToPrettyString(grid ?? EntityUid.Invalid)}\", flyable shuttle: {isShuttle}");
+        }
+
+        _ui.OpenUi(suitUid, ShuttleConsoleUiKey.Key, args.Actor);
+
+        _shuttleConsole.RefreshShuttleConsole(suitUid);
+
+        if (TryComp<ShuttleConsoleComponent>(suitUid, out var shuttleComp))
+        {
+            EnsureComp<PilotComponent>(args.Actor);
+            _shuttleConsole.AddPilot(suitUid, args.Actor, shuttleComp);
+        }
     }
 
     private void OnSetAppearance(Entity<SpiderOSComponent> suit, ref SpiderOSSetAppearanceMessage args)
