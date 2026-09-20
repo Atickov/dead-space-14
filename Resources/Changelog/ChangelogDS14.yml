@@ -7994,3 +7994,10 @@ Entries:
   changes:
   - type: Fix
     message: Откат химикатов у генки
+- id: 763
+  author: Oberfuhrer
+  time: '2026-09-20T12:54:16.572878+00:00'
+  pr: 2316
+  changes:
+  - type: Tweak
+    message: Шаттла CF и снаряжение агентов
