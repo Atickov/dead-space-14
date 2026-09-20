@@ -146,7 +146,7 @@
   parent: BaseAction
   id: NinjaActionToggleCloak
   name: фазовый покров
-  description: переключить джетпак в костюме, дающий дополнительную мобильность вне станции.
+  description: Переключает фазовый покров, делающий вас невидимым. Учтите, что костюм имеет свойство перегреваться.
   components:
   - type: Action
     raiseOnUser: true
@@ -207,8 +207,8 @@
 - type: entity
   parent: BaseAction
   id: ToggleNinjaShurikenAbility
-  name: сюрикены.
-  description: Позволяет автоматически создавать дымовую завесу при использовании некоторых других способностей в ослабленном виде и за уменьшенную цену.
+  name: Сюрикены
+  description: Дает вам в руки эммитер сюрикенов, позволяющий стрелять очередями энерго-сюрикенов.
   components:
   - type: Action
     icon:
@@ -244,12 +244,12 @@
   parent: BaseAction
   id: ToggleNinjaNetAbility
   name: Энергосеть
-  description: Позволяет автоматически создавать дымовую завесу при использовании некоторых других способностей в ослабленном виде и за уменьшенную цену.
+  description: Выдаёт вам в руки эммитер энергосети, которая при удачном срабатывании ограничивает подвижность цели. Учтите, что сеть довольно легко сломать. 
   components:
   - type: Action
     icon:
       sprite: _DeadSpace/Actions/ninja_actions.rsi
-      state: shuriken
+      state: energynet
     useDelay: 1.0
     itemIconStyle: BigAction
     raiseOnAction: true
@@ -302,14 +302,20 @@
     useDelay: 120
     itemIconStyle: BigAction
     raiseOnAction: true
+    sound: /Audio/Items/hypospray.ogg
   - type: InstantAction
-    event: !type:UseInjectReagentsActionEvent
-  - type: InjectReagentsAction
-    injectSound: /Audio/Items/hypospray.ogg
-    popup: ninja-inject-adrenal
-    reagents: 
-      Velaxin: 15
-      Radium: 2.5
+    event: !type:EntityEffectInstantActionEvent
+  - type: EntityEffectAction
+    effects:
+    - !type:AddReagentToBloodstream
+      reagent: Velaxin
+      quantity: 15
+    - !type:AddReagentToBloodstream
+      reagent: Radium
+      quantity: 2.5
+    - !type:PopupMessage
+      messages: [ ninja-inject-adrenal ]
+      visualType: Medium
   - type: LimitedCharges
     maxCharges: 3
 
@@ -326,13 +332,17 @@
     useDelay: 60
     itemIconStyle: BigAction
     raiseOnAction: true
+    sound: /Audio/Items/hypospray.ogg
   - type: InstantAction
-    event: !type:UseInjectReagentsActionEvent
-  - type: InjectReagentsAction
-    injectSound: /Audio/Items/hypospray.ogg
-    popup: ninja-inject-healing-cocktail
-    reagents: 
-      Chiyurizine: 10
+    event: !type:EntityEffectInstantActionEvent
+  - type: EntityEffectAction
+    effects:
+    - !type:AddReagentToBloodstream
+      reagent: Chiyurizine
+      quantity: 10
+    - !type:PopupMessage
+      messages: [ ninja-inject-healing-cocktail ]
+      visualType: Medium
   - type: LimitedCharges
     maxCharges: 3
 

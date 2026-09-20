@@ -10,17 +10,33 @@ spider-os-modules-steel = Steel
 spider-os-module-ghost-1 = Smoke Screen
 spider-os-module-ghost-1-desc = The suit releases a thick smoke cloud, hiding you from enemies.
 spider-os-module-ghost-2 = Phase Cloak
-spider-os-module-ghost-2-desc = Scanner modules that help locate targets.
+spider-os-module-ghost-2-desc = Makes the ninja invisible. Hey, what are those sparks in the middle of the corridor? Note that prolonged use of this ability significantly heats up the suit. The longer this module stays active, the more "special effects" appear around you. To cool the suit down, run around without invisibility for a while.
 spider-os-module-ghost-3 = Holographic Clones
-spider-os-module-ghost-4 = Spirit Form
+spider-os-module-ghost-3-desc = Creates your clones that live for 5 seconds and attack a random enemy. With each attack, every clone also has a chance to split into two, eventually surrounding and beating down the target.
+spider-os-module-ghost-4 = Chameleon
+spider-os-module-ghost-4-desc = This module allows you to change your appearance and voice, for example into that of a station crew member. To pull this off, you need to scan a player's character with the scanner. Impersonating someone with this ability not only masks your appearance, but also fools the station's security sensors.
+spider-os-module-ghost-5 = Spirit Form
+spider-os-module-ghost-5-desc = Makes your body more spectral, allowing you to walk through walls. It would be unfortunate to run out of power inside a sealed room, wouldn't it?
 spider-os-module-snake-1 = Kunai
+spider-os-module-snake-1-desc = Gives you a chain kunai with which you can pull your victim to you. A pulled victim is stunned for a brief moment.
 spider-os-module-snake-2 = Chem Injector
+spider-os-module-snake-2-desc = Has 3 charges. Injects the chemical "Chiyurizin" into your body. A powerful, experimental healing reagent.
 spider-os-module-snake-3 = Emergency Blink
+spider-os-module-snake-3-desc = Teleports you to a random spot nearby.
 spider-os-module-snake-4 = Caltrop
+spider-os-module-snake-4-desc = Places caltrops 3 tiles behind you. Stepping on them deals some burns and knocks you down. Works well when fleeing a chase, and pairs brilliantly with the smoke screen's automatic mode.
+spider-os-module-snake-5 = Second Chance
+spider-os-module-snake-5-desc = If you die, grants you a chance to make things right. There will be no third chance.
 spider-os-module-steel-1 = Shuriken
+spider-os-module-steel-1-desc = Lets you fire energy shurikens. They work through glass and deal stamina damage while leaving burns.
 spider-os-module-steel-2 = Adrenaline
+spider-os-module-steel-2-desc = Flushes 20 units of a reagent into your bloodstream. Works like the Syndicate's Adrenaline implant, but lasts longer and takes its toll, dealing radiation damage. Recharges with 10 sheets of uranium.
 spider-os-module-steel-3 = EM Pulse
+spider-os-module-steel-3-desc = A fairly large EMP charge. You won't be harmed, but the pulse can affect various devices.
 spider-os-module-steel-4 = Energy Net
+spider-os-module-steel-4-desc = Wraps the selected target in an energy net. It is quite sturdy, but can still be broken with any improvised object.
+spider-os-module-steel-5 = Black Widow Martial Arts
+spider-os-module-steel-5-desc = Alas, not implemented yet.
 
 # Ninja OS Personalization
 
@@ -45,6 +61,7 @@ spider-os-head-scarf = Scarf
 
 spider-os-boot-self-test = Running self-test..
 spider-os-boot-verify-identity = Verifying bioscanner identity..
+spider-os-boot-neuro-sync = Synchronizing with brain impulses..
 spider-os-boot-driver-setup-init = Installing SpiderOS drivers..
 spider-os-boot-driver-setup-10 = 10%
 spider-os-boot-driver-setup-20 = 20%
@@ -60,6 +77,7 @@ spider-os-boot-driver-setup-96 = 96%
 spider-os-boot-driver-setup-97 = 97%
 spider-os-boot-driver-setup-98 = 98%
 spider-os-boot-driver-setup-99 = 99%
+spider-os-boot-driver-setup-complete = SpiderOS drivers installed.
 spider-os-boot-lock-modules = Locking module configuration..
 spider-os-boot-locking-suit = Locking suit..
 spider-os-boot-locking-visor = Locking visor..
@@ -92,3 +110,27 @@ spider-os-boot-fail-no-boots = ERROR: Boots not detected.
 spider-os-boot-fail-not-worn = ERROR: Suit not worn.
 spider-os-boot-fail-no-power = ERROR: Power source not detected.
 spider-os-boot-fail-timeout = ERROR: Suit interface timeout.
+
+# Ninja Auto-Dust module
+
+auto-dust-toggle-off = Auto-Dust disabled
+auto-dust-toggle-crit = Auto-Dust is set to disperse on critical condition
+auto-dust-toggle-dead = Auto-Dust is set to disperse on death
+
+# Ninja cloak
+
+ninja-suit-overheated = The suit overheated. The phase cloak has been disabled.
+
+# Ninja Johyo
+
+johyo-phrase-1 = Come here!
+johyo-phrase-2 = Heel!
+
+# Ninja Action Refill
+
+ninja-action-refill = The suit has reprocessed materials. The charge for "{ $action }" has been restored.
+
+# Ninja Inject Actions
+
+ninja-inject-adrenal = The suit injects a reagent into you. Your heart starts beating faster.
+ninja-inject-healing-cocktail = The suit injects a reagent into you. Your wounds begin to close.

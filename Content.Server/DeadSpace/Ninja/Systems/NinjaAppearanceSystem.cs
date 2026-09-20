@@ -58,11 +58,6 @@ public sealed partial class NinjaAppearanceSystem : SharedNinjaAppearanceSystem
             RemoveHideLayerClothing(wearer, helmetUid, comp, humanoid.HideLayersOnEquip);
     }
 
-    /// <summary>
-    /// Drops the helmet's <see cref="HideLayerClothingComponent"/> so the wearer's hair shows
-    /// again while it is deactivated. The hidden layers are saved on the item component so they
-    /// can be restored verbatim on re-show.
-    /// </summary>
     private void RemoveHideLayerClothing(EntityUid wearer, EntityUid helmet,
         NinjaAppearanceItemComponent comp, HashSet<HumanoidVisualLayers> hideable)
     {
@@ -105,12 +100,6 @@ public sealed partial class NinjaAppearanceSystem : SharedNinjaAppearanceSystem
         ToggleHiddenLayers(wearer, saved, hideable, inSlot, hidden: true);
     }
 
-    /// <summary>
-    /// Flips the managed body layers, gated exactly like
-    /// <see cref="Content.Shared.Clothing.EntitySystems.HideLayerClothingSystem"/>: the
-    /// layer must be hideable by the wearer's <c>HideLayersOnEquip</c> and the gated slots must
-    /// cover the slot the helmet is equipped in.
-    /// </summary>
     private void ToggleHiddenLayers(EntityUid wearer, Dictionary<HumanoidVisualLayers, SlotFlags> layers,
         HashSet<HumanoidVisualLayers> hideable, SlotFlags inSlot, bool hidden)
     {
@@ -123,9 +112,6 @@ public sealed partial class NinjaAppearanceSystem : SharedNinjaAppearanceSystem
 
     private void OnSuitUnequipped(Entity<NinjaAppearanceComponent> ent, ref GotUnequippedEvent args)
     {
-        // The suit no longer drives the gear, so bake its colorway onto the still-worn ninja
-        // items. Otherwise they would snap back to the default look the next time they are
-        // re-rendered, because FrozenColor is only set when an item itself leaves the suit.
         var colorway = ent.Comp.Colorway;
         var style = ent.Comp.Style;
 
@@ -137,7 +123,6 @@ public sealed partial class NinjaAppearanceSystem : SharedNinjaAppearanceSystem
             if (!TryComp<NinjaAppearanceItemComponent>(item, out var itemComp) ||
                 FindSuit(Transform(item).ParentUid) != null)
             {
-                // Still driven by another (or this, still-contained) ninja suit.
                 continue;
             }
 
@@ -182,9 +167,6 @@ public sealed partial class NinjaAppearanceSystem : SharedNinjaAppearanceSystem
 
     private void OnItemReparented(Entity<NinjaAppearanceItemComponent> ent, ref EntParentChangedMessage args)
     {
-        // While an item is in a suit's inventory the suit drives its color, so do nothing while
-        // the new parent chain contains a suit. Otherwise bake the color it had into the item so
-        // all clients keep showing it after it leaves the ninja.
         if (FindSuit(args.Transform.ParentUid) != null)
             return;
 
@@ -224,7 +206,6 @@ public sealed partial class NinjaAppearanceSystem : SharedNinjaAppearanceSystem
             if (TryComp<NinjaAppearanceComponent>(parent, out var comp))
                 return (parent, comp);
 
-            // A suit worn by an ancestor is its child (inventory), not an ancestor itself.
             var enumerator = _inventory.GetSlotEnumerator(parent);
             while (enumerator.NextItem(out var wornItem, out _))
             {
