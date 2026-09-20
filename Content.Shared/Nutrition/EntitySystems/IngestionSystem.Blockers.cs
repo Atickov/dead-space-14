@@ -1,4 +1,4 @@
-﻿using System.Linq;
+﻿﻿using System.Linq;
 using Content.Shared.Chemistry.Components;
 using Content.Shared.Clothing;
 using Content.Shared.Containers.ItemSlots;
@@ -71,7 +71,7 @@ public sealed partial class IngestionSystem
         if (args.Cancelled || args.Solution != null)
             return;
 
-        if (entity.Comp.UtensilRequired && !HasRequiredUtensils(args.User, entity.Comp.Utensil))
+        if (args.RequireUtensils && entity.Comp.UtensilRequired && !HasRequiredUtensils(args.User, entity.Comp.Utensil))
         {
             args.Cancelled = true;
             return;
