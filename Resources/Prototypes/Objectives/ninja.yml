@@ -89,7 +89,7 @@
       sprite: Objects/Weapons/Melee/stunbaton.rsi
       state: stunbaton_on
 
-# DS14
+# DS14-start
 
 - type: entity
   parent: [BaseNinjaObjective, BaseKillObjective]
@@ -163,3 +163,32 @@
       - TaipanResearcher
       - TaipanTechnician
       - TaipanTechnicalOperationsSupervisor
+
+- type: entity
+  parent: [BaseNinjaObjective, BaseCodeObjective]
+  id: NinjaAiHackObjective
+  name: Взлом Станционного ИИ
+  description: Необходимо вывести из строя Станционный Искуственный Интеллект путем взлома его с помощью своих перчаток. Будьте аккуратны, безопасность ИИ может быть лучше, чем вы ожидали.
+  components:
+  - type: Objective
+    icon:
+      sprite: _DeadSpace/Mobs/Silicon/station_ai.rsi
+      state: ai
+  - type: NinjaAiHackCondition
+
+- type: entity
+  parent: [BaseNinjaObjective, BaseCodeObjective]
+  id: NinjaInfoScanObjective
+  name: Сканирование целей
+  description: Просканируйте необходимые объекты или персонал станции с помощью своего инфо-сканера для сбора разведданных.
+  components:
+  - type: Objective
+    icon:
+      sprite: _DeadSpace/Objects/Devices/pinpointer.rsi
+      state: pinpointer-black
+  - type: NumberObjective
+    min: 3
+    max: 5
+    title: objective-condition-ninja-scan-title
+  - type: NinjaInfoCondition
+# DS14-end

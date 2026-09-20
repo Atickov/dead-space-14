@@ -139,3 +139,25 @@ ninja-inject-healing-cocktail = Костюм впрыскивает в вас р
 
 alerts-concentration-name = Концентрация
 description: alerts-concentration-desc = ...
+
+# Ninja Scan
+
+ninja-info-job-unknown = Неизвестно
+ninja-info-objective-description = {$base}
+
+    Требуемая должность: {$job}
+    Необходимо просканировать сотрудников: {$count}
+
+ninja-info-popup-scan-success = Сканирование завершено: Носитель информации найден!
+ninja-info-popup-scan-fail = Субъект уже сканировался или не содержит нужных данных.
+ninja-info-popup-not-alive = Ошибка: Субъект должен быть жив для извлечения информации!
+ninja-info-popup-scanner-selected = Сканер выбран. Теперь нажмите мультитулом по консоли для связывания.
+ninja-info-popup-console-linked = Консоль успешно привязана к сканеру!
+ninja-info-popup-no-scanner-linked = Консоль не привязана к сканеру!
+
+ninja-info-ui-title = Консоль сканирования разума
+ninja-info-ui-status-empty = Камера сканера пуста
+ninja-info-ui-status-subject = Субъект: {$name}
+ninja-info-ui-scan = Сканировать
+ninja-info-ui-eject = Извлечь
+ninja-info-ui-teleport = Выкинуть
