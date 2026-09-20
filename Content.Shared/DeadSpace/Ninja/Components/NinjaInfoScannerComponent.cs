@@ -1,4 +1,5 @@
 using Robust.Shared.GameStates;
+using Robust.Shared.Serialization;
 
 namespace Content.Shared.DeadSpace.Ninja.Components;
 
@@ -30,6 +31,7 @@ public sealed partial class NinjaInfoScannerComponent : Component
     public float ScanReagentAmount = 10f;
 }
 
+[Serializable, NetSerializable]
 public enum NinjaInfoScannerVisualState : byte
 {
     Open,
@@ -37,6 +39,7 @@ public enum NinjaInfoScannerVisualState : byte
     Scan
 }
 
+[Serializable, NetSerializable]
 public enum NinjaInfoScannerVisuals : byte
 {
     VisualState
