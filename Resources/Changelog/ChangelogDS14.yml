@@ -8008,3 +8008,13 @@ Entries:
   changes:
   - type: Add
     message: резисты дракону
+- id: 765
+  author: RIP6100
+  time: '2026-09-20T14:43:42.359486+00:00'
+  pr: 2364
+  changes:
+  - type: Tweak
+    message: Карты Loop, CLuster и Reach вернулись в пулл карт (Reach так же получил
+      полный ремапп by ViviWewe и Wasd6100)
+  - type: Fix
+    message: Баги на картах Loop, Cluster, Omega, Box и Saltern by Amaliz
