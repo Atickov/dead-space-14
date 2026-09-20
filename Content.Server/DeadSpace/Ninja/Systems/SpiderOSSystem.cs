@@ -131,14 +131,6 @@ public sealed class SpiderOSSystem : SharedSpiderOSSystem
             return;
         }
 
-        if (TryComp<ShuttleConsoleComponent>(suitUid, out _) &&
-            _shuttleConsole.GetShuttleConsole(suitUid) is { } target)
-        {
-            var grid = Transform(target).GridUid;
-            var isShuttle = grid != null && TryComp<ShuttleComponent>(grid.Value, out var shuttle) && shuttle.Enabled;
-            Log.Info($"SpiderOS: shuttle control resolved target \"{ToPrettyString(target)}\", grid \"{ToPrettyString(grid ?? EntityUid.Invalid)}\", flyable shuttle: {isShuttle}");
-        }
-
         _ui.OpenUi(suitUid, ShuttleConsoleUiKey.Key, args.Actor);
 
         _shuttleConsole.RefreshShuttleConsole(suitUid);
@@ -156,13 +148,12 @@ public sealed class SpiderOSSystem : SharedSpiderOSSystem
 
         if (!IsAuthorized(suitUid, args.Actor) ||
             comp.SuitActivated ||
-            args.Colorway is < NinjaColorway.Red or > NinjaColorway.Green ||
-            args.Style is < NinjaStyle.Old or > NinjaStyle.New)
+            !Enum.IsDefined(args.Colorway) ||
+            !Enum.IsDefined(args.Style))
         {
             return;
         }
 
-        // The new style has no scarf variant, so it always wears the helmet.
         var helmet = args.Style == NinjaStyle.New || args.Helmet;
 
         if (comp.PendingColorway == args.Colorway && comp.PendingHelmet == helmet &&
@@ -338,7 +329,6 @@ public sealed class SpiderOSSystem : SharedSpiderOSSystem
     {
         var grantedProtos = new HashSet<string>();
 
-        // Katana recall is only usable while the suit is activated.
         if (TryComp<NinjaSuitComponent>(suitUid, out var suitComp))
         {
             grantedProtos.Add(suitComp.RecallKatanaAction);
@@ -426,28 +416,13 @@ public sealed class SpiderOSSystem : SharedSpiderOSSystem
 
     private void SetAllLocked(EntityUid wearer, EntityUid suitUid, bool locked)
     {
-        ApplyLock(suitUid);
+        ApplyLock(suitUid, locked);
 
         foreach (var slot in SuitHardwareSlots.Values)
         {
             if (Inventory.TryGetSlotEntity(wearer, slot, out var item))
             {
-                ApplyLock(item.Value);
-            }
-        }
-
-        return;
-
-        void ApplyLock(EntityUid uid)
-        {
-            if (locked)
-            {
-                if (!HasComp<UnremoveableComponent>(uid))
-                    AddComp(uid, new UnremoveableComponent { DeleteOnDrop = false }, true);
-            }
-            else
-            {
-                RemComp<UnremoveableComponent>(uid);
+                ApplyLock(item.Value, locked);
             }
         }
     }
@@ -456,7 +431,7 @@ public sealed class SpiderOSSystem : SharedSpiderOSSystem
     {
         if (check == SpiderOSBootCheck.SuitFasten)
         {
-            ApplyLock(suitUid);
+            ApplyLock(suitUid, locked);
             return;
         }
 
@@ -465,22 +440,20 @@ public sealed class SpiderOSSystem : SharedSpiderOSSystem
 
         if (Inventory.TryGetSlotEntity(wearer, slot, out var item))
         {
-            ApplyLock(item.Value);
+            ApplyLock(item.Value, locked);
         }
+    }
 
-        return;
-
-        void ApplyLock(EntityUid uid)
+    private void ApplyLock(EntityUid uid, bool locked)
+    {
+        if (locked)
         {
-            if (locked)
-            {
-                if (!HasComp<UnremoveableComponent>(uid))
-                    AddComp(uid, new UnremoveableComponent { DeleteOnDrop = false }, true);
-            }
-            else
-            {
-                RemComp<UnremoveableComponent>(uid);
-            }
+            if (!HasComp<UnremoveableComponent>(uid))
+                AddComp(uid, new UnremoveableComponent { DeleteOnDrop = false }, true);
+        }
+        else
+        {
+            RemComp<UnremoveableComponent>(uid);
         }
     }
 

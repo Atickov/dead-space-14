@@ -15,10 +15,10 @@ public abstract partial class SharedSpiderOSSystem : EntitySystem
     [Dependency] protected readonly InventorySystem Inventory = default!;
     [Dependency] protected readonly PowerCellSystem PowerCell = default!;
 
-    public const float RollbackDelaySeconds = 7f;
-    public const float ConfirmTimeoutSeconds = 6f;
-    public const float LockTimeoutSeconds = 5f;
-    public const float FinishDelaySeconds = 5f;
+    public const float RollbackDelaySeconds = 10f;
+    public const float ConfirmTimeoutSeconds = 50f;
+    public const float LockTimeoutSeconds = 50f;
+    public const float FinishDelaySeconds = 10f;
 
     public static readonly Dictionary<SpiderOSBootCheck, string> SuitHardwareSlots = new()
     {

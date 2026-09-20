@@ -242,10 +242,10 @@
   - type: ChameleonClothing
     slot: head
     default: ClothingHeadHelmetSpaceNinja
-#DS14-end
   - type: NinjaAppearanceItem
     itemType: Helmet
   - type: NinjaSuitItem
+  #DS14-end
   - type: Tag
     tags:
     - WhitelistChameleon
