@@ -315,12 +315,13 @@ public sealed class PatrolTabletSystem : EntitySystem
         }
 
         var recipients = new List<ICommonSession>();
+        var senderMap = Transform(msg.Actor).MapUid;
+
         foreach (var session in _player.Sessions)
         {
             if (session.AttachedEntity is not { Valid: true } playerEntity)
                 continue;
 
-            // Admin ghosts always receive targeted announcements so they can moderate them.
             if (IsAdminGhost(playerEntity))
             {
                 recipients.Add(session);
@@ -332,6 +333,9 @@ public sealed class PatrolTabletSystem : EntitySystem
             {
                 continue;
             }
+
+            if (Transform(playerEntity).MapUid != senderMap)
+                continue;
 
             if (!WearsAnnouncementEquipment(playerEntity, comp))
                 continue;
@@ -397,7 +401,7 @@ public sealed class PatrolTabletSystem : EntitySystem
                 continue;
             }
 
-            var remaining = (float) (busyUntil - _timing.CurTime).TotalSeconds;
+            var remaining = (float)(busyUntil - _timing.CurTime).TotalSeconds;
             if (remaining > maxRemaining)
                 maxRemaining = remaining;
         }
@@ -581,7 +585,7 @@ public sealed class PatrolTabletSystem : EntitySystem
         var busyRemaining = GetAnnouncementBusyRemaining(comp);
         var cooldownRemaining = Math.Max(
             0f,
-            (float) (comp.NextAnnouncementTime - _timing.CurTime).TotalSeconds);
+            (float)(comp.NextAnnouncementTime - _timing.CurTime).TotalSeconds);
 
         _ui.SetUiState(uid, PatrolTabletUiKey.Key,
             new PatrolTabletUpdateState(
