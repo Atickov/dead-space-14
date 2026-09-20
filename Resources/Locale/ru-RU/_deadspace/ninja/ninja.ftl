@@ -147,7 +147,8 @@ ninja-inject-healing-cocktail = Костюм впрыскивает в вас р
 # Ninja Scan
 
 ninja-info-job-unknown = Неизвестно
-ninja-info-objective-description = {$base}
+objective-condition-ninja-scan-title = Сканирование разума
+ninja-info-objective-description = Просканируйте необходимый персонал станции с помощью своего сканера разума для сбора разведданных.
 
     Требуемая должность: {$job}
     Необходимо просканировать сотрудников: {$count}
@@ -165,3 +166,13 @@ ninja-info-ui-status-subject = Субъект: {$name}
 ninja-info-ui-scan = Сканировать
 ninja-info-ui-eject = Извлечь
 ninja-info-ui-teleport = Выкинуть
+
+# Ninja AI hack
+
+ninja-ai-hack-started = Внимание! Обнаружено несанкционированное вмешательство в систему загрузки!
+
+# Ninja scanner
+
+ninja-scanner-window-targets = Сканированные цели
+ninja-scanner-window-disguise-button = Маскировка
+ninja-scanner-window-reset-button = Сброс

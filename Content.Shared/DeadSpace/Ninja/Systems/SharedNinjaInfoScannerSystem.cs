@@ -1,0 +1,90 @@
+using Content.Shared.DeadSpace.Ninja.Components;
+using Content.Shared.DragDrop;
+using Content.Shared.Interaction;
+using Robust.Shared.Containers;
+
+namespace Content.Shared.DeadSpace.Ninja;
+
+public abstract class SharedNinjaInfoScannerSystem : EntitySystem
+{
+    [Dependency] private readonly SharedContainerSystem _container = default!;
+    [Dependency] private readonly SharedInteractionSystem _interaction = default!;
+
+    public override void Initialize()
+    {
+        base.Initialize();
+
+        SubscribeLocalEvent<NinjaInfoScannerComponent, CanDropTargetEvent>(OnCanDropTarget);
+        SubscribeLocalEvent<NinjaInfoScannerComponent, DragDropTargetEvent>(OnDropTarget);
+    }
+
+    private void OnCanDropTarget(
+        Entity<NinjaInfoScannerComponent> ent,
+        ref CanDropTargetEvent args)
+    {
+        if (args.Handled)
+            return;
+
+        if (ent.Comp.IsScanning)
+            return;
+
+        if (!_interaction.InRangeUnobstructed(
+                args.User,
+                ent.Owner,
+                popup: false) ||
+            !_interaction.InRangeUnobstructed(
+                args.User,
+                args.Dragged,
+                popup: false))
+        {
+            return;
+        }
+
+        if (_container.TryGetContainer(
+                ent.Owner,
+                ent.Comp.ContainerId,
+                out var container) &&
+            container.Count == 0)
+        {
+            if (_container.CanInsert(args.Dragged, container))
+            {
+                args.CanDrop = true;
+                args.Handled = true;
+            }
+        }
+    }
+
+    private void OnDropTarget(
+        Entity<NinjaInfoScannerComponent> ent,
+        ref DragDropTargetEvent args)
+    {
+        if (args.Handled)
+            return;
+
+        if (ent.Comp.IsScanning)
+            return;
+
+        if (!_interaction.InRangeUnobstructed(
+                args.User,
+                ent.Owner,
+                popup: false) ||
+            !_interaction.InRangeUnobstructed(
+                args.User,
+                args.Dragged,
+                popup: false))
+        {
+            return;
+        }
+
+        if (_container.TryGetContainer(
+                ent.Owner,
+                ent.Comp.ContainerId,
+                out var container))
+        {
+            if (_container.Insert(args.Dragged, container))
+            {
+                args.Handled = true;
+            }
+        }
+    }
+}

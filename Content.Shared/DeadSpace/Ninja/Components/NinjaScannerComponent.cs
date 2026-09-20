@@ -1,5 +1,7 @@
-using Robust.Shared.GameStates;
+using System;
+using System.Collections.Generic;
 using Content.Shared.Actions;
+using Robust.Shared.GameStates;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization;
 
@@ -62,7 +64,9 @@ public sealed class NinjaScannerBoundUserInterfaceState : BoundUserInterfaceStat
     public List<NinjaScanData> ScannedTargets { get; }
     public bool IsDisguised { get; }
 
-    public NinjaScannerBoundUserInterfaceState(List<NinjaScanData> scannedTargets, bool isDisguised)
+    public NinjaScannerBoundUserInterfaceState(
+        List<NinjaScanData> scannedTargets,
+        bool isDisguised)
     {
         ScannedTargets = scannedTargets;
         IsDisguised = isDisguised;
@@ -81,6 +85,4 @@ public sealed class NinjaApplyDisguiseMessage : BoundUserInterfaceMessage
 }
 
 [Serializable, NetSerializable]
-public sealed class NinjaResetDisguiseMessage : BoundUserInterfaceMessage
-{
-}
+public sealed class NinjaResetDisguiseMessage : BoundUserInterfaceMessage;

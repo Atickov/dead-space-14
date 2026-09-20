@@ -307,6 +307,7 @@
     - NinjaKillRandomPersonObjective
     - NinjaAiHackObjective
     - NinjaProtectPersonObjective
+    - NinjaInfoScanObjective
     #DS14-end
   - type: AntagSelection
     agentName: ninja-round-end-agent-name

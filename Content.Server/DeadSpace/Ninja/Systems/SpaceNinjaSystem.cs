@@ -64,7 +64,7 @@ public sealed class SpaceNinjaSystem : SharedSpaceNinjaSystem
                 {
                     var chance = (heat.Heat - heat.EffectsThreshold) / (heat.MaxHeat - heat.EffectsThreshold);
                     if (_random.Prob(chance * frameTime * 2f))
-                        Spawn("AdminInstantEffectSmoke3", Transform(uid).Coordinates);
+                        Spawn("EffectSparksBrokenEvent", Transform(uid).Coordinates);
                 }
 
                 if (heat.Heat >= heat.MaxHeat)
