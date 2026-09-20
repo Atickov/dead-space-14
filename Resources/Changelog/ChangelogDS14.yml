@@ -7973,3 +7973,10 @@ Entries:
   changes:
   - type: Add
     message: Фиксы на трамстейшен
+- id: 760
+  author: Atickov
+  time: '2026-09-20T08:15:48.591776+00:00'
+  pr: 2363
+  changes:
+  - type: Tweak
+    message: планшет связи теперь показывает уведомления по карте, а не по всему серверу
