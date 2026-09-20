@@ -101,6 +101,18 @@
                     <BoxContainer Margin="0 0 0 5"
                             Orientation="Horizontal"
                             HorizontalExpand="True">
+                        <Label Text="{Loc 'spider-os-personalization-style'}"
+                               HorizontalAlignment="Left"
+                               StyleClasses="ConsoleText"
+                               Modulate="#1bcc15"
+                               Align="Left"/>
+                        <Control HorizontalExpand="True"/>
+                        <OptionButton Name="StyleOption"
+                                MinSize="40 25"/>
+                    </BoxContainer>
+                    <BoxContainer Margin="0 0 0 5"
+                            Orientation="Horizontal"
+                            HorizontalExpand="True">
                         <Label Text="{Loc 'spider-os-personalization-color'}"
                                HorizontalAlignment="Left"
                                StyleClasses="ConsoleText"

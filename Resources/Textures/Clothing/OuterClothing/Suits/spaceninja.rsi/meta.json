@@ -75,6 +75,39 @@
     {
       "name": "red-inhand-right",
       "directions": 4
+    },
+    {
+      "name": "new-icon"
+    },
+    {
+      "name": "red-new-icon"
+    },
+    {
+      "name": "blue-new-icon"
+    },
+    {
+      "name": "new-equipped-OUTERCLOTHING",
+      "directions": 4
+    },
+    {
+      "name": "red-new-equipped-OUTERCLOTHING",
+      "directions": 4
+    },
+    {
+      "name": "blue-new-equipped-OUTERCLOTHING",
+      "directions": 4
+    },
+    {
+      "name": "new-equipped-OUTERCLOTHING-unshaded",
+      "directions": 4
+    },
+    {
+      "name": "red-new-equipped-OUTERCLOTHING-unshaded",
+      "directions": 4
+    },
+    {
+      "name": "blue-new-equipped-OUTERCLOTHING-unshaded",
+      "directions": 4
     }
   ]
 }

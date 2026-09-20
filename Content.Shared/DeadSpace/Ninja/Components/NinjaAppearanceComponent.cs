@@ -10,6 +10,12 @@ public enum NinjaColorway : byte
     Green = 2,
 }
 
+public enum NinjaStyle : byte
+{
+    Old = 0,
+    New = 1,
+}
+
 public enum NinjaAppearanceItemType : byte
 {
     Color = 0,
@@ -25,6 +31,9 @@ public sealed partial class NinjaAppearanceComponent : Component
 {
     [DataField, AutoNetworkedField]
     public NinjaColorway Colorway = NinjaColorway.Green;
+
+    [DataField, AutoNetworkedField]
+    public NinjaStyle Style = NinjaStyle.Old;
 
     [DataField, AutoNetworkedField]
     public bool ScarfShown = false;

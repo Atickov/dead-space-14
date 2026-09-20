@@ -156,18 +156,24 @@ public sealed class SpiderOSSystem : SharedSpiderOSSystem
 
         if (!IsAuthorized(suitUid, args.Actor) ||
             comp.SuitActivated ||
-            args.Colorway is < NinjaColorway.Red or > NinjaColorway.Green)
+            args.Colorway is < NinjaColorway.Red or > NinjaColorway.Green ||
+            args.Style is < NinjaStyle.Old or > NinjaStyle.New)
         {
             return;
         }
 
-        if (comp.PendingColorway == args.Colorway && comp.PendingHelmet == args.Helmet)
+        // The new style has no scarf variant, so it always wears the helmet.
+        var helmet = args.Style == NinjaStyle.New || args.Helmet;
+
+        if (comp.PendingColorway == args.Colorway && comp.PendingHelmet == helmet &&
+            comp.PendingStyle == args.Style)
         {
             return;
         }
 
         comp.PendingColorway = args.Colorway;
-        comp.PendingHelmet = args.Helmet;
+        comp.PendingHelmet = helmet;
+        comp.PendingStyle = args.Style;
 
         Dirty(suitUid, comp);
         UpdateUi(suitUid, comp);
@@ -248,7 +254,7 @@ public sealed class SpiderOSSystem : SharedSpiderOSSystem
     {
         if (TryComp<NinjaAppearanceComponent>(suitUid, out var appearance))
         {
-            _appearance.SetAppearance((suitUid, appearance), comp.PendingColorway, comp.PendingHelmet);
+            _appearance.SetAppearance((suitUid, appearance), comp.PendingColorway, comp.PendingHelmet, comp.PendingStyle);
         }
     }
 
@@ -271,6 +277,7 @@ public sealed class SpiderOSSystem : SharedSpiderOSSystem
         comp.Actions = new List<EntProtoId>(source.Actions);
         comp.PendingColorway = source.PendingColorway;
         comp.PendingHelmet = source.PendingHelmet;
+        comp.PendingStyle = source.PendingStyle;
         comp.SuitActivated = false;
         Dirty(suitUid, comp);
 
@@ -486,6 +493,7 @@ public sealed class SpiderOSSystem : SharedSpiderOSSystem
             comp.Skills.Id,
             comp.PendingColorway,
             comp.PendingHelmet,
+            comp.PendingStyle,
             comp.SuitActivated);
         _ui.SetUiState(suitUid, SpiderOSUiKey.Key, state);
     }

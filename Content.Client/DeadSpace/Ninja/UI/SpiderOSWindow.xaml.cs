@@ -49,6 +49,8 @@ public sealed partial class SpiderOSWindow : FancyWindow
 
     private Button _shuttleButton = default!;
 
+    private OptionButton _styleOption = default!;
+
     private OptionButton _colorOption = default!;
 
     private OptionButton _hoodOrScarfOption = default!;
@@ -79,7 +81,7 @@ public sealed partial class SpiderOSWindow : FancyWindow
 
     public event Action? OnShuttleControl;
 
-    public event Action<NinjaColorway, bool>? OnAppearanceChanged;
+    public event Action<NinjaColorway, bool, NinjaStyle>? OnAppearanceChanged;
 
     public SpiderOSWindow()
     {
@@ -99,20 +101,30 @@ public sealed partial class SpiderOSWindow : FancyWindow
         _shuttleButton = FindControl<Button>("ShuttleButton");
         _shuttleButton.OnPressed += _ => OnShuttleControl?.Invoke();
 
+        _styleOption = FindControl<OptionButton>("StyleOption");
+        _styleOption.AddItem(Loc.GetString("spider-os-style-old"));
+        _styleOption.AddItem(Loc.GetString("spider-os-style-new"));
+        _styleOption.OnItemSelected += args =>
+        {
+            var style = StyleFromIndex(args.Id);
+            UpdateHoodOrScarfForStyle(style);
+            OnAppearanceChanged?.Invoke(ColorFromIndex(_colorOption.SelectedId), _hoodOrScarfOption.SelectedId == 0, style);
+        };
+
         _colorOption = FindControl<OptionButton>("ColorOption");
         _colorOption.AddItem(Loc.GetString("spider-os-color-green"));
         _colorOption.AddItem(Loc.GetString("spider-os-color-red"));
         _colorOption.AddItem(Loc.GetString("spider-os-color-blue"));
-        _colorOption.OnItemSelected += args => OnAppearanceChanged?.Invoke(ColorFromIndex(args.Id), _hoodOrScarfOption.SelectedId == 0);
+        _colorOption.OnItemSelected += args => OnAppearanceChanged?.Invoke(ColorFromIndex(args.Id), _hoodOrScarfOption.SelectedId == 0, StyleFromIndex(_styleOption.SelectedId));
 
         _hoodOrScarfOption = FindControl<OptionButton>("HoodOrScarfOption");
         _hoodOrScarfOption.AddItem(Loc.GetString("spider-os-head-helmet"));
         _hoodOrScarfOption.AddItem(Loc.GetString("spider-os-head-scarf"));
-        _hoodOrScarfOption.OnItemSelected += args => OnAppearanceChanged?.Invoke(ColorFromIndex(_colorOption.SelectedId), args.Id == 0);
+        _hoodOrScarfOption.OnItemSelected += args => OnAppearanceChanged?.Invoke(ColorFromIndex(_colorOption.SelectedId), args.Id == 0, StyleFromIndex(_styleOption.SelectedId));
 
         _stylePreview = FindControl<TextureRect>("StylePreview");
         _stylePreview.TextureScale = new Vector2(4, 4);
-        UpdatePreview(NinjaColorway.Green, true);
+        UpdatePreview(NinjaColorway.Green, true, NinjaStyle.Old);
 
         _mainView = FindControl<BoxContainer>("MainSpiderOS");
         _loadView = FindControl<LayoutContainer>("LoadSpiderOS");
@@ -137,6 +149,7 @@ public sealed partial class SpiderOSWindow : FancyWindow
 
         _activateButton.Disabled = true;
         _shuttleButton.Disabled = true;
+        _styleOption.Disabled = true;
         _colorOption.Disabled = true;
         _hoodOrScarfOption.Disabled = true;
         SetModulesEnabled(false);
@@ -154,6 +167,7 @@ public sealed partial class SpiderOSWindow : FancyWindow
 
         _activateButton.Disabled = false;
         _shuttleButton.Disabled = false;
+        _styleOption.Disabled = _suitActivated;
         _colorOption.Disabled = _suitActivated;
         _hoodOrScarfOption.Disabled = _suitActivated;
         SetModulesEnabled(!_suitActivated);
@@ -185,6 +199,7 @@ public sealed partial class SpiderOSWindow : FancyWindow
         List<NinjaSkill> skills,
         NinjaColorway pendingColorway,
         bool pendingHelmet,
+        NinjaStyle pendingStyle,
         bool suitActivated)
     {
         _suitActivated = suitActivated;
@@ -197,13 +212,25 @@ public sealed partial class SpiderOSWindow : FancyWindow
             ? "spider-os-personalization-deactivate"
             : "spider-os-personalization-activate");
 
+        _styleOption.Disabled = suitActivated || _bootActive;
+        _styleOption.SelectId(IndexFromStyle(pendingStyle));
+
         _colorOption.Disabled = suitActivated || _bootActive;
         _colorOption.SelectId(IndexFromColor(pendingColorway));
 
         _hoodOrScarfOption.Disabled = suitActivated || _bootActive;
-        _hoodOrScarfOption.SelectId(pendingHelmet ? 0 : 1);
+        _hoodOrScarfOption.SetItemDisabled(1, pendingStyle == NinjaStyle.New);
+        _hoodOrScarfOption.SelectId(pendingStyle == NinjaStyle.New || pendingHelmet ? 0 : 1);
 
-        UpdatePreview(pendingColorway, pendingHelmet);
+        UpdatePreview(pendingColorway, pendingHelmet, pendingStyle);
+    }
+
+    private void UpdateHoodOrScarfForStyle(NinjaStyle style)
+    {
+        _hoodOrScarfOption.SetItemDisabled(1, style == NinjaStyle.New);
+
+        if (style == NinjaStyle.New)
+            _hoodOrScarfOption.SelectId(0);
     }
 
     private void RebuildSkills(
@@ -351,7 +378,7 @@ public sealed partial class SpiderOSWindow : FancyWindow
         _ => "Ghost",
     };
 
-    private void UpdatePreview(NinjaColorway colorway, bool helmet)
+    private void UpdatePreview(NinjaColorway colorway, bool helmet, NinjaStyle style)
     {
         var color = colorway switch
         {
@@ -361,19 +388,34 @@ public sealed partial class SpiderOSWindow : FancyWindow
         };
 
         var head = helmet ? "helmet" : "scarf";
-        var path = new ResPath($"{PreviewBasePath}preview-{color}-{head}.png");
 
+        if (style == NinjaStyle.New)
+        {
+            var newPath = new ResPath($"{PreviewBasePath}preview-{color}-new-helmet.png");
+            if (_resCache.TryGetResource<TextureResource>(newPath, out var newPreview))
+            {
+                _stylePreview.Texture = newPreview.Texture;
+                return;
+            }
+
+            ShowNoPreview();
+            return;
+        }
+
+        var path = new ResPath($"{PreviewBasePath}preview-{color}-{head}.png");
         if (_resCache.TryGetResource<TextureResource>(path, out var preview))
         {
             _stylePreview.Texture = preview.Texture;
             return;
         }
 
+        ShowNoPreview();
+    }
+
+    private void ShowNoPreview()
+    {
         if (_resCache.TryGetResource<TextureResource>(new ResPath($"{PreviewBasePath}no-preview.png"), out var noPreview))
-        {
             _stylePreview.Texture = noPreview.Texture;
-            return;
-        }
     }
 
     private static NinjaColorway ColorFromIndex(int index) => index switch
@@ -387,6 +429,18 @@ public sealed partial class SpiderOSWindow : FancyWindow
     {
         NinjaColorway.Red => 1,
         NinjaColorway.Blue => 2,
+        _ => 0,
+    };
+
+    private static NinjaStyle StyleFromIndex(int index) => index switch
+    {
+        1 => NinjaStyle.New,
+        _ => NinjaStyle.Old,
+    };
+
+    private static int IndexFromStyle(NinjaStyle style) => style switch
+    {
+        NinjaStyle.New => 1,
         _ => 0,
     };
 }

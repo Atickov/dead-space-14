@@ -36,6 +36,9 @@ public sealed partial class SpiderOSComponent : Component
     public bool PendingHelmet = true;
 
     [DataField, AutoNetworkedField]
+    public NinjaStyle PendingStyle = NinjaStyle.Old;
+
+    [DataField, AutoNetworkedField]
     public bool SuitActivated = false;
 
     [DataField]
@@ -80,15 +83,17 @@ public sealed class SpiderOSSetAppearanceMessage : BoundUserInterfaceMessage
 {
     public NinjaColorway Colorway;
     public bool Helmet;
+    public NinjaStyle Style;
 
     public SpiderOSSetAppearanceMessage()
     {
     }
 
-    public SpiderOSSetAppearanceMessage(NinjaColorway colorway, bool helmet)
+    public SpiderOSSetAppearanceMessage(NinjaColorway colorway, bool helmet, NinjaStyle style)
     {
         Colorway = colorway;
         Helmet = helmet;
+        Style = style;
     }
 }
 
@@ -160,6 +165,7 @@ public sealed class SpiderOSBoundUserInterfaceState : BoundUserInterfaceState
     public string Skills = "SpiderOS";
     public NinjaColorway PendingColorway = NinjaColorway.Green;
     public bool PendingHelmet = true;
+    public NinjaStyle PendingStyle = NinjaStyle.Old;
     public bool SuitActivated = false;
 
     public SpiderOSBoundUserInterfaceState()
@@ -173,6 +179,7 @@ public sealed class SpiderOSBoundUserInterfaceState : BoundUserInterfaceState
         string skills,
         NinjaColorway pendingColorway,
         bool pendingHelmet,
+        NinjaStyle pendingStyle,
         bool suitActivated)
     {
         LockedTiers = lockedTiers;
@@ -181,6 +188,7 @@ public sealed class SpiderOSBoundUserInterfaceState : BoundUserInterfaceState
         Skills = skills;
         PendingColorway = pendingColorway;
         PendingHelmet = pendingHelmet;
+        PendingStyle = pendingStyle;
         SuitActivated = suitActivated;
     }
 }
