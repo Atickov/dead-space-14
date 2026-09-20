@@ -8018,3 +8018,11 @@ Entries:
       полный ремапп by ViviWewe и Wasd6100)
   - type: Fix
     message: Баги на картах Loop, Cluster, Omega, Box и Saltern by Amaliz
+- id: 766
+  author: KillFroozy
+  time: '2026-09-20T15:45:16.860573+00:00'
+  pr: 2367
+  changes:
+  - type: Fix
+    message: 'Исправлены спрайты грустной, испуганной и застенчивой масок мима (автор:
+      pivo_3amopckoe.)'
