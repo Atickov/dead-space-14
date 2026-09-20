@@ -266,13 +266,18 @@
   parent: BaseGameRule
   id: NinjaSpawn
   components:
+  #DS14-start
+  - type: LoadMapRule
+    mapPath: /Maps/_DeadSpace/Ninja/ninja.yml
+  - type: RuleGrids
+  #DS14-end
   - type: StationEvent
     weight: 3 # DS14
     duration: null
     earliestStart: 30
     reoccurrenceDelay: 30 # DS14
     minimumPlayers: 30
-  - type: SpaceSpawnRule
+  #- type: SpaceSpawnRule ##DS14
   - type: AntagLoadProfileRule
   # DS14-start
     speciesOverride: Human
@@ -328,7 +333,7 @@
       - type: SpaceNinja
       - type: NpcFactionMember
         factions:
-        - Ninja ## ds-14
+        - Ninja ## DS14
       - type: RandomMetadata
         nameSegments:
         - NamesNinjaTitle
