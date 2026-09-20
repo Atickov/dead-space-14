@@ -1,4 +1,5 @@
 using Content.Shared.Medical.SuitSensor;
+using Content.Shared.Medical.CrewMonitoring;
 
 namespace Content.Server.Medical.CrewMonitoring;
 
@@ -35,13 +36,3 @@ public sealed partial class CrewMonitoringConsoleComponent : Component
     public CrewMonitoringConsolePingMode CurrentPingMode = CrewMonitoringConsolePingMode.Severe;
     // DS14-end
 }
-
-// DS14-start
-public enum CrewMonitoringConsolePingMode
-{
-    Severe,
-    Critical,
-    Dead,
-    Disabled
-}
-// DS14-end
