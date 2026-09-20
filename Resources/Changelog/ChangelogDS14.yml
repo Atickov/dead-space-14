@@ -8001,3 +8001,10 @@ Entries:
   changes:
   - type: Tweak
     message: Шаттла CF и снаряжение агентов
+- id: 764
+  author: IvanKuvalda
+  time: '2026-09-20T13:42:27.781239+00:00'
+  pr: 2366
+  changes:
+  - type: Add
+    message: резисты дракону
