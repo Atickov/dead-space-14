@@ -30,15 +30,15 @@
       state: clones
     components:
     - type: NinjaHolographicClones
-  - category: Ghost
-    tier: 4
-    name: spider-os-module-ghost-4
-    description: spider-os-module-ghost-4-desc
-    icon:
-      sprite: /Textures/_DeadSpace/Actions/ninja_actions.rsi
-      state: scanner
-    components:
-    - type: NinjaScanner
+  #- category: Ghost
+  #  tier: 4
+  #  name: spider-os-module-ghost-4
+  #  description: spider-os-module-ghost-4-desc
+  #  icon:
+  #    sprite: /Textures/_DeadSpace/Actions/ninja_actions.rsi
+  #    state: scanner
+  #  components:
+  #  - type: NinjaScanner
   - category: Ghost
     tier: 5
     name: spider-os-module-ghost-5

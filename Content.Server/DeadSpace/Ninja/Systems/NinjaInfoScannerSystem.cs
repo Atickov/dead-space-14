@@ -1,45 +1,40 @@
 using System.Linq;
+using Content.Server.Chat.Systems;
+using Content.Shared.Body.Components;
+using Content.Shared.Body.Systems;
+using Content.Shared.Chat;
+using Content.Shared.Chemistry.Components;
+using Content.Shared.Chemistry.Reagent;
 using Content.Shared.DeadSpace.Ninja;
 using Content.Shared.DeadSpace.Ninja.Components;
-using Content.Shared.Interaction;
+using Content.Shared.FixedPoint;
 using Content.Shared.Mobs.Systems;
-using Content.Shared.Popups;
 using Robust.Server.GameObjects;
 using Robust.Shared.Containers;
 using Robust.Shared.Random;
 using Robust.Shared.Timing;
-using Content.Shared.Chemistry.EntitySystems;
-using Content.Shared.Chemistry.Reagent;
-using Content.Shared.FixedPoint;
-using Content.Shared.Chemistry.Components;
 
 namespace Content.Server.DeadSpace.Ninja.Systems;
 
 public sealed class NinjaInfoScannerSystem : SharedNinjaInfoScannerSystem
 {
     [Dependency] private readonly SharedContainerSystem _container = default!;
-    [Dependency] private readonly UserInterfaceSystem _ui = default!;
+    [Dependency] private readonly AppearanceSystem _appearance = default!;
     [Dependency] private readonly TransformSystem _transform = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly ChatSystem _chatSystem = default!;
     [Dependency] private readonly NinjaInfoObjectiveSystem _objectiveSystem = default!;
     [Dependency] private readonly MobStateSystem _mobState = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly SharedSolutionContainerSystem _solutionContainer = default!;
-
-    private readonly Dictionary<EntityUid, TimeSpan> _scanEndTimes = new();
+    [Dependency] private readonly BloodstreamSystem _bloodstream = default!;
 
     public override void Initialize()
     {
         base.Initialize();
 
         SubscribeLocalEvent<NinjaInfoScannerComponent, ComponentInit>(OnInit);
-        SubscribeLocalEvent<NinjaInfoScannerComponent, ActivateInWorldEvent>(OnActivateInWorld);
         SubscribeLocalEvent<NinjaInfoScannerComponent, EntInsertedIntoContainerMessage>(OnContainerInserted);
         SubscribeLocalEvent<NinjaInfoScannerComponent, EntRemovedFromContainerMessage>(OnContainerRemoved);
-        SubscribeLocalEvent<NinjaInfoScannerComponent, NinjaInfoScannerScanMessage>(OnScanMessage);
-        SubscribeLocalEvent<NinjaInfoScannerComponent, NinjaInfoScannerEjectMessage>(OnEjectMessage);
-        SubscribeLocalEvent<NinjaInfoScannerComponent, NinjaInfoScannerTeleportMessage>(OnTeleportMessage);
         SubscribeLocalEvent<NinjaInfoScannerComponent, ComponentShutdown>(OnShutdown);
     }
 
@@ -47,6 +42,7 @@ public sealed class NinjaInfoScannerSystem : SharedNinjaInfoScannerSystem
     {
         base.Update(frameTime);
 
+        var curTime = _timing.CurTime;
         var query = EntityQueryEnumerator<NinjaInfoScannerComponent>();
 
         while (query.MoveNext(out var uid, out var comp))
@@ -54,10 +50,7 @@ public sealed class NinjaInfoScannerSystem : SharedNinjaInfoScannerSystem
             if (!comp.IsScanning)
                 continue;
 
-            if (!_scanEndTimes.TryGetValue(uid, out var endTime))
-                continue;
-
-            if (_timing.CurTime < endTime)
+            if (comp.ScanEndTime is { } endTime && curTime < endTime)
                 continue;
 
             FinishScan((uid, comp));
@@ -79,41 +72,33 @@ public sealed class NinjaInfoScannerSystem : SharedNinjaInfoScannerSystem
         Entity<NinjaInfoScannerComponent> ent,
         ref ComponentShutdown args)
     {
-        _scanEndTimes.Remove(ent.Owner);
-    }
-
-    private void OnActivateInWorld(
-        Entity<NinjaInfoScannerComponent> ent,
-        ref ActivateInWorldEvent args)
-    {
-        if (args.Handled)
-            return;
-
-        _ui.OpenUi(
-            ent.Owner,
-            NinjaInfoScannerUiKey.Key,
-            args.User);
-
-        UpdateUserInterface(ent);
-
-        args.Handled = true;
+        ent.Comp.ScanEndTime = null;
+        ent.Comp.ScanSpeaker = null;
     }
 
     private void OnContainerInserted(
         Entity<NinjaInfoScannerComponent> ent,
         ref EntInsertedIntoContainerMessage args)
     {
-        if (ent.Comp.IsScanning)
+        if (args.Container.Owner != ent.Owner ||
+            args.Container.ID != ent.Comp.ContainerId)
+        {
             return;
+        }
 
         UpdateVisualState(ent);
-        UpdateUserInterface(ent);
     }
 
     private void OnContainerRemoved(
         Entity<NinjaInfoScannerComponent> ent,
         ref EntRemovedFromContainerMessage args)
     {
+        if (args.Container.Owner != ent.Owner ||
+            args.Container.ID != ent.Comp.ContainerId)
+        {
+            return;
+        }
+
         if (ent.Comp.IsScanning)
         {
             FinishScan(ent);
@@ -121,244 +106,203 @@ public sealed class NinjaInfoScannerSystem : SharedNinjaInfoScannerSystem
         }
 
         UpdateVisualState(ent);
-        UpdateUserInterface(ent);
     }
 
-    private void OnScanMessage(
-        Entity<NinjaInfoScannerComponent> ent,
-        ref NinjaInfoScannerScanMessage args)
-    {
-        if (ent.Comp.IsScanning)
-            return;
-
-        if (!_container.TryGetContainer(
-                ent.Owner,
-                ent.Comp.ContainerId,
-                out var container) ||
-            container.ContainedEntities.Count == 0)
-        {
-            _popup.PopupEntity(
-                Loc.GetString("ninja-info-popup-no-target"),
-                ent.Owner,
-                args.Actor);
-
-            return;
-        }
-
-        var target = container.ContainedEntities[0];
-
-        if (!Exists(target) ||
-            !_mobState.IsAlive(target))
-        {
-            _popup.PopupEntity(
-                Loc.GetString("ninja-info-popup-not-alive"),
-                ent.Owner,
-                args.Actor);
-
-            return;
-        }
-
-        StartScan(ent, target, args.Actor);
-    }
-
-    public bool TryStartScan(EntityUid scanner, EntityUid actor)
+    public bool TryStartScan(EntityUid scanner, EntityUid speaker)
     {
         if (!TryComp<NinjaInfoScannerComponent>(scanner, out var comp))
+            return false;
+
+        if (comp.IsScanning)
         {
+            Say(speaker, "ninja-info-phrase-scan-busy");
             return false;
         }
 
-        if (comp.IsScanning)
-            return false;
-
-        if (!_container.TryGetContainer(scanner, comp.ContainerId, out var container) || container.ContainedEntities.Count == 0)
+        if (!_container.TryGetContainer(scanner, comp.ContainerId, out var container) ||
+            container.ContainedEntities.Count == 0)
         {
+            Say(speaker, "ninja-info-phrase-no-target");
             return false;
         }
 
         var target = container.ContainedEntities[0];
 
-        if (!Exists(target) || !_mobState.IsAlive(target))
+        if (!_mobState.IsAlive(target))
         {
+            Say(speaker, "ninja-info-phrase-not-alive");
             return false;
         }
 
-        StartScan((scanner, comp), target, actor);
+        StartScan((scanner, comp), target, speaker);
 
         return true;
     }
 
-    private void StartScan(Entity<NinjaInfoScannerComponent> ent, EntityUid target, EntityUid actor)
+    public bool TryEjectTarget(EntityUid scanner, EntityUid? speaker = null)
+    {
+        if (!TryComp<NinjaInfoScannerComponent>(scanner, out var comp))
+            return false;
+
+        if (comp.IsScanning)
+        {
+            Say(speaker, "ninja-info-phrase-scan-busy");
+            return false;
+        }
+
+        if (!_container.TryGetContainer(scanner, comp.ContainerId, out var container) ||
+            container.ContainedEntities.Count == 0)
+        {
+            return false;
+        }
+
+        _container.Remove(container.ContainedEntities[0], container);
+
+        return true;
+    }
+
+    public bool TryTeleportTarget(EntityUid scanner, EntityUid? speaker = null)
+    {
+        if (!TryComp<NinjaInfoScannerComponent>(scanner, out var comp))
+            return false;
+
+        if (comp.IsScanning)
+        {
+            Say(speaker, "ninja-info-phrase-scan-busy");
+            return false;
+        }
+
+        if (!_container.TryGetContainer(scanner, comp.ContainerId, out var container) ||
+            container.ContainedEntities.Count == 0)
+        {
+            return false;
+        }
+
+        var target = container.ContainedEntities[0];
+
+        _container.Remove(target, container);
+
+        var marker = GetRandomMarker();
+        if (marker != null)
+        {
+            _transform.SetCoordinates(
+                target,
+                Transform(marker.Value).Coordinates);
+        }
+        else
+        {
+            Say(speaker, "ninja-info-phrase-no-teleport-markers");
+        }
+
+        return true;
+    }
+
+    private void StartScan(
+        Entity<NinjaInfoScannerComponent> ent,
+        EntityUid target,
+        EntityUid speaker)
     {
         ent.Comp.IsScanning = true;
         ent.Comp.ScanningEntity = target;
-        ent.Comp.VisualState = NinjaInfoScannerVisualState.Scan;
-
-        _scanEndTimes[ent.Owner] =
+        ent.Comp.ScanSpeaker = speaker;
+        ent.Comp.ScanEndTime =
             _timing.CurTime +
             TimeSpan.FromSeconds(ent.Comp.ScanTime);
 
-        Dirty(ent);
+        UpdateVisualState(ent);
 
-        if (TryComp<SolutionComponent>(target, out var solution))
+        if (TryComp<BloodstreamComponent>(target, out var bloodstream))
         {
-            _solutionContainer.TryAddReagent(
-                new Entity<SolutionComponent>(target, solution),
+            var solution = new Solution();
+            solution.AddReagent(
                 new ReagentQuantity(
                     ent.Comp.ScanReagent,
-                    FixedPoint2.New(ent.Comp.ScanReagentAmount)),
-                out _);
+                    FixedPoint2.New(ent.Comp.ScanReagentAmount)));
+
+            _bloodstream.TryAddToBloodstream((target, bloodstream), solution);
         }
 
-        UpdateVisualState(ent);
-        UpdateUserInterface(ent);
-
-        _popup.PopupEntity(Loc.GetString("ninja-info-popup-scan-started"), ent.Owner, actor);
+        Say(speaker, "ninja-info-phrase-scan-started");
     }
 
     private void FinishScan(Entity<NinjaInfoScannerComponent> ent)
     {
-        _scanEndTimes.Remove(ent.Owner);
-
-        if (!ent.Comp.IsScanning)
-            return;
-
         var target = ent.Comp.ScanningEntity;
+        var speaker = ent.Comp.ScanSpeaker;
 
         ent.Comp.IsScanning = false;
         ent.Comp.ScanningEntity = null;
+        ent.Comp.ScanSpeaker = null;
+        ent.Comp.ScanEndTime = null;
 
-        if (target is not { } targetUid || !Exists(targetUid) || !_container.TryGetContainer(ent.Owner, ent.Comp.ContainerId, out var container) || !container.ContainedEntities.Any(x => x == targetUid))
+        if (target is not { } targetUid || !Exists(targetUid))
         {
-            ent.Comp.VisualState = NinjaInfoScannerVisualState.Open;
-
-            Dirty(ent);
             UpdateVisualState(ent);
-            UpdateUserInterface(ent);
-
             return;
         }
 
-        if (!_mobState.IsAlive(targetUid))
+        if (_container.TryGetContainer(ent.Owner, ent.Comp.ContainerId, out var container) &&
+            container.ContainedEntities.Contains(targetUid) &&
+            _mobState.IsAlive(targetUid))
         {
-            ent.Comp.VisualState = NinjaInfoScannerVisualState.Closed;
+            var success = _objectiveSystem.TryScanEntity(targetUid, speaker);
 
-            Dirty(ent);
-            UpdateVisualState(ent);
-            UpdateUserInterface(ent);
-
-            return;
+            Say(speaker, success
+                ? "ninja-info-phrase-scan-success"
+                : "ninja-info-phrase-scan-fail");
         }
-
-        if (_objectiveSystem.TryScanEntity(targetUid))
-        {
-            _popup.PopupEntity(Loc.GetString("ninja-info-popup-scan-success"), ent.Owner, ent.Owner);
-        }
-        else
-        {
-            _popup.PopupEntity(Loc.GetString("ninja-info-popup-scan-fail"), ent.Owner, ent.Owner);
-        }
-
-        ent.Comp.VisualState = NinjaInfoScannerVisualState.Closed;
-
-        Dirty(ent);
 
         UpdateVisualState(ent);
-        UpdateUserInterface(ent);
     }
 
-    private void OnEjectMessage(Entity<NinjaInfoScannerComponent> ent, ref NinjaInfoScannerEjectMessage args)
+    private EntityUid? GetRandomMarker()
     {
-        if (ent.Comp.IsScanning)
-            return;
-
-        if (!_container.TryGetContainer(ent.Owner, ent.Comp.ContainerId, out var container) || container.ContainedEntities.Count == 0)
-        {
-            return;
-        }
-
-        var target = container.ContainedEntities[0];
-
-        _container.Remove(
-            target,
-            container);
-
-        UpdateVisualState(ent);
-        UpdateUserInterface(ent);
-    }
-
-    private void OnTeleportMessage(Entity<NinjaInfoScannerComponent> ent, ref NinjaInfoScannerTeleportMessage args)
-    {
-        if (ent.Comp.IsScanning)
-            return;
-
-        if (!_container.TryGetContainer(ent.Owner, ent.Comp.ContainerId, out var container) || container.ContainedEntities.Count == 0)
-        {
-            return;
-        }
-
-        var target = container.ContainedEntities[0];
-
-        _container.Remove(
-            target,
-            container);
-
         var markers = new List<EntityUid>();
-        var query =
-            EntityQueryEnumerator<NinjaInfoTeleportMarkerComponent>();
 
-        while (query.MoveNext(out var markerUid, out _))
+        var query = EntityQueryEnumerator<NinjaInfoTeleportMarkerComponent>();
+        while (query.MoveNext(out var uid, out _))
         {
-            markers.Add(markerUid);
+            markers.Add(uid);
         }
 
-        if (markers.Count > 0)
-        {
-            var randomMarker = _random.Pick(markers);
+        if (markers.Count == 0)
+            return null;
 
-            _transform.SetCoordinates(
-                target,
-                Transform(randomMarker).Coordinates);
-        }
+        return _random.Pick(markers);
+    }
 
-        UpdateVisualState(ent);
-        UpdateUserInterface(ent);
+    private void Say(EntityUid? speaker, string phrase)
+    {
+        if (speaker is not { } speakerUid || !Exists(speakerUid))
+            return;
+
+        _chatSystem.TrySendInGameICMessage(
+            speakerUid,
+            Loc.GetString(phrase),
+            InGameICChatType.Speak,
+            ChatTransmitRange.Normal,
+            true
+        );
     }
 
     private void UpdateVisualState(Entity<NinjaInfoScannerComponent> ent)
     {
-        if (ent.Comp.IsScanning)
-        {
-            ent.Comp.VisualState = NinjaInfoScannerVisualState.Scan;
-            Dirty(ent);
-            return;
-        }
+        var state = GetVisualState(ent);
 
-        if (_container.TryGetContainer(ent.Owner, ent.Comp.ContainerId, out var container) && container.ContainedEntities.Count > 0)
-        {
-            ent.Comp.VisualState =
-                NinjaInfoScannerVisualState.Closed;
-
-            Dirty(ent);
-
-            return;
-        }
-
-        ent.Comp.VisualState =
-            NinjaInfoScannerVisualState.Open;
-
-        Dirty(ent);
+        _appearance.SetData(ent.Owner, NinjaInfoScannerVisuals.VisualState, state);
     }
 
-    private void UpdateUserInterface(Entity<NinjaInfoScannerComponent> ent)
+    private NinjaInfoScannerVisualState GetVisualState(Entity<NinjaInfoScannerComponent> ent)
     {
-        NetEntity? contained = null;
+        if (ent.Comp.IsScanning)
+            return NinjaInfoScannerVisualState.Scan;
 
-        if (_container.TryGetContainer(ent.Owner, ent.Comp.ContainerId, out var container) && container.ContainedEntities.Count > 0)
+        if (_container.TryGetContainer(ent.Owner, ent.Comp.ContainerId, out var container) &&
+            container.ContainedEntities.Count > 0)
         {
-            contained = GetNetEntity(container.ContainedEntities[0]);
+            return NinjaInfoScannerVisualState.Closed;
         }
 
-        _ui.SetUiState(ent.Owner, NinjaInfoScannerUiKey.Key, new NinjaInfoScannerState(contained));
+        return NinjaInfoScannerVisualState.Open;
     }
 }

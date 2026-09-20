@@ -153,26 +153,24 @@ ninja-info-objective-description = Просканируйте необходим
     Требуемая должность: {$job}
     Необходимо просканировать сотрудников: {$count}
 
-ninja-info-popup-scan-success = Сканирование завершено: Носитель информации найден!
-ninja-info-popup-scan-fail = Субъект уже сканировался или не содержит нужных данных.
-ninja-info-popup-not-alive = Ошибка: Субъект должен быть жив для извлечения информации!
-ninja-info-popup-scanner-selected = Сканер выбран. Теперь нажмите мультитулом по консоли для связывания.
-ninja-info-popup-console-linked = Консоль успешно привязана к сканеру!
-ninja-info-popup-no-scanner-linked = Консоль не привязана к сканеру!
+ninja-info-phrase-scan-success = Сканирование завершено. Носитель информации найден.
+ninja-info-phrase-scan-fail = Субъект уже был просканирован или не содержит нужных данных.
+ninja-info-phrase-not-alive = Субъект должен быть жив для извлечения информации.
+ninja-info-phrase-scanner-selected = Сканер выбран. Нажмите мультитулом по консоли для связывания.
+ninja-info-phrase-console-linked = Консоль успешно привязана к сканеру.
+ninja-info-phrase-no-scanner-linked = Сканер не подключён к консоли.
+ninja-info-phrase-no-target = В сканере отсутствует субъект.
+ninja-info-phrase-scan-started = Сканирование начато. Не извлекайте субъект до завершения процесса.
+ninja-info-phrase-scan-busy = Сканирование уже выполняется.
+ninja-info-phrase-no-teleport-markers = Не найдено точек назначения для перемещения субъекта.
 
 ninja-info-ui-title = Консоль сканирования разума
 ninja-info-ui-status-empty = Камера сканера пуста
 ninja-info-ui-status-subject = Субъект: {$name}
 ninja-info-ui-scan = Сканировать
 ninja-info-ui-eject = Извлечь
-ninja-info-ui-teleport = Выкинуть
+ninja-info-ui-teleport = Телепортировать
 
 # Ninja AI hack
 
 ninja-ai-hack-started = Внимание! Обнаружено несанкционированное вмешательство в систему загрузки!
-
-# Ninja scanner
-
-ninja-scanner-window-targets = Сканированные цели
-ninja-scanner-window-disguise-button = Маскировка
-ninja-scanner-window-reset-button = Сброс

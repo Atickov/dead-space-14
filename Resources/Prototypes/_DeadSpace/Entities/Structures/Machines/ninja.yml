@@ -21,7 +21,16 @@
   - type: Sprite
     sprite: _DeadSpace/Structures/Machines/ninja_scan.rsi
     layers:
-    - state: icon_open
+    - map: ["base"]
+      state: icon_open
+  - type: Appearance
+  - type: GenericVisualizer
+    visuals:
+      enum.NinjaInfoScannerVisuals.VisualState:
+        base:
+          Open: { state: icon_open }
+          Closed: { state: icon_closed }
+          Scan: { state: icon_scan }
   - type: InteractionOutline
   - type: Physics
     bodyType: Static
@@ -54,6 +63,9 @@
     interfaces:
       enum.NinjaInfoScannerUiKey.Key:
         type: NinjaInfoScannerBoundUserInterface
+  - type: Speech
+    speechVerb: Robotic
+    speechSounds: Pai
   - type: Sprite
     sprite: Structures/Machines/computers.rsi
     layers:

@@ -1,12 +1,11 @@
 using System.Linq;
+using Content.Server.Objectives.Systems;
 using Content.Shared.DeadSpace.Ninja.Components;
 using Content.Shared.Mind;
-using Content.Shared.Mind.Components;
 using Content.Shared.Mobs.Systems;
 using Content.Shared.Objectives.Components;
 using Content.Shared.Roles;
 using Content.Shared.Roles.Jobs;
-using Robust.Server.Player;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 
@@ -17,24 +16,23 @@ public sealed class NinjaInfoObjectiveSystem : EntitySystem
     [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly SharedJobSystem _jobs = default!;
     [Dependency] private readonly SharedMindSystem _mind = default!;
-    [Dependency] private readonly IPlayerManager _playerManager = default!;
     [Dependency] private readonly IPrototypeManager _proto = default!;
     [Dependency] private readonly MobStateSystem _mobState = default!;
     [Dependency] private readonly MetaDataSystem _metaData = default!;
+    [Dependency] private readonly NumberObjectiveSystem _number = default!;
 
     public override void Initialize()
     {
         base.Initialize();
 
-        SubscribeLocalEvent<NinjaInfoConditionComponent, ObjectiveAssignedEvent>(OnObjectiveAssigned);
+        SubscribeLocalEvent<NinjaInfoConditionComponent, ObjectiveAfterAssignEvent>(OnObjectiveAssigned);
         SubscribeLocalEvent<NinjaInfoConditionComponent, ObjectiveGetProgressEvent>(OnGetProgress);
     }
 
-    private void OnObjectiveAssigned(Entity<NinjaInfoConditionComponent> ent, ref ObjectiveAssignedEvent args)
+    private void OnObjectiveAssigned(Entity<NinjaInfoConditionComponent> ent, ref ObjectiveAfterAssignEvent args)
     {
         var comp = ent.Comp;
-        var onlineCount = _playerManager.PlayerCount;
-        comp.TargetCount = Math.Max(1, onlineCount / comp.PlayersPerTarget);
+        comp.TargetCount = Math.Max(1, _number.GetTarget(ent.Owner));
         var activeJobs = new List<(string JobId, JobPrototype Proto)>();
 
         var query = EntityQueryEnumerator<MindComponent>();
@@ -70,13 +68,12 @@ public sealed class NinjaInfoObjectiveSystem : EntitySystem
             ? Loc.GetString("ninja-info-job-unknown")
             : comp.TargetJobTitle;
 
-        var baseDescription = Loc.GetString("objective-condition-secret-info-description");
         var fullDescription = Loc.GetString("ninja-info-objective-description",
-            ("base", baseDescription),
             ("job", jobTitle),
             ("count", comp.TargetCount));
 
-        _metaData.SetEntityDescription(ent, fullDescription);
+        _metaData.SetEntityDescription(ent, fullDescription, args.Meta);
+        Dirty(ent.Owner, comp);
     }
 
     private void OnGetProgress(Entity<NinjaInfoConditionComponent> ent, ref ObjectiveGetProgressEvent args)
@@ -91,31 +88,39 @@ public sealed class NinjaInfoObjectiveSystem : EntitySystem
         args.Progress = Math.Clamp((float)comp.CorrectScans / comp.TargetCount, 0f, 1f);
     }
 
-    public bool TryScanEntity(EntityUid scannedBody)
+    public bool TryScanEntity(EntityUid scannedBody, EntityUid? actor)
     {
         if (!_mobState.IsAlive(scannedBody))
             return false;
 
-        var query = EntityQueryEnumerator<NinjaInfoConditionComponent>();
+        if (!_mind.TryGetMind(scannedBody, out var scannedMind, out _))
+            return false;
+
+        if (!_jobs.MindTryGetJob(scannedMind, out var jobProto))
+            return false;
+
+        if (actor is not { } actorUid || !_mind.TryGetMind(actorUid, out _, out var actorMind))
+            return false;
+
         var scannedAny = false;
 
-        while (query.MoveNext(out _, out var comp))
+        foreach (var objective in actorMind.Objectives)
         {
+            if (!TryComp<NinjaInfoConditionComponent>(objective, out var comp))
+                continue;
+
             if (comp.ScannedEntities.Contains(scannedBody))
                 continue;
 
-            if (!_mind.TryGetMind(scannedBody, out var mindId, out _))
+            if (jobProto.ID != comp.TargetJobId)
                 continue;
 
-            if (!_jobs.MindTryGetJob(mindId, out var jobProto))
-                continue;
-
-            if (jobProto.ID == comp.TargetJobId)
-            {
-                comp.ScannedEntities.Add(scannedBody);
+            comp.ScannedEntities.Add(scannedBody);
+            if (comp.CorrectScans < comp.TargetCount)
                 comp.CorrectScans++;
-                scannedAny = true;
-            }
+
+            Dirty(objective, comp);
+            scannedAny = true;
         }
 
         return scannedAny;

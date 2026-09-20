@@ -17,8 +17,11 @@ public sealed partial class NinjaInfoScannerComponent : Component
     [DataField, AutoNetworkedField]
     public float ScanTime = 10f;
 
-    [DataField, AutoNetworkedField]
-    public NinjaInfoScannerVisualState VisualState = NinjaInfoScannerVisualState.Open;
+    [DataField]
+    public TimeSpan? ScanEndTime;
+
+    [DataField]
+    public EntityUid? ScanSpeaker;
 
     [DataField]
     public string ScanReagent = "Nocturine";
@@ -32,4 +35,9 @@ public enum NinjaInfoScannerVisualState : byte
     Open,
     Closed,
     Scan
+}
+
+public enum NinjaInfoScannerVisuals : byte
+{
+    VisualState
 }

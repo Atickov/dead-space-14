@@ -44,9 +44,13 @@ public sealed class NinjaCloakSystem : SharedNinjaCloakSystem
             if (!cloak.Enabled)
                 continue;
 
+            var user = Transform(uid).ParentUid;
+            if (!user.IsValid())
+                continue;
+
             float cost = cloak.DrainRate * frameTime;
 
-            if (!_ninja.TryUseCharge(uid, cost))
+            if (!_ninja.TryUseCharge(user, cost))
             {
                 cloak.Enabled = false;
                 Dirty(uid, cloak);

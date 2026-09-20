@@ -134,3 +134,30 @@ ninja-action-refill = The suit has reprocessed materials. The charge for "{ $act
 
 ninja-inject-adrenal = The suit injects a reagent into you. Your heart starts beating faster.
 ninja-inject-healing-cocktail = The suit injects a reagent into you. Your wounds begin to close.
+
+# Ninja Scan
+
+ninja-info-job-unknown = Unknown
+objective-condition-ninja-scan-title = Mind Scan
+ninja-info-objective-description = Scan the station's required personnel using your mind scanner to gather intelligence.
+
+    Required job: {$job}
+    Employees to scan: {$count}
+
+ninja-info-phrase-scan-success = Scan complete. Information carrier found.
+ninja-info-phrase-scan-fail = Subject was already scanned or does not contain the required data.
+ninja-info-phrase-not-alive = The subject must be alive to extract information.
+ninja-info-phrase-scanner-selected = Scanner selected. Use the multitool on the console to link them.
+ninja-info-phrase-console-linked = Console successfully linked to the scanner.
+ninja-info-phrase-no-scanner-linked = Console is not linked to a scanner.
+ninja-info-phrase-no-target = There is no subject in the scanner to scan.
+ninja-info-phrase-scan-started = Scan started. Do not eject the subject until it completes.
+ninja-info-phrase-scan-busy = The scanner is already performing a scan.
+ninja-info-phrase-no-teleport-markers = No destination points found to move the subject.
+
+ninja-info-ui-title = Mind Scan Console
+ninja-info-ui-status-empty = Scanner chamber is empty
+ninja-info-ui-status-subject = Subject: {$name}
+ninja-info-ui-scan = Scan
+ninja-info-ui-eject = Eject
+ninja-info-ui-teleport = Teleport

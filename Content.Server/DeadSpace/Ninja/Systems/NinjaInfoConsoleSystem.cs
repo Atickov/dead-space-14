@@ -1,13 +1,11 @@
-using Content.Server.DeviceLinking.Systems;
+using Content.Server.Chat.Systems;
+using Content.Shared.Chat;
 using Content.Shared.DeadSpace.Ninja;
 using Content.Shared.DeadSpace.Ninja.Components;
 using Content.Shared.DeviceLinking;
 using Content.Shared.Interaction;
-using Content.Shared.Mobs.Systems;
-using Content.Shared.Popups;
 using Robust.Server.GameObjects;
 using Robust.Shared.Containers;
-using Robust.Shared.Random;
 
 namespace Content.Server.DeadSpace.Ninja.Systems;
 
@@ -15,10 +13,7 @@ public sealed class NinjaInfoConsoleSystem : EntitySystem
 {
     [Dependency] private readonly UserInterfaceSystem _ui = default!;
     [Dependency] private readonly SharedContainerSystem _container = default!;
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
-    [Dependency] private readonly TransformSystem _transform = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly DeviceLinkSystem _deviceLink = default!;
+    [Dependency] private readonly ChatSystem _chatSystem = default!;
     [Dependency] private readonly NinjaInfoScannerSystem _scannerSystem = default!;
 
     public override void Initialize()
@@ -29,35 +24,52 @@ public sealed class NinjaInfoConsoleSystem : EntitySystem
         SubscribeLocalEvent<NinjaInfoConsoleComponent, NinjaInfoScannerScanMessage>(OnScanMessage);
         SubscribeLocalEvent<NinjaInfoConsoleComponent, NinjaInfoScannerEjectMessage>(OnEjectMessage);
         SubscribeLocalEvent<NinjaInfoConsoleComponent, NinjaInfoScannerTeleportMessage>(OnTeleportMessage);
+        SubscribeLocalEvent<NinjaInfoConsoleComponent, EntInsertedIntoContainerMessage>(OnScannerContainerModified);
+        SubscribeLocalEvent<NinjaInfoConsoleComponent, EntRemovedFromContainerMessage>(OnScannerContainerModified);
     }
 
     private EntityUid? GetLinkedScanner(EntityUid console)
     {
-        if (TryComp<DeviceLinkSinkComponent>(console, out var sinkComp))
-        {
-            foreach (var source in sinkComp.LinkedSources)
-            {
-                if (HasComp<NinjaInfoScannerComponent>(source))
-                    return source;
-            }
-        }
+        if (!TryComp<DeviceLinkSinkComponent>(console, out var sinkComp))
+            return null;
 
-        if (TryComp<DeviceLinkSourceComponent>(console, out var sourceComp))
+        foreach (var source in sinkComp.LinkedSources)
         {
-            foreach (var sinks in sourceComp.Outputs.Values)
-            {
-                foreach (var sinkUid in sinks)
-                {
-                    if (HasComp<NinjaInfoScannerComponent>(sinkUid))
-                        return sinkUid;
-                }
-            }
+            if (Exists(source) && HasComp<NinjaInfoScannerComponent>(source))
+                return source;
         }
 
         return null;
     }
 
-    private void OnActivateInWorld(Entity<NinjaInfoConsoleComponent> ent, ref ActivateInWorldEvent args)
+    private void OnScannerContainerModified(
+        Entity<NinjaInfoConsoleComponent> ent,
+        ref EntInsertedIntoContainerMessage args)
+    {
+        OnScannerContainerModified(ent.Owner, args.Container);
+    }
+
+    private void OnScannerContainerModified(
+        Entity<NinjaInfoConsoleComponent> ent,
+        ref EntRemovedFromContainerMessage args)
+    {
+        OnScannerContainerModified(ent.Owner, args.Container);
+    }
+
+    private void OnScannerContainerModified(EntityUid console, BaseContainer container)
+    {
+        if (GetLinkedScanner(console) is not { } scanner ||
+            container.Owner != scanner)
+        {
+            return;
+        }
+
+        UpdateUserInterface(console);
+    }
+
+    private void OnActivateInWorld(
+        Entity<NinjaInfoConsoleComponent> ent,
+        ref ActivateInWorldEvent args)
     {
         if (args.Handled)
             return;
@@ -65,7 +77,7 @@ public sealed class NinjaInfoConsoleSystem : EntitySystem
         var scanner = GetLinkedScanner(ent.Owner);
         if (scanner == null)
         {
-            _popup.PopupEntity(Loc.GetString("ninja-info-popup-no-scanner-linked"), ent.Owner, args.User);
+            Say(ent.Owner, "ninja-info-phrase-no-scanner-linked");
             return;
         }
 
@@ -74,12 +86,24 @@ public sealed class NinjaInfoConsoleSystem : EntitySystem
         args.Handled = true;
     }
 
+    private void Say(EntityUid speaker, string phrase)
+    {
+        _chatSystem.TrySendInGameICMessage(
+            speaker,
+            Loc.GetString(phrase),
+            InGameICChatType.Speak,
+            ChatTransmitRange.Normal,
+            true
+        );
+    }
+
     public void UpdateUserInterface(EntityUid consoleUid)
     {
         NetEntity? contained = null;
 
         if (GetLinkedScanner(consoleUid) is { } scanner &&
-            _container.TryGetContainer(scanner, "entity_storage", out var container) &&
+            TryComp<NinjaInfoScannerComponent>(scanner, out var scannerComp) &&
+            _container.TryGetContainer(scanner, scannerComp.ContainerId, out var container) &&
             container.ContainedEntities.Count > 0)
         {
             contained = GetNetEntity(container.ContainedEntities[0]);
@@ -95,44 +119,26 @@ public sealed class NinjaInfoConsoleSystem : EntitySystem
         if (GetLinkedScanner(ent.Owner) is not { } scanner)
             return;
 
-        _scannerSystem.TryStartScan(scanner, args.Actor);
+        _scannerSystem.TryStartScan(scanner, ent.Owner);
     }
 
-    private void OnEjectMessage(Entity<NinjaInfoConsoleComponent> ent, ref NinjaInfoScannerEjectMessage args)
+    private void OnEjectMessage(
+        Entity<NinjaInfoConsoleComponent> ent,
+        ref NinjaInfoScannerEjectMessage args)
     {
-        if (GetLinkedScanner(ent.Owner) is not { } scanner ||
-            !_container.TryGetContainer(scanner, "entity_storage", out var container) ||
-            container.ContainedEntities.Count == 0)
+        if (GetLinkedScanner(ent.Owner) is not { } scanner)
             return;
 
-        var target = container.ContainedEntities[0];
-        _container.Remove(target, container);
-        UpdateUserInterface(ent.Owner);
+        _scannerSystem.TryEjectTarget(scanner, ent.Owner);
     }
 
-    private void OnTeleportMessage(Entity<NinjaInfoConsoleComponent> ent, ref NinjaInfoScannerTeleportMessage args)
+    private void OnTeleportMessage(
+        Entity<NinjaInfoConsoleComponent> ent,
+        ref NinjaInfoScannerTeleportMessage args)
     {
-        if (GetLinkedScanner(ent.Owner) is not { } scanner ||
-            !_container.TryGetContainer(scanner, "entity_storage", out var container) ||
-            container.ContainedEntities.Count == 0)
+        if (GetLinkedScanner(ent.Owner) is not { } scanner)
             return;
 
-        var target = container.ContainedEntities[0];
-        _container.Remove(target, container);
-
-        var markers = new List<EntityUid>();
-        var query = EntityQueryEnumerator<NinjaInfoTeleportMarkerComponent>();
-        while (query.MoveNext(out var markerUid, out _))
-        {
-            markers.Add(markerUid);
-        }
-
-        if (markers.Count > 0)
-        {
-            var randomMarker = _random.Pick(markers);
-            _transform.SetCoordinates(target, Transform(randomMarker).Coordinates);
-        }
-
-        UpdateUserInterface(ent.Owner);
+        _scannerSystem.TryTeleportTarget(scanner, ent.Owner);
     }
 }

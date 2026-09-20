@@ -199,8 +199,6 @@
         type: SpiderOSWindowBoundUserInterface
       enum.HealthAnalyzerUiKey.Key:
         type: HealthAnalyzerBoundUserInterface
-      enum.NinjaScannerUiKey.Key:
-        type: NinjaScannerBoundUserInterface
       enum.ShuttleConsoleUiKey.Key:
         type: ShuttleConsoleBoundUserInterface
   - type: SelfHealthAnalyzer
@@ -222,9 +220,6 @@
     heatRate: 5
     coolRate: 10
     effectsThreshold: 50 
-  - type: ChameleonClothing
-    slot: outerclothing
-    default: ClothingOuterSuitSpaceNinja
   - type: NinjaAppearance
   - type: NinjaAppearanceItem
   #DS14 end

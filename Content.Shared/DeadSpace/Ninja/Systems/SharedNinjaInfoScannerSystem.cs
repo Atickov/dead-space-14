@@ -1,6 +1,7 @@
 using Content.Shared.DeadSpace.Ninja.Components;
 using Content.Shared.DragDrop;
 using Content.Shared.Interaction;
+using Content.Shared.Mobs.Systems;
 using Robust.Shared.Containers;
 
 namespace Content.Shared.DeadSpace.Ninja;
@@ -9,6 +10,7 @@ public abstract class SharedNinjaInfoScannerSystem : EntitySystem
 {
     [Dependency] private readonly SharedContainerSystem _container = default!;
     [Dependency] private readonly SharedInteractionSystem _interaction = default!;
+    [Dependency] private readonly MobStateSystem _mobState = default!;
 
     public override void Initialize()
     {
@@ -26,6 +28,9 @@ public abstract class SharedNinjaInfoScannerSystem : EntitySystem
             return;
 
         if (ent.Comp.IsScanning)
+            return;
+
+        if (!_mobState.IsAlive(args.Dragged))
             return;
 
         if (!_interaction.InRangeUnobstructed(
@@ -62,6 +67,9 @@ public abstract class SharedNinjaInfoScannerSystem : EntitySystem
             return;
 
         if (ent.Comp.IsScanning)
+            return;
+
+        if (!_mobState.IsAlive(args.Dragged))
             return;
 
         if (!_interaction.InRangeUnobstructed(

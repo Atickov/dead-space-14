@@ -13,4 +13,3 @@ ninja-research-steal-success =
        *[other] новых технологий
     } из { $server }.
 ninja-criminal-records-hack-announcement = ОШИБКА: В криминальных записях обнаружена [ИЗМЕНЕНО] ошибка #*;"
-ninja-scanner-scan-success = Успешное сканирование
