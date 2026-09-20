@@ -638,3 +638,6 @@
     interfaces:
       enum.AgentIDCardUiKey.Key:
         type: AgentIDCardBoundUserInterface
+  - type: Access
+    tags:
+    - Ninja
