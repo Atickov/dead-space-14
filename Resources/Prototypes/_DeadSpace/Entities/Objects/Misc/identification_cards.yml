@@ -619,6 +619,8 @@
     layers:
     - state: Ninja_ID
   - type: Access
+    tags:
+    - Ninja
   - type: Item
     inhandVisuals:
       left:
@@ -638,6 +640,3 @@
     interfaces:
       enum.AgentIDCardUiKey.Key:
         type: AgentIDCardBoundUserInterface
-  - type: Access
-    tags:
-    - Ninja
