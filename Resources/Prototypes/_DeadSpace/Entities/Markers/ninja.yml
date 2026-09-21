@@ -8,3 +8,15 @@
     - state: red
     - sprite: Objects/Weapons/Melee/energykatana.rsi
       state: icon
+
+- type: entity
+  parent: MarkerBase
+  id: SpawnPointSpaceNinja
+  name: космический ниндзя
+  components:
+  - type: SpawnPoint
+  - type: Sprite
+    layers:
+    - state: green
+    - sprite: Objects/Weapons/Melee/energykatana.rsi
+      state: icon

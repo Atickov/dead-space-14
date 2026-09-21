@@ -59,6 +59,9 @@
     - NinjaScannerPort
   - type: ActivatableUI
     key: enum.NinjaInfoScannerUiKey.Key
+  - type: ActivatableUIRequiresAccess
+  - type: AccessReader
+    access: [["Ninja"]]
   - type: UserInterface
     interfaces:
       enum.NinjaInfoScannerUiKey.Key:

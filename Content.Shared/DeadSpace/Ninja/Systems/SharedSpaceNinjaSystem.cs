@@ -5,6 +5,7 @@ using Content.Shared.Popups;
 using System.Diagnostics.CodeAnalysis;
 using Content.Shared.Power.EntitySystems;
 using Content.Shared.PowerCell;
+using Robust.Shared.Random;
 
 namespace Content.Shared.DeadSpace.Ninja.Systems;
 
@@ -17,6 +18,7 @@ public abstract class SharedSpaceNinjaSystem : EntitySystem
     [Dependency] protected readonly SharedPopupSystem Popup = default!;
     [Dependency] protected readonly SharedBatterySystem Battery = default!;
     [Dependency] protected readonly PowerCellSystem PowerCell = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
 
     public EntityQuery<SpaceNinjaComponent> NinjaQuery;
 
@@ -29,6 +31,51 @@ public abstract class SharedSpaceNinjaSystem : EntitySystem
         SubscribeLocalEvent<SpaceNinjaComponent, AttackedEvent>(OnNinjaAttacked);
         SubscribeLocalEvent<SpaceNinjaComponent, MeleeAttackEvent>(OnNinjaAttack);
         SubscribeLocalEvent<SpaceNinjaComponent, ShotAttemptedEvent>(OnShotAttempted);
+    }
+
+    public override void Update(float frameTime)
+    {
+        var query = EntityQueryEnumerator<SpaceNinjaComponent>();
+        while (query.MoveNext(out var uid, out var ninja))
+        {
+            if (ninja.Suit is not { } suitUid)
+                continue;
+
+            if (!TryComp<NinjaSuitHeatComponent>(suitUid, out var heat))
+                continue;
+
+            if (TryComp<NinjaCloakComponent>(suitUid, out var cloak) && cloak.Enabled)
+            {
+                heat.Heat += heat.HeatRate * frameTime;
+
+                if (heat.Heat >= heat.EffectsThreshold && heat.MaxHeat > heat.EffectsThreshold)
+                {
+                    var chance = (heat.Heat - heat.EffectsThreshold) / (heat.MaxHeat - heat.EffectsThreshold);
+                    if (_random.Prob(chance * frameTime * 2f))
+                        Spawn(heat.EffectPrototype, Transform(uid).Coordinates);
+                }
+
+                if (heat.Heat >= heat.MaxHeat)
+                {
+                    heat.Heat = heat.MaxHeat;
+
+                    cloak.Enabled = false;
+                    Dirty(suitUid, cloak);
+
+                    Popup.PopupEntity(Loc.GetString("ninja-suit-overheated"), uid, uid, PopupType.MediumCaution);
+                }
+            }
+            else
+            {
+                heat.Heat = MathF.Max(0f, heat.Heat - heat.CoolRate * frameTime);
+            }
+
+            if (MathF.Abs(heat.Heat - heat.LastSentHeat) >= 1f)
+            {
+                heat.LastSentHeat = heat.Heat;
+                Dirty(suitUid, heat);
+            }
+        }
     }
 
     public bool IsNinja([NotNullWhen(true)] EntityUid? uid)

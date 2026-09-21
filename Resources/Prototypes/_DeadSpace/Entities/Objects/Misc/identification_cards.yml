@@ -607,13 +607,14 @@
 - type: entity
   parent: IDCardStandard
   id: NinjaIDCard
-  name: зеленая ID-карта
-  description: Зеленая ID-карта.... 
+  name: ID-карта с пауком
+  description: ID-карта с пауком.... 
   suffix: Ninja
   components:
   - type: AgentIDCard
-  - type: PresetIdCard
-    job: Passenger
+  - type: IdCard
+    jobTitle: job-name-passenger
+    jobIcon: JobIconPassenger
   - type: Sprite
     sprite: _DeadSpace/Objects/Misc/ninja_id.rsi
     layers:

@@ -1,4 +1,5 @@
 using Robust.Shared.GameStates;
+using Robust.Shared.Prototypes;
 
 namespace Content.Shared.DeadSpace.Ninja.Components;
 
@@ -19,6 +20,9 @@ public sealed partial class NinjaSuitHeatComponent : Component
 
     [DataField]
     public float EffectsThreshold = 50f;
+
+    [DataField]
+    public EntProtoId EffectPrototype = "EffectSparksBrokenEvent";
 
     /// <summary>
     /// Last heat value sent to clients, so the suit is not re-sent every tick. Server-side only.

@@ -3,7 +3,7 @@ using Content.Shared.Chat;
 using Content.Shared.DeadSpace.Ninja;
 using Content.Shared.DeadSpace.Ninja.Components;
 using Content.Shared.DeviceLinking;
-using Content.Shared.Interaction;
+using Content.Shared.UserInterface;
 using Robust.Server.GameObjects;
 using Robust.Shared.Containers;
 
@@ -20,7 +20,8 @@ public sealed class NinjaInfoConsoleSystem : EntitySystem
     {
         base.Initialize();
 
-        SubscribeLocalEvent<NinjaInfoConsoleComponent, ActivateInWorldEvent>(OnActivateInWorld);
+        SubscribeLocalEvent<NinjaInfoConsoleComponent, ActivatableUIOpenAttemptEvent>(OnUiOpenAttempt);
+        SubscribeLocalEvent<NinjaInfoConsoleComponent, AfterActivatableUIOpenEvent>(OnUiOpened);
         SubscribeLocalEvent<NinjaInfoConsoleComponent, NinjaInfoScannerScanMessage>(OnScanMessage);
         SubscribeLocalEvent<NinjaInfoConsoleComponent, NinjaInfoScannerEjectMessage>(OnEjectMessage);
         SubscribeLocalEvent<NinjaInfoConsoleComponent, NinjaInfoScannerTeleportMessage>(OnTeleportMessage);
@@ -67,23 +68,26 @@ public sealed class NinjaInfoConsoleSystem : EntitySystem
         UpdateUserInterface(console);
     }
 
-    private void OnActivateInWorld(
+    private void OnUiOpenAttempt(
         Entity<NinjaInfoConsoleComponent> ent,
-        ref ActivateInWorldEvent args)
+        ref ActivatableUIOpenAttemptEvent args)
     {
-        if (args.Handled)
+        if (args.Cancelled)
             return;
 
-        var scanner = GetLinkedScanner(ent.Owner);
-        if (scanner == null)
-        {
+        if (GetLinkedScanner(ent.Owner) != null)
+            return;
+
+        args.Cancel();
+        if (!args.Silent)
             Say(ent.Owner, "ninja-info-phrase-no-scanner-linked");
-            return;
-        }
+    }
 
-        _ui.OpenUi(ent.Owner, NinjaInfoScannerUiKey.Key, args.User);
+    private void OnUiOpened(
+        Entity<NinjaInfoConsoleComponent> ent,
+        ref AfterActivatableUIOpenEvent args)
+    {
         UpdateUserInterface(ent.Owner);
-        args.Handled = true;
     }
 
     private void Say(EntityUid speaker, string phrase)

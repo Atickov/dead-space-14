@@ -15,7 +15,6 @@ using Content.Shared.PowerCell;
 using Content.Shared.Popups;
 using Content.Shared.Rounding;
 using System.Diagnostics.CodeAnalysis;
-using Robust.Shared.Random;
 
 namespace Content.Server.DeadSpace.Ninja.Systems;
 
@@ -29,7 +28,6 @@ public sealed class SpaceNinjaSystem : SharedSpaceNinjaSystem
     [Dependency] private readonly CodeConditionSystem _codeCondition = default!;
     [Dependency] private readonly PowerCellSystem _powerCell = default!;
     [Dependency] private readonly SharedMindSystem _mind = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
 
     public override void Initialize()
     {
@@ -41,55 +39,14 @@ public sealed class SpaceNinjaSystem : SharedSpaceNinjaSystem
         SubscribeLocalEvent<SpaceNinjaComponent, CriminalRecordsHackedEvent>(OnCriminalRecordsHacked);
     }
 
-    // TODO: Make this charge rate based instead of updating it every single tick.
-    // Or make it client side, since power cells are predicted.
     public override void Update(float frameTime)
     {
+        base.Update(frameTime);
+
         var query = EntityQueryEnumerator<SpaceNinjaComponent>();
         while (query.MoveNext(out var uid, out var ninja))
         {
             SetSuitPowerAlert((uid, ninja));
-
-            if (ninja.Suit is not { } suitUid)
-                continue;
-
-            if (!TryComp<NinjaSuitHeatComponent>(suitUid, out var heat))
-                continue;
-
-            if (TryComp<NinjaCloakComponent>(suitUid, out var cloak) && cloak.Enabled)
-            {
-                heat.Heat += heat.HeatRate * frameTime;
-
-                if (heat.Heat >= heat.EffectsThreshold && heat.MaxHeat > heat.EffectsThreshold)
-                {
-                    var chance = (heat.Heat - heat.EffectsThreshold) / (heat.MaxHeat - heat.EffectsThreshold);
-                    if (_random.Prob(chance * frameTime * 2f))
-                        Spawn("EffectSparksBrokenEvent", Transform(uid).Coordinates);
-                }
-
-                if (heat.Heat >= heat.MaxHeat)
-                {
-                    heat.Heat = heat.MaxHeat;
-
-                    cloak.Enabled = false;
-                    Dirty(suitUid, cloak);
-
-                    Popup.PopupEntity(Loc.GetString("ninja-suit-overheated"), uid, uid, PopupType.MediumCaution);
-                }
-            }
-            else
-            {
-                heat.Heat = MathF.Max(0f, heat.Heat - heat.CoolRate * frameTime);
-            }
-
-            // The heat state has no client-side consumer, so propagating it every tick just
-            // re-sends the whole suit entity to every client that has the ninja in view.
-            // Only drift it out when it moves by a visible amount.
-            if (MathF.Abs(heat.Heat - heat.LastSentHeat) >= 1f)
-            {
-                heat.LastSentHeat = heat.Heat;
-                Dirty(suitUid, heat);
-            }
         }
     }
 
