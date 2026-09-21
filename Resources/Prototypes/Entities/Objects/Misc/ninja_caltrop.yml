@@ -45,7 +45,6 @@
   - type: TriggerOnCollide
     fixtureID: fix1
     maxTriggers: 1
-  - type: DeleteOnTrigger
   - type: TimedDespawn
     lifetime: 5
     

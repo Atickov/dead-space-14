@@ -216,10 +216,6 @@
     requiresGas: false
     toggleAction: NinjaActionToggleJetpack
   - type: NinjaSuitHeat
-    maxHeat: 400
-    heatRate: 5
-    coolRate: 10
-    effectsThreshold: 50 
   - type: NinjaAppearance
   - type: NinjaAppearanceItem
   #DS14 end

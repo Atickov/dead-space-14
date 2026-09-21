@@ -307,7 +307,7 @@
     effects:
     - !type:AddReagentToBloodstream
       reagent: Chiyurizine
-      quantity: 10
+      quantity: 20
     - !type:PopupMessage
       messages: [ ninja-inject-healing-cocktail ]
       visualType: Medium

@@ -36,6 +36,7 @@ public abstract class SharedSpaceNinjaSystem : EntitySystem
     public override void Update(float frameTime)
     {
         var query = EntityQueryEnumerator<SpaceNinjaComponent>();
+
         while (query.MoveNext(out var uid, out var ninja))
         {
             if (ninja.Suit is not { } suitUid)
@@ -44,15 +45,31 @@ public abstract class SharedSpaceNinjaSystem : EntitySystem
             if (!TryComp<NinjaSuitHeatComponent>(suitUid, out var heat))
                 continue;
 
+            var previousHeat = heat.Heat;
+
             if (TryComp<NinjaCloakComponent>(suitUid, out var cloak) && cloak.Enabled)
             {
                 heat.Heat += heat.HeatRate * frameTime;
 
-                if (heat.Heat >= heat.EffectsThreshold && heat.MaxHeat > heat.EffectsThreshold)
+                if (heat.Heat >= heat.EffectsThreshold && previousHeat < heat.EffectsThreshold)
+                {
+                    Popup.PopupEntity(Loc.GetString("ninja-suit-heat-warning"), uid, uid, PopupType.MediumCaution);
+                }
+
+                var dangerThreshold = heat.MaxHeat * 0.75f;
+
+                if (heat.Heat >= dangerThreshold &&
+                    previousHeat < dangerThreshold)
+                {
+                    Popup.PopupEntity(Loc.GetString("ninja-suit-heat-danger"), uid, uid, PopupType.MediumCaution);
+                }
+
+                if (heat.Heat >= heat.EffectsThreshold &&
+                    heat.MaxHeat > heat.EffectsThreshold)
                 {
                     var chance = (heat.Heat - heat.EffectsThreshold) / (heat.MaxHeat - heat.EffectsThreshold);
-                    if (_random.Prob(chance * frameTime * 2f))
-                        Spawn(heat.EffectPrototype, Transform(uid).Coordinates);
+
+                    if (_random.Prob(chance * frameTime * 0.1f)) Spawn(heat.EffectPrototype, Transform(uid).Coordinates);
                 }
 
                 if (heat.Heat >= heat.MaxHeat)
@@ -159,7 +176,7 @@ public abstract class SharedSpaceNinjaSystem : EntitySystem
 
     private void TryRevealNinja(Entity<SpaceNinjaComponent> ent)
     {
-        if (ent.Comp.Suit is {} uid && TryComp<NinjaSuitComponent>(ent.Comp.Suit, out var suit))
+        if (ent.Comp.Suit is { } uid && TryComp<NinjaSuitComponent>(ent.Comp.Suit, out var suit))
             Suit.RevealNinja((uid, suit), ent);
     }
 

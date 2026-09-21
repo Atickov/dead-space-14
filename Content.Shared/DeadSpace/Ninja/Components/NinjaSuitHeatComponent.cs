@@ -10,7 +10,7 @@ public sealed partial class NinjaSuitHeatComponent : Component
     public float Heat = 0f;
 
     [DataField]
-    public float MaxHeat = 100f;
+    public float MaxHeat = 400;
 
     [DataField]
     public float HeatRate = 5f;
@@ -19,14 +19,14 @@ public sealed partial class NinjaSuitHeatComponent : Component
     public float CoolRate = 10f;
 
     [DataField]
-    public float EffectsThreshold = 50f;
+    public float EffectsThreshold = 200f;
 
     [DataField]
-    public EntProtoId EffectPrototype = "EffectSparksBrokenEvent";
+    public float DangerThreshold = 300f;
 
-    /// <summary>
-    /// Last heat value sent to clients, so the suit is not re-sent every tick. Server-side only.
-    /// </summary>
+    [DataField]
+    public EntProtoId EffectPrototype = "EffectSparks";
+
     [ViewVariables]
     public float LastSentHeat = 0f;
 }

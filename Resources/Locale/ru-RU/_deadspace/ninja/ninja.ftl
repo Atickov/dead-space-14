@@ -22,7 +22,7 @@ spider-os-module-ghost-5-desc = Делает ваше тело более при
 spider-os-module-snake-1 = Дожхьё
 spider-os-module-snake-1-desc = Дает вам кунай с цепью, который позволяет притянуть жертву к себе. Притянутая жертва при этом оглушается на небольшое время. 
 spider-os-module-snake-2 = Исцеляющий коктейль
-spider-os-module-snake-2-desc = Имеет 3 заряда. Вводит вам в организм химикат "Чиюризин". Мощный, экспериментальный лечащий реагент.
+spider-os-module-snake-2-desc = Имеет 3 заряда. Вводит вам в организм химикат "Чьюризин". Мощный, экспериментальный лечащий реагент.
 spider-os-module-snake-3 = Экстренная телепортация
 spider-os-module-snake-3-desc = Переместит вас в случайное место неподалеку.
 spider-os-module-snake-4 = Электро-чеснок
@@ -122,6 +122,8 @@ auto-dust-toggle-dead = Auto-Dust в режиме распыления по см
 
 # Ninja cloak
 
+ninja-suit-heat-warning = Костюм начинает нагреваться.
+ninja-suit-heat-danger = Костюм сильно нагрет. Возможны сбои в ходе работы.
 ninja-suit-overheated = Костюм перегрелся. Фазовый покров отключен.
 
 # Ninja Johyo
