@@ -11,7 +11,32 @@ namespace Content.Shared.Kitchen
 
         public void Initialize()
         {
-            Recipes = new List<FoodRecipePrototype>();
+            //DS14-start
+            //Recipes = new List<FoodRecipePrototype>();
+            //foreach (var item in _prototypeManager.EnumeratePrototypes<FoodRecipePrototype>())
+            //{
+            //    if (!item.SecretRecipe)
+            //        Recipes.Add(item);
+            //}
+
+            //Recipes.Sort(new RecipeComparer());
+            //DS14-end
+            _prototypeManager.PrototypesReloaded += OnPrototypesReloaded;
+            ReloadRecipes();
+        }
+
+        //DS14-start
+        private void OnPrototypesReloaded(PrototypesReloadedEventArgs args)
+        {
+            if (args.WasModified<FoodRecipePrototype>())
+            {
+                ReloadRecipes();
+            }
+        }
+
+        public void ReloadRecipes()
+        {
+            Recipes.Clear();
             foreach (var item in _prototypeManager.EnumeratePrototypes<FoodRecipePrototype>())
             {
                 if (!item.SecretRecipe)
@@ -20,6 +45,8 @@ namespace Content.Shared.Kitchen
 
             Recipes.Sort(new RecipeComparer());
         }
+        //DS14-end
+
         /// <summary>
         /// Check if a prototype ids appears in any of the recipes that exist.
         /// </summary>
