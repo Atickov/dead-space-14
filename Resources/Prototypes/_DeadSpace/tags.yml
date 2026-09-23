@@ -95,9 +95,6 @@
   id: CloningPodMachineCircuitboard
 
 - type: Tag
-  id: CorruptTeleportItem
-
-- type: Tag
   id: CompactDefibrillator
 
 - type: Tag
@@ -288,6 +285,9 @@
 
 - type: Tag
   id: MagazineCarbineSKS
+
+- type: Tag
+  id: MagazineSmartWeaponShingen
 
 - type: Tag
   id: Magmite
@@ -514,5 +514,14 @@
 
 - type: Tag
   id: YellowFlower
+
+- type: Tag
+  id: GasGrenadeShell
+
+- type: Tag
+  id: GasGrenadeShellRed
+
+- type: Tag
+  id: GasGrenadeShellBlue
 
   # Обязательно в алфавитном порядке
