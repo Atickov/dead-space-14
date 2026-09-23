@@ -12,17 +12,9 @@ namespace Content.Shared.Kitchen
         public void Initialize()
         {
             //DS14-start
-            //Recipes = new List<FoodRecipePrototype>();
-            //foreach (var item in _prototypeManager.EnumeratePrototypes<FoodRecipePrototype>())
-            //{
-            //    if (!item.SecretRecipe)
-            //        Recipes.Add(item);
-            //}
-
-            //Recipes.Sort(new RecipeComparer());
-            //DS14-end
             _prototypeManager.PrototypesReloaded += OnPrototypesReloaded;
             ReloadRecipes();
+            //DS14-end
         }
 
         //DS14-start
