@@ -8085,3 +8085,14 @@ Entries:
   - type: Tweak
     message: отныне RecipeManager способен переваривать прототипы ивент-отдела (меня
       заставил @chronomantus)
+- id: 769
+  author: RIP6100
+  time: '2026-09-24T10:31:23.185116+00:00'
+  pr: 2383
+  changes:
+  - type: Tweak
+    message: На карте Chloris теперь имеется горячая атмосфера содержащая плазму.
+  - type: Fix
+    message: Баги на картах Avrit, Loop и Chloris
+  - type: Fix
+    message: Баг со слотом атмос-голопроектора
