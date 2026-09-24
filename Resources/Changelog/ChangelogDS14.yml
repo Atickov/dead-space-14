@@ -8096,3 +8096,11 @@ Entries:
     message: Баги на картах Avrit, Loop и Chloris
   - type: Fix
     message: Баг со слотом атмос-голопроектора
+- id: 770
+  author: RIP6100
+  time: '2026-09-24T11:45:02.421321+00:00'
+  pr: 2375
+  changes:
+  - type: Tweak
+    message: Карты Amber, Barratry, Fland и Origin были убраны на ремапп из списка
+      карт в голосовании.
