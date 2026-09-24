@@ -8104,3 +8104,10 @@ Entries:
   - type: Tweak
     message: Карты Amber, Barratry, Fland и Origin были убраны на ремапп из списка
       карт в голосовании.
+- id: 771
+  author: KillFroozy
+  time: '2026-09-24T13:24:45.466654+00:00'
+  pr: 2376
+  changes:
+  - type: Tweak
+    message: В пояс и РПС СБ теперь помещаются болы, телескопический щит и дубинка.
