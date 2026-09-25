@@ -8111,3 +8111,12 @@ Entries:
   changes:
   - type: Tweak
     message: В пояс и РПС СБ теперь помещаются болы, телескопический щит и дубинка.
+- id: 772
+  author: Manstari
+  time: '2026-09-25T04:31:28.117236+00:00'
+  pr: 2384
+  changes:
+  - type: Add
+    message: Редспейс мешок для клоуна Тайпана
+  - type: Add
+    message: Роль клоуна Тайпана
