@@ -161,3 +161,20 @@ ninja-info-ui-status-subject = Subject: {$name}
 ninja-info-ui-scan = Scan
 ninja-info-ui-eject = Eject
 ninja-info-ui-teleport = Teleport
+
+# Ninja disguise base
+
+ninja-disguise-ui-title = Disguise base
+ninja-disguise-ui-active = (active)
+ninja-disguise-ui-empty = The base is empty. Scan a target with the suit's new ability.
+ninja-disguise-ui-reset = Reset disguise
+ninja-disguise-ui-no-data = no data
+
+ninja-disguise-scan-fail-not-ninja = The suit's scanner can only be used by a ninja.
+ninja-disguise-scan-fail-not-humanoid = The target is not a humanoid and cannot be scanned.
+ninja-disguise-scan-fail-out-of-range = The target is too far away to be scanned.
+ninja-disguise-scan-fail-energy = The suit does not have enough power to scan.
+ninja-disguise-scan-success = The image of "{$name}" was saved to the disguise base.
+ninja-disguise-applied = Disguise applied: you now look like "{$name}".
+ninja-disguise-reset = Disguise reset.
+ninja-disguise-strip-attempt = Someone is trying to strip you!

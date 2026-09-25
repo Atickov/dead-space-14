@@ -108,15 +108,27 @@ public abstract class SharedNinjaSuitSystem : EntitySystem
         var uid = ent.Owner;
         var comp = ent.Comp;
 
-        if (!TryComp<NinjaCloakComponent>(uid, out var cloak) || !cloak.Enabled)
+        var revealed = false;
+
+        if (TryComp<NinjaCloakComponent>(uid, out var cloak) && cloak.Enabled)
+        {
+            cloak.Enabled = false;
+            Dirty(uid, cloak);
+            revealed = true;
+            if (TryComp<ActionComponent>(cloak.ActionEntity, out var cloakaction) && cloakaction.UseDelay != null)
+                _actions.SetCooldown(cloak.ActionEntity, cloakaction.UseDelay.Value);
+        }
+
+        if (TryComp<NinjaDisguiseComponent>(uid, out var disguise) && disguise.Disguised)
+        {
+            revealed = true;
+            var revealedEvent = new NinjaDisguiseRevealedEvent();
+            RaiseLocalEvent(uid, ref revealedEvent);
+        }
+
+        if (!revealed)
             return;
 
-        cloak.Enabled = false;
-        Dirty(uid, cloak);
-        if (TryComp<ActionComponent>(cloak.ActionEntity, out var cloakaction) && cloakaction.UseDelay != null)
-            _actions.SetCooldown(cloak.ActionEntity, cloakaction.UseDelay.Value);
-
-        // previously cloaked, disable abilities for a short time
         _audio.PlayPredicted(comp.RevealSound, uid, user);
         Popup.PopupClient(Loc.GetString("ninja-revealed"), user, user, PopupType.MediumCaution);
     }

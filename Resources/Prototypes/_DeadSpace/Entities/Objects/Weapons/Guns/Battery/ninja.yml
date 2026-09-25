@@ -127,7 +127,6 @@
     - state: net_emitter
   - type: Appearance
   - type: NinjaEnergyNetGun
-    
 
 - type: entity
   id: NinjaNet

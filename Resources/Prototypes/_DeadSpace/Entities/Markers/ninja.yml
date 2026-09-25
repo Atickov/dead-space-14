@@ -8,6 +8,7 @@
     - state: red
     - sprite: Objects/Weapons/Melee/energykatana.rsi
       state: icon
+  - type: NinjaInfoTeleportMarker
 
 - type: entity
   parent: MarkerBase

@@ -24,7 +24,7 @@ public sealed partial class NinjaEnergyNetGunComponent : Component
     public float Charge = 100f;
 
     [DataField]
-    public SoundSpecifier FireSound = new SoundPathSpecifier("/Audio/_DeadSpace/Wizard/Effect/lightning_start.ogg");
+    public SoundSpecifier FireSound = new SoundPathSpecifier("/Audio/_DeadSpace/Items/Handing/batton/stun_baton_pickup.ogg");
 
     [DataField]
     public SpriteSpecifier NetBeamSprite =

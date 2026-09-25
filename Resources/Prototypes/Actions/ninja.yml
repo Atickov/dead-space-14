@@ -189,7 +189,7 @@
 - type: entity
   parent: BaseAction
   id: ToggleNinjaAutoSmokeAction
-  name: автоматический режим дымовой завесы.
+  name: автоматический режим дымовой завесы
   description: Позволяет автоматически создавать дымовую завесу при использовании некоторых других способностей в ослабленном виде и за уменьшенную цену.
   components:
   - type: Action
@@ -368,4 +368,51 @@
   - type: Action
   - type: InstantAction
     event: !type:CycleNinjaVisorActionEvent
+
+- type: entity
+  parent: BaseAction
+  id: ActionNinjaDisguiseScan
+  name: сканирование
+  description: Сканирует выбранную гуманоидную цель, сохраняя её внешность и данные в базу маскировки костюма. Появляется место для максимум трёх целей.
+  components:
+  - type: Action
+    icon:
+      sprite: _DeadSpace/Actions/ninja_actions.rsi
+      state: scanner
+    itemIconStyle: BigAction
+    priority: -14
+  - type: TargetAction
+    range: 1.5
+  - type: EntityTargetAction
+    event: !type:NinjaDisguiseScanEvent
+
+- type: entity
+  parent: BaseAction
+  id: ActionNinjaDisguiseMenu
+  name: база маскировки
+  description: Открывает базу маскировки костюма. Применяет сохранённый образ или сбрасывает текущую маскировку.
+  components:
+  - type: Action
+    icon:
+      sprite: _DeadSpace/Actions/ninja_actions.rsi
+      state: scanner
+    itemIconStyle: BigAction
+    priority: -14
+  - type: InstantAction
+    event: !type:NinjaDisguiseMenuEvent
+
+- type: entity
+  id: NinjaDisguiseEffect
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Sprite
+    sprite: _DeadSpace/Actions/ninja_actions.rsi
+    state: smoke
+    noRot: true
+    drawdepth: Effects
+  - type: PointLight
+    color: "#33ff99"
+    radius: 2
+    energy: 2
+    netsync: false
 #DS-14 End

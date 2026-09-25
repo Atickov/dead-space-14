@@ -201,6 +201,8 @@
         type: HealthAnalyzerBoundUserInterface
       enum.ShuttleConsoleUiKey.Key:
         type: ShuttleConsoleBoundUserInterface
+      enum.NinjaDisguiseUiKey.Key:
+        type: NinjaDisguiseBoundUserInterface
   - type: SelfHealthAnalyzer
   - type: HealthAnalyzer
   - type: AutoDust

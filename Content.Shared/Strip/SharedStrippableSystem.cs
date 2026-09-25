@@ -4,6 +4,8 @@ using Content.Shared.CombatMode;
 using Content.Shared.Cuffs;
 using Content.Shared.Cuffs.Components;
 using Content.Shared.Database;
+using Content.Shared.DeadSpace.Ninja.Components; //DS-14
+using Content.Shared.DeadSpace.Ninja.Systems; //DS-14
 using Content.Shared.DoAfter;
 using Content.Shared.DragDrop;
 using Content.Shared.Ghost;
@@ -47,6 +49,7 @@ public abstract class SharedStrippableSystem : EntitySystem
     [Dependency] private readonly MobStateSystem _mobState = default!;
     [Dependency] private readonly SharedContainerSystem _container = default!;
     [Dependency] private readonly INetManager _netManager = default!;
+    [Dependency] private readonly SharedNinjaDisguiseSystem _ninjaDisguise = default!;
     // DS14-end
 
     public override void Initialize()
@@ -112,6 +115,14 @@ public abstract class SharedStrippableSystem : EntitySystem
             return;
         }
 
+        // DS14-start
+        if (IsStripTargetDisguised(strippable.Owner))
+        {
+            RaiseStripAttempt(strippable.Owner);
+            return;
+        }
+        // DS14-end
+
         if (!TryComp<InventoryComponent>(strippable, out var inventory))
             return;
 
@@ -169,6 +180,11 @@ public abstract class SharedStrippableSystem : EntitySystem
     {
         if (!Resolve(user, ref user.Comp))
             return false;
+
+        // DS14-start
+        if (IsStripTargetDisguised(target))
+            return false;
+        // DS14-end
 
         if (!_handsSystem.TryGetActiveItem(user, out var activeItem) || activeItem != held)
             return false;
@@ -276,6 +292,11 @@ public abstract class SharedStrippableSystem : EntitySystem
         EntityUid item,
         string slot)
     {
+        // DS14-start
+        if (IsStripTargetDisguised(target))
+            return false;
+        // DS14-end
+
         if (!_inventorySystem.TryGetSlotEntity(target, slot, out var slotItem))
         {
             _popupSystem.PopupCursor(Loc.GetString("strippable-component-item-slot-free-message", ("owner", Identity.Entity(target, EntityManager))));
@@ -860,6 +881,21 @@ public abstract class SharedStrippableSystem : EntitySystem
     private static bool IsActiveSession(ICommonSession session)
     {
         return session.Status is SessionStatus.Connected or SessionStatus.InGame;
+    }
+
+    // DS14-start
+    private bool IsStripTargetDisguised(EntityUid target)
+    {
+        return _ninjaDisguise.TryGetActiveDisguise(target, out _, out _);
+    }
+
+    private void RaiseStripAttempt(EntityUid wearer)
+    {
+        if (!_ninjaDisguise.TryGetActiveDisguise(wearer, out var suit, out _))
+            return;
+
+        var ev = new NinjaDisguiseStripAttemptEvent(wearer);
+        RaiseLocalEvent(suit, ref ev);
     }
     // DS14-end
 

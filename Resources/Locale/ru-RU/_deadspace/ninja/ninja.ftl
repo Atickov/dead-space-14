@@ -38,7 +38,7 @@ spider-os-module-steel-3 = ЭМИ-импульс
 spider-os-module-steel-3-desc = Достаточно большой по площади ЕМП заряд. Сами вы никак не пострадаете, но ЕМП может задеть разные устройства.
 spider-os-module-steel-4 = Энергосеть
 spider-os-module-steel-4-desc = Заковывает выбранную цель в энергетическую сеть. Она довольно прочная, но её все еще можно сломать любым подручным предметом.
-spider-os-module-steel-5 = Боевое искусство "Чёрной вдовы"
+spider-os-module-steel-5 = тут явно что-то крутое
 spider-os-module-steel-5-desc = увы и ах, не готово.
 
 # Ninja OS Personalization
@@ -140,12 +140,6 @@ ninja-action-refill = Костюм переработал материал. За
 ninja-inject-adrenal = Костюм впрыскивает в вас реагент. Сердце забилось быстрее.
 ninja-inject-healing-cocktail = Костюм впрыскивает в вас реагент. Ваши раны затягиваются.
 
-# Ninja Concentration
-
-alerts-concentration-name = Концентрация
-description: alerts-concentration-desc = ...
-ninja-inject-healing-cocktail = Костюм впрыскивает в вас реагент. Ваши раны затягиваются.
-
 # Ninja Scan
 
 ninja-info-job-unknown = Неизвестно
@@ -176,3 +170,20 @@ ninja-info-ui-teleport = Телепортировать
 # Ninja AI hack
 
 ninja-ai-hack-started = Внимание! Обнаружено несанкционированное вмешательство в систему загрузки!
+
+# Ninja disguise base
+
+ninja-disguise-ui-title = База маскировки
+ninja-disguise-ui-active = (активна)
+ninja-disguise-ui-empty = База пуста. Просканируйте цель новой способностью костюма.
+ninja-disguise-ui-reset = Сбросить маскировку
+ninja-disguise-ui-no-data = нет данных
+
+ninja-disguise-scan-fail-not-ninja = Сканер костюма активируется только ниндзя.
+ninja-disguise-scan-fail-not-humanoid = Целевой объект не гуманоид, сканирование невозможно.
+ninja-disguise-scan-fail-out-of-range = Цель слишком далеко для сканирования.
+ninja-disguise-scan-fail-energy = Недостаточно энергии в костюме для сканирования.
+ninja-disguise-scan-success = Образ «{$name}» сохранён в базу маскировки.
+ninja-disguise-applied = Маскировка применена: вы выглядите как «{$name}».
+ninja-disguise-reset = Маскировка сброшена.
+ninja-disguise-strip-attempt = Кто-то пытается обыскать вас!
