@@ -8139,3 +8139,10 @@ Entries:
       т.д)'
   - type: Fix
     message: Неадекватная цена на свиток карпа (100 ка)
+- id: 774
+  author: IvanKuvalda
+  time: '2026-09-25T09:59:59.538531+00:00'
+  pr: 2377
+  changes:
+  - type: Add
+    message: Для теста вернули обломки и планетку
