@@ -115,14 +115,14 @@ public sealed class NinjaInfoScannerSystem : SharedNinjaInfoScannerSystem
 
         if (comp.IsScanning)
         {
-            Say(speaker, "ninja-info-phrase-scan-busy");
+            Say(scanner, "ninja-info-phrase-scan-busy");
             return false;
         }
 
         if (!_container.TryGetContainer(scanner, comp.ContainerId, out var container) ||
             container.ContainedEntities.Count == 0)
         {
-            Say(speaker, "ninja-info-phrase-no-target");
+            Say(scanner, "ninja-info-phrase-no-target");
             return false;
         }
 
@@ -130,7 +130,7 @@ public sealed class NinjaInfoScannerSystem : SharedNinjaInfoScannerSystem
 
         if (!_mobState.IsAlive(target))
         {
-            Say(speaker, "ninja-info-phrase-not-alive");
+            Say(scanner, "ninja-info-phrase-not-alive");
             return false;
         }
 
@@ -146,7 +146,7 @@ public sealed class NinjaInfoScannerSystem : SharedNinjaInfoScannerSystem
 
         if (comp.IsScanning)
         {
-            Say(speaker, "ninja-info-phrase-scan-busy");
+            Say(scanner, "ninja-info-phrase-scan-busy");
             return false;
         }
 
@@ -168,7 +168,7 @@ public sealed class NinjaInfoScannerSystem : SharedNinjaInfoScannerSystem
 
         if (comp.IsScanning)
         {
-            Say(speaker, "ninja-info-phrase-scan-busy");
+            Say(scanner, "ninja-info-phrase-scan-busy");
             return false;
         }
 
@@ -191,7 +191,7 @@ public sealed class NinjaInfoScannerSystem : SharedNinjaInfoScannerSystem
         }
         else
         {
-            Say(speaker, "ninja-info-phrase-no-teleport-markers");
+            Say(scanner, "ninja-info-phrase-no-teleport-markers");
         }
 
         return true;
@@ -222,7 +222,7 @@ public sealed class NinjaInfoScannerSystem : SharedNinjaInfoScannerSystem
             _bloodstream.TryAddToBloodstream((target, bloodstream), solution);
         }
 
-        Say(speaker, "ninja-info-phrase-scan-started");
+        Say(ent.Owner, "ninja-info-phrase-scan-started");
     }
 
     private void FinishScan(Entity<NinjaInfoScannerComponent> ent)
@@ -247,7 +247,7 @@ public sealed class NinjaInfoScannerSystem : SharedNinjaInfoScannerSystem
         {
             var result = _objectiveSystem.TryScanEntity(targetUid, speaker);
 
-            Say(speaker, result switch
+            Say(ent.Owner, result switch
             {
                 NinjaInfoScanResult.Priority => "ninja-info-phrase-scan-priority",
                 NinjaInfoScanResult.Job => "ninja-info-phrase-scan-success",
@@ -274,13 +274,13 @@ public sealed class NinjaInfoScannerSystem : SharedNinjaInfoScannerSystem
         return _random.Pick(markers);
     }
 
-    private void Say(EntityUid? speaker, string phrase)
+    private void Say(EntityUid? machine, string phrase)
     {
-        if (speaker is not { } speakerUid || !Exists(speakerUid))
+        if (machine is not { } machineUid || !Exists(machineUid))
             return;
 
         _chatSystem.TrySendInGameICMessage(
-            speakerUid,
+            machineUid,
             Loc.GetString(phrase),
             InGameICChatType.Speak,
             ChatTransmitRange.Normal,
