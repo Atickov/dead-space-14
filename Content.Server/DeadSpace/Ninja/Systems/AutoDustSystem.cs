@@ -62,7 +62,7 @@ public sealed class AutoDustSystem : SharedAutoDustSystem
         if (!TryComp<AutoDustComponent>(component.AutoDustItem, out var dust))
             return;
 
-        if (args.NewMobState == MobState.Dead && dust.AutoDustMode == DustMode.Dead)
+        if (args.NewMobState == MobState.Dead && dust.AutoDustMode != DustMode.Off)
         {
             ActivateAutoDust(uid, component);
         }
