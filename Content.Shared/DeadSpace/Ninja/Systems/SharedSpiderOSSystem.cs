@@ -9,7 +9,7 @@ namespace Content.Shared.DeadSpace.Ninja.Systems;
 
 public abstract partial class SharedSpiderOSSystem : EntitySystem
 {
-    [Dependency] protected readonly SharedTransformSystem Transform = default!;
+    [Dependency] protected readonly SharedTransformSystem SharedTransform = default!;
     [Dependency] protected readonly SharedSpaceNinjaSystem Ninja = default!;
     [Dependency] protected readonly IPrototypeManager Proto = default!;
     [Dependency] protected readonly InventorySystem Inventory = default!;
@@ -105,7 +105,7 @@ public abstract partial class SharedSpiderOSSystem : EntitySystem
 
     protected bool IsAuthorized(EntityUid suitUid, EntityUid actor)
     {
-        if (!actor.IsValid() || actor != Transform.GetParentUid(suitUid))
+        if (!actor.IsValid() || actor != SharedTransform.GetParentUid(suitUid))
             return false;
 
         if (!Ninja.NinjaQuery.TryComp(actor, out var ninja))

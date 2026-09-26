@@ -112,7 +112,7 @@ public sealed class SpiderOSSystem : SharedSpiderOSSystem
         if (!IsAuthorized(suitUid, args.Actor))
             return;
 
-        var wearer = Transform.GetParentUid(suitUid);
+        var wearer = SharedTransform.GetParentUid(suitUid);
         if (!wearer.IsValid())
         {
             _popup.PopupEntity(Loc.GetString("spider-os-shuttle-control-fail-not-worn"), suitUid, args.Actor);
@@ -207,7 +207,7 @@ public sealed class SpiderOSSystem : SharedSpiderOSSystem
                 comp.ActivatedTiers.Add(tier);
             }
 
-            var wearer = Transform.GetParentUid(suitUid);
+            var wearer = SharedTransform.GetParentUid(suitUid);
             if (wearer.IsValid())
             {
                 SetAllLocked(wearer, suitUid, true);
@@ -226,7 +226,7 @@ public sealed class SpiderOSSystem : SharedSpiderOSSystem
 
             comp.SuitActivated = false;
 
-            var wearer = Transform.GetParentUid(suitUid);
+            var wearer = SharedTransform.GetParentUid(suitUid);
             if (wearer.IsValid())
             {
                 SetAllLocked(wearer, suitUid, false);
@@ -381,7 +381,7 @@ public sealed class SpiderOSSystem : SharedSpiderOSSystem
             return;
         }
 
-        var wearer = Transform.GetParentUid(suitUid);
+        var wearer = SharedTransform.GetParentUid(suitUid);
         if (!wearer.IsValid())
         {
             _ui.ServerSendUiMessage(suitUid, SpiderOSUiKey.Key,

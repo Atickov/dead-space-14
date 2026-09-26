@@ -187,7 +187,7 @@ public sealed class SpiderOSSystem : SharedSpiderOSSystem
 
         if (step.Check is { } check)
         {
-            var actor = Transform.GetParentUid(session.Suit);
+            var actor = SharedTransform.GetParentUid(session.Suit);
             if (!RunBootCheck(session.Suit, actor, check, out var failReason))
             {
                 session.OnLog?.Invoke(step.Log, null);

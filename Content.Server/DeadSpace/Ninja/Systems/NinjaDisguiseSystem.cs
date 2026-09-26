@@ -31,6 +31,8 @@ namespace Content.Server.DeadSpace.Ninja.Systems;
 
 public sealed class NinjaDisguiseSystem : SharedNinjaDisguiseSystem
 {
+    private static readonly ProtoId<JobIconPrototype> JobIconNoId = "JobIconNoId";
+
     [Dependency] private readonly SharedSpaceNinjaSystem _ninja = default!;
     [Dependency] private readonly SharedIdCardSystem _idCard = default!;
     [Dependency] private readonly InventorySystem _inventory = default!;
@@ -501,7 +503,7 @@ public sealed class NinjaDisguiseSystem : SharedNinjaDisguiseSystem
         {
             _idCard.TryChangeFullName(card.Owner, null, card.Comp);
             _idCard.TryChangeJobTitle(card.Owner, null, card.Comp);
-            _idCard.TryChangeJobIcon(card.Owner, _proto.Index<JobIconPrototype>("JobIconNoId"), card.Comp);
+            _idCard.TryChangeJobIcon(card.Owner, _proto.Index(JobIconNoId), card.Comp);
             _idCard.TryChangeJobDepartment(card.Owner, new List<ProtoId<DepartmentPrototype>>(), card.Comp);
         }
 
