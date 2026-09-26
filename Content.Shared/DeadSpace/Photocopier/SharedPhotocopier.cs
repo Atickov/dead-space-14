@@ -105,6 +105,8 @@ public enum PhotocopierFormCategory // Ideally, it should be its own FormCategor
     // about. Printing it from a regular photocopier would produce a paper with those tokens still
     // literally in the text.
     NTPersonnel,
+    // {{TARGET.*}}/{{AUTHOR.*}}/{{ARTICLES}}/{{SENTENCE}} placeholders.
+    NTCriminalRecords,
     // DS14-end
 }
 
