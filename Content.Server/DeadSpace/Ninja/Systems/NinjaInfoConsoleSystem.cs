@@ -123,7 +123,7 @@ public sealed class NinjaInfoConsoleSystem : EntitySystem
         if (GetLinkedScanner(ent.Owner) is not { } scanner)
             return;
 
-        _scannerSystem.TryStartScan(scanner, ent.Owner);
+        _scannerSystem.TryStartScan(scanner, args.Actor);
     }
 
     private void OnEjectMessage(
@@ -133,7 +133,7 @@ public sealed class NinjaInfoConsoleSystem : EntitySystem
         if (GetLinkedScanner(ent.Owner) is not { } scanner)
             return;
 
-        _scannerSystem.TryEjectTarget(scanner, ent.Owner);
+        _scannerSystem.TryEjectTarget(scanner, args.Actor);
     }
 
     private void OnTeleportMessage(
@@ -143,6 +143,6 @@ public sealed class NinjaInfoConsoleSystem : EntitySystem
         if (GetLinkedScanner(ent.Owner) is not { } scanner)
             return;
 
-        _scannerSystem.TryTeleportTarget(scanner, ent.Owner);
+        _scannerSystem.TryTeleportTarget(scanner, args.Actor);
     }
 }

@@ -39,7 +39,7 @@
       state: scanner
     components:
     - type: NinjaDisguise
-      #effect: NinjaDisguiseEffect
+      effect: NinjaDisguiseEffect
   - category: Ghost
     tier: 5
     name: spider-os-module-ghost-5

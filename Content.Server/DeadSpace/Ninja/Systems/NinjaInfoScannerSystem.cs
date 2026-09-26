@@ -245,11 +245,14 @@ public sealed class NinjaInfoScannerSystem : SharedNinjaInfoScannerSystem
             container.ContainedEntities.Contains(targetUid) &&
             _mobState.IsAlive(targetUid))
         {
-            var success = _objectiveSystem.TryScanEntity(targetUid, speaker);
+            var result = _objectiveSystem.TryScanEntity(targetUid, speaker);
 
-            Say(speaker, success
-                ? "ninja-info-phrase-scan-success"
-                : "ninja-info-phrase-scan-fail");
+            Say(speaker, result switch
+            {
+                NinjaInfoScanResult.Priority => "ninja-info-phrase-scan-priority",
+                NinjaInfoScanResult.Job => "ninja-info-phrase-scan-success",
+                _ => "ninja-info-phrase-scan-fail",
+            });
         }
 
         UpdateVisualState(ent);

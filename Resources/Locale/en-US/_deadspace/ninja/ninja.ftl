@@ -19,7 +19,7 @@ spider-os-module-ghost-5 = Spirit Form
 spider-os-module-ghost-5-desc = Makes your body more spectral, allowing you to walk through walls. It would be unfortunate to run out of power inside a sealed room, wouldn't it?
 spider-os-module-snake-1 = Kunai
 spider-os-module-snake-1-desc = Gives you a chain kunai with which you can pull your victim to you. A pulled victim is stunned for a brief moment.
-spider-os-module-snake-2 = Chem Injector
+spider-os-module-snake-2 = Healing Cocktail
 spider-os-module-snake-2-desc = Has 3 charges. Injects the chemical "Chiyurizin" into your body. A powerful, experimental healing reagent.
 spider-os-module-snake-3 = Emergency Blink
 spider-os-module-snake-3-desc = Teleports you to a random spot nearby.
@@ -119,6 +119,8 @@ auto-dust-toggle-dead = Auto-Dust is set to disperse on death
 
 # Ninja cloak
 
+ninja-suit-heat-warning = The suit is starting to heat up.
+ninja-suit-heat-danger = The suit is running very hot. Malfunctions may occur while you operate.
 ninja-suit-overheated = The suit overheated. The phase cloak has been disabled.
 
 # Ninja Johyo
@@ -139,12 +141,13 @@ ninja-inject-healing-cocktail = The suit injects a reagent into you. Your wounds
 
 ninja-info-job-unknown = Unknown
 objective-condition-ninja-scan-title = Mind Scan
-ninja-info-objective-description = Scan the station's required personnel using your mind scanner to gather intelligence.
+ninja-info-objective-description = All personnel with the listed jobs hold only a fraction of the information the Clan needs. Find the one who knows it all, or scan the required number of staff.
 
-    Required job: {$job}
-    Employees to scan: {$count}
+    Jobs: {$jobs}
+    Must be scanned: {$count}
 
-ninja-info-phrase-scan-success = Scan complete. Information carrier found.
+ninja-info-phrase-scan-success = Scan complete. Data extracted and filed.
+ninja-info-phrase-scan-priority = Scan complete. Full data carrier found. Objective complete.
 ninja-info-phrase-scan-fail = Subject was already scanned or does not contain the required data.
 ninja-info-phrase-not-alive = The subject must be alive to extract information.
 ninja-info-phrase-scanner-selected = Scanner selected. Use the multitool on the console to link them.
@@ -161,6 +164,10 @@ ninja-info-ui-status-subject = Subject: {$name}
 ninja-info-ui-scan = Scan
 ninja-info-ui-eject = Eject
 ninja-info-ui-teleport = Teleport
+
+# Ninja AI hack
+
+ninja-ai-hack-started = Warning! Unauthorized interference with the loading system detected!
 
 # Ninja disguise base
 

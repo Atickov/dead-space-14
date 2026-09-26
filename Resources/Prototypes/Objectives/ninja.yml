@@ -186,9 +186,5 @@
     icon:
       sprite: _DeadSpace/Objects/Devices/pinpointer.rsi
       state: pinpointer-black
-  - type: NumberObjective
-    min: 3
-    max: 5
-    title: objective-condition-ninja-scan-title
   - type: NinjaInfoCondition
 # DS14-end
