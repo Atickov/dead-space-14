@@ -324,6 +324,9 @@
     - objective: MassArrestObjective
       components:
       - type: CriminalRecordsHacker
+    - objective: NinjaAiHackObjective
+      components:
+      - type: NinjaAiHack
 
 - type: entity
   parent: [ ClothingHandsGlovesColorBlack, BaseSecurityEngineeringContraband ]

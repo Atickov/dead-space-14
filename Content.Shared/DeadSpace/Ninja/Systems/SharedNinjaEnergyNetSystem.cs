@@ -1,3 +1,5 @@
+// Мёртвый Космос, Licensed under custom terms with restrictions on public hosting and commercial use, full text: https://raw.githubusercontent.com/dead-space-server/space-station-14-fobos/master/LICENSE.TXT
+
 using Content.Shared.DeadSpace.Ninja.Components;
 using Content.Shared.Interaction;
 using Content.Shared.Mobs.Components;
@@ -17,7 +19,6 @@ public sealed class SharedNinjaEnergyNetSystem : EntitySystem
     [Dependency] private readonly MobStateSystem _mobState = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedSpaceNinjaSystem _ninja = default!;
-    [Dependency] private readonly SharedNinjaSuitSystem _suit = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly INetManager _net = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
@@ -66,8 +67,7 @@ public sealed class SharedNinjaEnergyNetSystem : EntitySystem
 
         args.Handled = true;
 
-        if (TryComp<SpaceNinjaComponent>(args.User, out var spaceNinja) && spaceNinja.Suit != null)
-            _suit.RevealNinja(spaceNinja.Suit.Value, args.User);
+        _ninja.RevealNinja(args.User);
 
         component.RechargeTime = _timing.CurTime + component.Cooldown;
         Dirty(uid, component);

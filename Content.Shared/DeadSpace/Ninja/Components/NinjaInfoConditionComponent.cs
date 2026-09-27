@@ -1,10 +1,9 @@
 using Content.Shared.Roles;
-using Robust.Shared.GameStates;
 using Robust.Shared.Prototypes;
 
 namespace Content.Shared.DeadSpace.Ninja.Components;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent]
 public sealed partial class NinjaInfoConditionComponent : Component
 {
     [DataField] public List<ProtoId<JobPrototype>> TargetJobs = new();

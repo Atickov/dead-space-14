@@ -1,3 +1,5 @@
+// Мёртвый Космос, Licensed under custom terms with restrictions on public hosting and commercial use, full text: https://raw.githubusercontent.com/dead-space-server/space-station-14-fobos/master/LICENSE.TXT
+
 using Content.Shared.Clothing.Components;
 using Content.Shared.DeadSpace.Ninja.Components;
 using Content.Shared.DeadSpace.Ninja.Systems;
@@ -9,12 +11,6 @@ using Robust.Shared.GameObjects;
 
 namespace Content.Server.DeadSpace.Ninja.Systems;
 
-/// <summary>
-/// Server half of the ninja gear appearance toggles. Applies the action handlers from
-/// <see cref="SharedNinjaAppearanceSystem"/>; the visual repaint happens on the client.
-/// Also freezes the colorway onto items the moment they leave a suit's inventory, so a
-/// dropped/handed-off ninja item keeps its color for the rest of the round.
-/// </summary>
 public sealed partial class NinjaAppearanceSystem : SharedNinjaAppearanceSystem
 {
     [Dependency] private readonly InventorySystem _inventory = default!;
@@ -76,9 +72,6 @@ public sealed partial class NinjaAppearanceSystem : SharedNinjaAppearanceSystem
         RemComp<HideLayerClothingComponent>(helmet);
     }
 
-    /// <summary>
-    /// Re-adds the helmet's <see cref="HideLayerClothingComponent"/> and re-hides the saved layers.
-    /// </summary>
     private void RestoreHideLayerClothing(EntityUid wearer, EntityUid helmet,
         NinjaAppearanceItemComponent comp, HashSet<HumanoidVisualLayers> hideable)
     {

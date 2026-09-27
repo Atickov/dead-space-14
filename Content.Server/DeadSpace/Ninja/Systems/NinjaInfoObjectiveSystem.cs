@@ -1,3 +1,5 @@
+// Мёртвый Космос, Licensed under custom terms with restrictions on public hosting and commercial use, full text: https://raw.githubusercontent.com/dead-space-server/space-station-14-fobos/master/LICENSE.TXT
+
 using System.Linq;
 using Content.Shared.DeadSpace.Ninja.Components;
 using Content.Shared.Mind;
@@ -89,8 +91,6 @@ public sealed class NinjaInfoObjectiveSystem : EntitySystem
             "ninja-info-objective-description",
             ("jobs", string.Join(", ", jobNames)),
             ("count", comp.TargetCount)));
-
-        Dirty(ent, comp);
     }
 
     private static int GetTargetCount(int playerCount)
@@ -146,8 +146,6 @@ public sealed class NinjaInfoObjectiveSystem : EntitySystem
 
             comp.ScannedEntities.Add(scannedBody);
             comp.CorrectScans = isPriority ? comp.TargetCount : Math.Min(comp.CorrectScans + 1, comp.TargetCount);
-
-            Dirty(objective, comp);
 
             if (isPriority)
                 result = NinjaInfoScanResult.Priority;

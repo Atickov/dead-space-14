@@ -167,8 +167,6 @@
 - type: entity
   parent: [BaseNinjaObjective, BaseCodeObjective]
   id: NinjaAiHackObjective
-  name: Взлом Станционного ИИ
-  description: Необходимо вывести из строя Станционный Искуственный Интеллект путем взлома его с помощью своих перчаток. Будьте аккуратны, безопасность ИИ может быть лучше, чем вы ожидали.
   components:
   - type: Objective
     icon:

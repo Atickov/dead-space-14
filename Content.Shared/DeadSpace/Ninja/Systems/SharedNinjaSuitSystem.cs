@@ -5,6 +5,7 @@ using Content.Shared.Inventory.Events;
 using Content.Shared.DeadSpace.Ninja.Components;
 using Content.Shared.Popups;
 using Robust.Shared.Audio.Systems;
+using Robust.Shared.Network;
 using Content.Shared.Actions.Components;
 
 namespace Content.Shared.DeadSpace.Ninja.Systems;
@@ -19,6 +20,7 @@ public abstract class SharedNinjaSuitSystem : EntitySystem
     [Dependency] protected readonly SharedPopupSystem Popup = default!;
     [Dependency] private readonly SharedSpaceNinjaSystem _ninja = default!;
     [Dependency] private readonly SharedActionsSystem _actions = default!;
+    [Dependency] private readonly INetManager _net = default!;
 
     public override void Initialize()
     {
@@ -102,6 +104,9 @@ public abstract class SharedNinjaSuitSystem : EntitySystem
     /// </summary>
     public void RevealNinja(Entity<NinjaSuitComponent?> ent, EntityUid user)
     {
+        if (!_net.IsServer)
+            return;
+
         if (!Resolve(ent, ref ent.Comp))
             return;
 
@@ -129,8 +134,8 @@ public abstract class SharedNinjaSuitSystem : EntitySystem
         if (!revealed)
             return;
 
-        _audio.PlayPredicted(comp.RevealSound, uid, user);
-        Popup.PopupClient(Loc.GetString("ninja-revealed"), user, user, PopupType.MediumCaution);
+        _audio.PlayPvs(comp.RevealSound, uid);
+        Popup.PopupEntity(Loc.GetString("ninja-revealed"), user, user, PopupType.MediumCaution);
     }
 
     /// <summary>

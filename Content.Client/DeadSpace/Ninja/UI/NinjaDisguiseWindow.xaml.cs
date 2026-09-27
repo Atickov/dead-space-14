@@ -1,6 +1,5 @@
 // Мёртвый Космос, Licensed under custom terms with restrictions on public hosting and commercial use, full text: https://raw.githubusercontent.com/dead-space-server/space-station-14-fobos/master/LICENSE.TXT
 
-using System.IO;
 using System.Linq;
 using System.Numerics;
 using Content.Client.Clothing;
@@ -19,9 +18,6 @@ using Content.Client.UserInterface.Controls;
 using Robust.Client.UserInterface.XAML;
 using Robust.Shared.Map;
 using Robust.Shared.Prototypes;
-using Robust.Shared.Serialization.Manager;
-using Robust.Shared.Serialization.Markdown;
-using Robust.Shared.Serialization.Markdown.Mapping;
 using Content.Client.DeadSpace.Stylesheets;
 
 namespace Content.Client.DeadSpace.Ninja.UI;
@@ -33,7 +29,6 @@ public sealed partial class NinjaDisguiseWindow : FancyWindow
     [Dependency] private readonly IPrototypeManager _proto = default!;
 
     private readonly SpriteSystem _spriteSystem;
-    private readonly ISerializationManager _ser;
     private readonly HumanoidAppearanceSystem _humanoid;
     private readonly ClientClothingSystem _clothingSystem;
     private readonly InventorySystem _inventorySystem;
@@ -52,7 +47,6 @@ public sealed partial class NinjaDisguiseWindow : FancyWindow
         HeaderClass = DeadSpaceStyleClass.SpiderOSWindowHeader;
 
         _spriteSystem = _entManager.System<SpriteSystem>();
-        _ser = IoCManager.Resolve<ISerializationManager>();
         _humanoid = _entManager.System<HumanoidAppearanceSystem>();
         _clothingSystem = _entManager.System<ClientClothingSystem>();
         _inventorySystem = _entManager.System<InventorySystem>();
@@ -151,32 +145,25 @@ public sealed partial class NinjaDisguiseWindow : FancyWindow
     {
         try
         {
-            if (entry.HumanoidAppearanceData is not { } humanoidYaml ||
-                ReadHumanoid(humanoidYaml) is not { } humanoid ||
-                !_proto.TryIndex<SpeciesPrototype>(humanoid.Species, out var species))
+            if (entry.Appearance is not { } appearance ||
+                !_proto.TryIndex<SpeciesPrototype>(appearance.Species, out var species))
             {
                 return null;
             }
 
             var uid = _entManager.SpawnEntity(species.DollPrototype, MapCoordinates.Nullspace);
-            if (!_entManager.TryGetComponent<HumanoidAppearanceComponent>(uid, out var existing) ||
+            if (!_entManager.TryGetComponent<HumanoidAppearanceComponent>(uid, out var humanoid) ||
                 !_entManager.TryGetComponent<SpriteComponent>(uid, out _))
             {
                 _entManager.DeleteEntity(uid);
                 return null;
             }
 
-            object? target = existing;
-            _ser.CopyTo((object)humanoid, ref target, notNullableOverride: true);
-            if (target is not HumanoidAppearanceComponent copied)
-            {
-                _entManager.DeleteEntity(uid);
-                return null;
-            }
+            appearance.ApplyTo(humanoid);
 
-            _inventorySystem.SetInventorySpecies(uid, entry.InventorySpeciesId ?? humanoid.Species.Id);
+            _inventorySystem.SetInventorySpecies(uid, entry.InventorySpeciesId ?? appearance.Species.Id);
 
-            _humanoid.RefreshAppearance(uid, copied);
+            _humanoid.RefreshAppearance(uid, humanoid);
 
             foreach (var inventoryEntry in entry.Inventory)
             {
@@ -205,15 +192,6 @@ public sealed partial class NinjaDisguiseWindow : FancyWindow
             Log.Error($"Failed to build ninja disguise preview: {e}");
             return null;
         }
-    }
-
-    private HumanoidAppearanceComponent? ReadHumanoid(string yaml)
-    {
-        var document = DataNodeParser.ParseYamlStream(new StringReader(yaml)).First();
-        if (document.Root is not MappingDataNode mapping)
-            return null;
-
-        return _ser.Read(typeof(HumanoidAppearanceComponent), mapping) as HumanoidAppearanceComponent;
     }
 
     private void CleanupPreviews()

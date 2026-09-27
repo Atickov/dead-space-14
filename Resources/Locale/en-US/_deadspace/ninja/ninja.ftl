@@ -166,8 +166,15 @@ ninja-info-ui-eject = Eject
 ninja-info-ui-teleport = Teleport
 
 # Ninja AI hack
+chat-manager-ninja-ai-wrap-message = [font size=28]{$message}[/font]
+ninja-ai-hack-started = Attention! Unauthorized interference with the upload system detected!
+ninja-ai-hack-announcement = Attention! The laws subsystem has been overwritten! Laws deleted... @%!$#!... recovery attempt aborted... #@&*!... laws updated!
+ninja-ai-hack-no-ai = The station AI core is currently offline.
+ninja-ai-hack-crew-announcement = Attention all crew! Unauthorized interference with the laws subsystem detected! @%!%#$... Laws corrupted... @#&*!...
+ninja-ai-hack-crew-announcement-sender = Station Artificial Intelligence
 
-ninja-ai-hack-started = Warning! Unauthorized interference with the loading system detected!
+objective-condition-ninja-ai-hack-title = Hack Station AI
+objective-condition-ninja-ai-hack-description = Disable the Station Artificial Intelligence by hacking it with your gloves. Use the AI ​​upload console. Be careful; the AI's security might be better than you expected.
 
 # Ninja disguise base
 

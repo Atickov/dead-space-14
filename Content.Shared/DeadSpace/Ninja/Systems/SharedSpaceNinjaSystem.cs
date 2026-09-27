@@ -53,7 +53,7 @@ public abstract class SharedSpaceNinjaSystem : EntitySystem
 
                 if (heat.Heat >= heat.EffectsThreshold && previousHeat < heat.EffectsThreshold)
                 {
-                    Popup.PopupEntity(Loc.GetString("ninja-suit-heat-warning"), uid, uid, PopupType.MediumCaution);
+                    Popup.PopupPredicted(Loc.GetString("ninja-suit-heat-warning"), uid, uid, PopupType.MediumCaution);
                 }
 
                 var dangerThreshold = heat.MaxHeat * 0.75f;
@@ -61,7 +61,7 @@ public abstract class SharedSpaceNinjaSystem : EntitySystem
                 if (heat.Heat >= dangerThreshold &&
                     previousHeat < dangerThreshold)
                 {
-                    Popup.PopupEntity(Loc.GetString("ninja-suit-heat-danger"), uid, uid, PopupType.MediumCaution);
+                    Popup.PopupPredicted(Loc.GetString("ninja-suit-heat-danger"), uid, uid, PopupType.MediumCaution);
                 }
 
                 if (heat.Heat >= heat.EffectsThreshold &&
@@ -79,7 +79,7 @@ public abstract class SharedSpaceNinjaSystem : EntitySystem
                     cloak.Enabled = false;
                     Dirty(suitUid, cloak);
 
-                    Popup.PopupEntity(Loc.GetString("ninja-suit-overheated"), uid, uid, PopupType.MediumCaution);
+                    Popup.PopupPredicted(Loc.GetString("ninja-suit-overheated"), uid, uid, PopupType.MediumCaution);
                 }
             }
             else
@@ -162,7 +162,7 @@ public abstract class SharedSpaceNinjaSystem : EntitySystem
     /// </summary>
     private void OnNinjaAttacked(Entity<SpaceNinjaComponent> ent, ref AttackedEvent args)
     {
-        TryRevealNinja(ent);
+        RevealNinja(ent);
     }
 
     /// <summary>
@@ -171,13 +171,19 @@ public abstract class SharedSpaceNinjaSystem : EntitySystem
     /// </summary>
     private void OnNinjaAttack(Entity<SpaceNinjaComponent> ent, ref MeleeAttackEvent args)
     {
-        TryRevealNinja(ent);
+        RevealNinja(ent);
     }
 
-    private void TryRevealNinja(Entity<SpaceNinjaComponent> ent)
+    public bool RevealNinja(EntityUid user)
     {
-        if (ent.Comp.Suit is { } uid && TryComp<NinjaSuitComponent>(ent.Comp.Suit, out var suit))
-            Suit.RevealNinja((uid, suit), ent);
+        if (!NinjaQuery.TryComp(user, out var ninja) || ninja.Suit is not { } suitUid)
+            return false;
+
+        if (!TryComp<NinjaSuitComponent>(suitUid, out var suit))
+            return false;
+
+        Suit.RevealNinja((suitUid, suit), user);
+        return true;
     }
 
     /// <summary>

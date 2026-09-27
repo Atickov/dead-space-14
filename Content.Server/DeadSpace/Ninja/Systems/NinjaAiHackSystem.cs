@@ -1,23 +1,37 @@
-using Content.Server.DeadSpace.Ninja.Systems;
-using Content.Shared.DeadSpace.Ninja.Components;
-using Content.Shared.DeadSpace.Ninja;
-using Content.Shared.DoAfter;
-using Content.Shared.Interaction;
-using Content.Shared.Silicons.Laws;
-using Content.Shared.Silicons.Laws.Components;
-using Content.Server.Silicons.Laws;
-using Content.Server.Chat.Managers;
-using Robust.Shared.Player;
+// Мёртвый Космос, Licensed under custom terms with restrictions on public hosting and commercial use, full text: https://raw.githubusercontent.com/dead-space-server/space-station-14-fobos/master/LICENSE.TXT
 
-namespace Content.Server.Ninja.Systems;
+using Content.Server.Chat.Managers;
+using Content.Server.Chat.Systems;
+using Content.Server.Silicons.Laws;
+using Content.Shared.DeadSpace.Ninja;
+using Content.Shared.DeadSpace.Ninja.Components;
+using Content.Server.Station.Systems;
+using Content.Shared.DoAfter;
+using Content.Shared.Emag.Systems;
+using Content.Shared.Interaction;
+using Content.Shared.Popups;
+using Content.Shared.Silicons.Laws.Components;
+using Content.Shared.Tag;
+using Robust.Shared.Player;
+using Robust.Shared.Prototypes;
+using Content.Shared.Chat;
+
+namespace Content.Server.DeadSpace.Ninja.Systems;
 
 public sealed class NinjaAiHackSystem : EntitySystem
 {
+    private static readonly ProtoId<TagPrototype> StationAiTag = "StationAi";
+
     [Dependency] private readonly NinjaGlovesSystem _gloves = default!;
     [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
     [Dependency] private readonly SiliconLawSystem _lawSystem = default!;
     [Dependency] private readonly IonStormSystem _ionStorm = default!;
     [Dependency] private readonly IChatManager _chatManager = default!;
+    [Dependency] private readonly ChatSystem _chat = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly EmagSystem _emag = default!;
+    [Dependency] private readonly TagSystem _tags = default!;
+    [Dependency] private readonly StationSystem _station = default!;
 
     public override void Initialize()
     {
@@ -32,21 +46,21 @@ public sealed class NinjaAiHackSystem : EntitySystem
         if (args.Handled || !HasComp<SiliconLawUpdaterComponent>(args.Target))
             return;
 
-        if (!_gloves.AbilityCheck(uid, args, out var target))
+        if (!_gloves.AbilityCheck(uid, args, out _))
             return;
 
-        if (TryComp<ActorComponent>(target, out var actor))
+        if (NotifyStationAiPlayers(comp.StartedMessage) == 0)
         {
-            var hackAnnouncement = Loc.GetString("ninja-ai-hack-started");
-            _chatManager.DispatchServerMessage(actor.PlayerSession, hackAnnouncement);
+            _popup.PopupEntity(Loc.GetString(comp.NoAiMessage), uid, uid);
+            return;
         }
 
-        var doAfterArgs = new DoAfterArgs(EntityManager, uid, comp.Delay, new NinjaAiHackDoAfterEvent(), target: target, used: uid, eventTarget: uid)
+        var doAfterArgs = new DoAfterArgs(EntityManager, uid, comp.Delay, new NinjaAiHackDoAfterEvent(), target: args.Target, used: uid, eventTarget: uid)
         {
             BreakOnDamage = true,
             BreakOnMove = true,
             MovementThreshold = 0.5f,
-            CancelDuplicate = false
+            CancelDuplicate = true
         };
 
         if (_doAfter.TryStartDoAfter(doAfterArgs))
@@ -59,33 +73,68 @@ public sealed class NinjaAiHackSystem : EntitySystem
             return;
         args.Handled = true;
 
-        var hackedLaws = _ionStorm.GenerateIonLaws(3);
-        var success = false;
-        var hackAnnouncement = Loc.GetString("ninja-ai-hack-announcement");
-
-        var query = EntityQueryEnumerator<SiliconLawBoundComponent>();
-        while (query.MoveNext(out var targetUid, out _))
+        if (ScrambleStationAiLaws() == 0)
         {
-            EnsureComp<SiliconLawProviderComponent>(targetUid);
-            _lawSystem.SetLaws(hackedLaws, targetUid);
+            _popup.PopupEntity(Loc.GetString(comp.NoAiMessage), uid, uid);
+            return;
+        }
 
-            if (TryComp<ActorComponent>(targetUid, out var actor))
-            {
-                _chatManager.DispatchServerMessage(actor.PlayerSession, hackAnnouncement);
-            }
+        NotifyStationAiPlayers(comp.HackedMessage);
 
-            success = true;
-        }
-        var providerQuery = EntityQueryEnumerator<SiliconLawProviderComponent>();
-        while (providerQuery.MoveNext(out var providerUid, out _))
+        var station = _station.GetOwningStation(args.Target.Value);
+
+        if (station != null)
         {
-            _lawSystem.SetLaws(hackedLaws, providerUid);
+            _chat.DispatchStationAnnouncement(
+                station.Value,
+                Loc.GetString(comp.AnnouncementMessage),
+                Loc.GetString(comp.AnnouncementSender),
+                announcementSound: comp.AnnouncementSound,
+                colorOverride: comp.AnnouncementColor);
         }
-        if (success)
+
+        RemComp<NinjaAiHackComponent>(uid);
+        var ev = new NinjaAiHackEvent(args.User, args.Target.Value);
+        RaiseLocalEvent(ref ev);
+    }
+
+    private int ScrambleStationAiLaws()
+    {
+        var count = 0;
+
+        var query = EntityQueryEnumerator<SiliconLawBoundComponent, TagComponent>();
+        while (query.MoveNext(out var uid, out _, out var tags))
         {
-            RemComp<NinjaAiHackComponent>(uid);
-            var ev = new NinjaAiHackEvent(args.User, args.Target.Value);
-            RaiseLocalEvent(ref ev);
+            if (!_tags.HasTag(tags, StationAiTag))
+                continue;
+
+            count++;
+
+            if (_emag.CheckFlag(uid, EmagType.Interaction))
+                continue;
+
+            _lawSystem.SetSubvertedLaws(uid, _ionStorm.GenerateIonLaws(3));
         }
+
+        return count;
+    }
+
+    private int NotifyStationAiPlayers(string message)
+    {
+        var count = 0;
+
+        var query = EntityQueryEnumerator<SiliconLawBoundComponent, TagComponent, ActorComponent>();
+        while (query.MoveNext(out _, out _, out var tags, out var actor))
+        {
+            if (!_tags.HasTag(tags, StationAiTag))
+                continue;
+
+            var msg = Loc.GetString(message);
+            var wrappedMessage = Loc.GetString("chat-manager-ninja-ai-wrap-message", ("message", msg));
+            _chatManager.ChatMessageToOne(ChatChannel.Server, msg, wrappedMessage, default, false, actor.PlayerSession.Channel, colorOverride: Color.Red);
+            count++;
+        }
+
+        return count;
     }
 }

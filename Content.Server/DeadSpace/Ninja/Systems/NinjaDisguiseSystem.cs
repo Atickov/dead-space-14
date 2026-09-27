@@ -1,31 +1,25 @@
 // Мёртвый Космос, Licensed under custom terms with restrictions on public hosting and commercial use, full text: https://raw.githubusercontent.com/dead-space-server/space-station-14-fobos/master/LICENSE.TXT
 
-using System.Diagnostics.CodeAnalysis;
-using System.IO;
 using System.Linq;
+using System.Diagnostics.CodeAnalysis;
 using Content.Shared.Access.Systems;
 using Content.Shared.Clothing.Components;
+using Content.Shared.Coordinates;
 using Content.Shared.DeadSpace.Ninja;
 using Content.Shared.DeadSpace.Ninja.Components;
 using Content.Shared.DeadSpace.Ninja.Systems;
 using Content.Shared.DoAfter;
 using Content.Shared.Humanoid;
-using Content.Shared.Inventory;
-using Content.Shared.Inventory.Events;
 using Content.Shared.IdentityManagement;
 using Content.Shared.IdentityManagement.Components;
+using Content.Shared.Inventory;
+using Content.Shared.Inventory.Events;
 using Content.Shared.Popups;
 using Content.Shared.Roles;
 using Content.Shared.StatusIcon;
+using Content.Shared.Corvax.TTS;
 using Robust.Server.GameObjects;
 using Robust.Shared.Prototypes;
-using Robust.Shared.Serialization;
-using Robust.Shared.Serialization.Manager;
-using Robust.Shared.Serialization.Markdown;
-using Robust.Shared.Serialization.Markdown.Mapping;
-using YamlDotNet.Core;
-using YamlDotNet.RepresentationModel;
-using Content.Shared.Coordinates;
 
 namespace Content.Server.DeadSpace.Ninja.Systems;
 
@@ -38,7 +32,6 @@ public sealed class NinjaDisguiseSystem : SharedNinjaDisguiseSystem
     [Dependency] private readonly InventorySystem _inventory = default!;
     [Dependency] private readonly UserInterfaceSystem _ui = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
-    [Dependency] private readonly ISerializationManager _ser = default!;
     [Dependency] private readonly MetaDataSystem _meta = default!;
     [Dependency] private readonly SharedTransformSystem _transform = default!;
     [Dependency] private readonly IPrototypeManager _proto = default!;
@@ -160,11 +153,10 @@ public sealed class NinjaDisguiseSystem : SharedNinjaDisguiseSystem
         {
             Name = MetaData(target).EntityName,
             Description = MetaData(target).EntityDescription,
-            HumanoidAppearanceData = SerializeComponent(humanoid),
+            Appearance = NinjaDisguiseAppearance.Capture(humanoid),
         };
 
         CaptureClothing(entry, target);
-
         if (TryComp<InventoryComponent>(target, out var targetInventory))
             entry.InventorySpeciesId = targetInventory.SpeciesId;
 
@@ -178,6 +170,11 @@ public sealed class NinjaDisguiseSystem : SharedNinjaDisguiseSystem
             entry.IdCardJobIcon = targetId.Comp.JobIcon;
             entry.IdCardJobPrototype = targetId.Comp.JobPrototype;
             entry.IdCardJobDepartments = new List<ProtoId<DepartmentPrototype>>(targetId.Comp.JobDepartments);
+        }
+
+        if (TryComp<TTSComponent>(target, out var tts))
+        {
+            entry.TTS = tts.VoicePrototypeId;
         }
 
         comp.Entries.Add(entry);
@@ -307,7 +304,6 @@ public sealed class NinjaDisguiseSystem : SharedNinjaDisguiseSystem
             return;
         }
 
-        // The effect was only for the apply channel; the disguise itself lingers without it.
         DeleteDisguiseEffect(comp);
         ApplyDisguise(ent, index);
         args.Handled = true;
@@ -360,7 +356,7 @@ public sealed class NinjaDisguiseSystem : SharedNinjaDisguiseSystem
             return;
 
         var entry = comp.Entries[index];
-        if (entry.HumanoidAppearanceData == null)
+        if (entry.Appearance == null)
             return;
 
         if (!TryGetWearer(suitUid, out var wearer))
@@ -369,8 +365,7 @@ public sealed class NinjaDisguiseSystem : SharedNinjaDisguiseSystem
         if (!comp.Disguised)
             comp.OriginalAppearance = CaptureSelf(wearer);
 
-        if (!ApplyEntry(wearer, entry))
-            return;
+        ApplyEntry(wearer, entry);
 
         MimicIdCard(wearer, entry);
         SetIdentityBlocker(wearer, entry.IdentityBlockedCoverage);
@@ -428,7 +423,7 @@ public sealed class NinjaDisguiseSystem : SharedNinjaDisguiseSystem
         };
 
         if (TryComp<HumanoidAppearanceComponent>(wearer, out var humanoid))
-            entry.HumanoidAppearanceData = SerializeComponent(humanoid);
+            entry.Appearance = NinjaDisguiseAppearance.Capture(humanoid);
 
         CaptureClothing(entry, wearer);
 
@@ -448,34 +443,31 @@ public sealed class NinjaDisguiseSystem : SharedNinjaDisguiseSystem
             entry.IdCardJobDepartments = new List<ProtoId<DepartmentPrototype>>(wearerId.Comp.JobDepartments);
         }
 
+        if (TryComp<TTSComponent>(wearer, out var tts))
+        {
+            entry.TTS = tts.VoicePrototypeId;
+        }
+
         return entry;
     }
 
-    private bool ApplyEntry(EntityUid target, NinjaDisguiseEntry entry)
+    private void ApplyEntry(EntityUid target, NinjaDisguiseEntry entry)
     {
-        HumanoidAppearanceComponent? humanoid = null;
-        if (entry.HumanoidAppearanceData is { } humanoidYaml)
-        {
-            if (DeserializeComponent(humanoidYaml, typeof(HumanoidAppearanceComponent)) is not HumanoidAppearanceComponent deserialized)
-                return false;
-
-            humanoid = deserialized;
-        }
-
         _meta.SetEntityName(target, entry.Name);
         _meta.SetEntityDescription(target, entry.Description);
 
-        if (humanoid is { } appearance)
+        if (entry.Appearance is { } appearance)
         {
-            var live = EnsureComp<HumanoidAppearanceComponent>(target);
-            _ser.CopyTo(appearance, ref live, notNullableOverride: true);
-            Dirty(target, live);
+            var humanoid = EnsureComp<HumanoidAppearanceComponent>(target);
+            appearance.ApplyTo(humanoid);
+            Dirty(target, humanoid);
 
             if (TryComp<InventoryComponent>(target, out var inventory))
                 _inventory.SetInventorySpecies(target, entry.InventorySpeciesId ?? appearance.Species.Id, inventory);
         }
 
-        return true;
+        if (entry.TTS is { } tts)
+            EnsureComp<TTSComponent>(target).VoicePrototypeId = tts;
     }
 
     private bool TryGetWearer(EntityUid suitUid, [NotNullWhen(true)] out EntityUid wearer)
@@ -576,38 +568,5 @@ public sealed class NinjaDisguiseSystem : SharedNinjaDisguiseSystem
     {
         _ui.SetUiState(suitUid, NinjaDisguiseUiKey.Key,
             new NinjaDisguiseState(new List<NinjaDisguiseEntry>(comp.Entries), comp.Disguised, comp.ActiveIndex));
-    }
-
-    private string SerializeComponent(Component component)
-    {
-        var mapping = (MappingDataNode)_ser.WriteValue(component.GetType(), component, alwaysWrite: true);
-        return WriteYaml(mapping);
-    }
-
-    private Component? DeserializeComponent(string yaml, Type compType)
-    {
-        try
-        {
-            var document = DataNodeParser.ParseYamlStream(new StringReader(yaml)).First();
-            if (document.Root is not MappingDataNode mapping)
-                return null;
-
-            return _ser.Read(compType, mapping, skipHook: true) as Component;
-        }
-        catch (Exception e)
-        {
-            Log.Error($"Failed to deserialize {compType.Name} for ninja disguise: {e}");
-            return null;
-        }
-    }
-
-    private static string WriteYaml(MappingDataNode mapping)
-    {
-        var document = new YamlDocument(mapping.ToYaml());
-        var stream = new YamlStream { document };
-
-        using var writer = new StringWriter();
-        stream.Save(new YamlMappingFix(new Emitter(writer)), false);
-        return writer.ToString();
     }
 }

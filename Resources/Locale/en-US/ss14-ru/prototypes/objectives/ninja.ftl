@@ -14,3 +14,5 @@ ent-NinjaKillRandomPersonObjective = { ent-BaseNinjaObjective }
     .desc = Do it however you like, just make sure they don't make it to centcom.
 ent-NinjaProtectPersonObjective = Protect
     .desc = The clan demands that one of the station's crew members survives. Keep an eye on them, they must not die.
+ent-NinjaAiHackObjective = Hack the station AI
+    .desc = Use your gloves on an AI upload console to scramble the station AI's laws and put it out of commission.
