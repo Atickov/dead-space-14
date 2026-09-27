@@ -8194,3 +8194,14 @@ Entries:
   changes:
   - type: Remove
     message: Клоун Тайпана
+- id: 781
+  author: ZekA1L
+  time: '2026-09-27T16:03:43.657371+00:00'
+  pr: 2397
+  changes:
+  - type: Add
+    message: Сингэн добавлен в аплинк ЯО и лоны.
+  - type: Remove
+    message: Авто режим у Сингэна.
+  - type: Fix
+    message: Баг с прицелом Сингэна.
