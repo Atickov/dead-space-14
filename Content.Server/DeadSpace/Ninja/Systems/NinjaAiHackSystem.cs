@@ -15,6 +15,7 @@ using Content.Shared.Tag;
 using Robust.Shared.Player;
 using Robust.Shared.Prototypes;
 using Content.Shared.Chat;
+using Content.Server.Ninja.Systems;
 
 namespace Content.Server.DeadSpace.Ninja.Systems;
 

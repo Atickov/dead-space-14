@@ -11,6 +11,7 @@ using Content.Shared.Buckle.Components;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Network;
 using Robust.Shared.Timing;
+using Content.Shared.Ninja.Systems;
 
 namespace Content.Shared.DeadSpace.Ninja.Systems;
 

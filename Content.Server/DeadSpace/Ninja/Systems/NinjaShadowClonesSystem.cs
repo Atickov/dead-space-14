@@ -5,6 +5,7 @@ using Content.Shared.DeadSpace.Ninja.Systems;
 using Content.Shared.Popups;
 using Robust.Shared.Map;
 using Robust.Shared.Random;
+using Content.Shared.Ninja.Systems;
 
 namespace Content.Server.DeadSpace.Ninja.Systems;
 

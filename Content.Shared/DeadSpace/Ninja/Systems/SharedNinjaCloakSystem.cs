@@ -3,6 +3,7 @@
 using Content.Shared.Actions;
 using Content.Shared.DeadSpace.Ninja.Components;
 using Content.Shared.Inventory.Events;
+using Content.Shared.Ninja.Components;
 
 namespace Content.Shared.DeadSpace.Ninja.Systems;
 

@@ -1,6 +1,7 @@
 using Content.Shared.DeadSpace.Ninja.Components;
 using Content.Shared.DeadSpace.Ninja.Systems;
 using Content.Shared.Weapons.Ranged.Events;
+using Content.Shared.Ninja.Systems;
 
 namespace Content.Shared.Weapons.Ranged.Systems;
 

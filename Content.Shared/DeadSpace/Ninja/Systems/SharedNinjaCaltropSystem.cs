@@ -18,6 +18,7 @@ using Content.Shared.Coordinates.Helpers;
 using Robust.Shared.Map;
 using Robust.Shared.Maths;
 using System.Numerics;
+using Content.Shared.Ninja.Systems;
 
 namespace Content.Shared.DeadSpace.Ninja.Systems;
 

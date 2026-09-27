@@ -10,6 +10,8 @@ using Content.Shared.Mobs;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Containers;
 using Robust.Shared.Map;
+using Content.Shared.Ninja.Components;
+using Content.Server.Ninja.Systems;
 
 namespace Content.Server.DeadSpace.Ninja.Systems;
 

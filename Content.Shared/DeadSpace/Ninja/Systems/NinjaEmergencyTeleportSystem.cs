@@ -15,6 +15,7 @@ using Robust.Shared.Physics.Components;
 using Robust.Shared.Random;
 using Content.Shared.DeadSpace.Ninja.Components;
 using Content.Shared.Actions;
+using Content.Shared.Ninja.Systems;
 
 namespace Content.Shared.DeadSpace.Ninja.Systems;
 

@@ -20,6 +20,7 @@ using Content.Shared.StatusIcon;
 using Content.Shared.Corvax.TTS;
 using Robust.Server.GameObjects;
 using Robust.Shared.Prototypes;
+using Content.Shared.Ninja.Systems;
 
 namespace Content.Server.DeadSpace.Ninja.Systems;
 

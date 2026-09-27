@@ -6,6 +6,7 @@ using Content.Shared.DeadSpace.Ninja.Prototypes;
 using Content.Shared.Inventory;
 using Content.Shared.PowerCell;
 using Robust.Shared.Prototypes;
+using Content.Shared.Ninja.Systems;
 
 namespace Content.Shared.DeadSpace.Ninja.Systems;
 

@@ -6,6 +6,8 @@ using Content.Shared.Interaction.Events;
 using Content.Shared.Popups;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Network;
+using Content.Shared.Ninja.Components;
+using Content.Shared.Ninja.Systems;
 
 namespace Content.Shared.DeadSpace.Ninja.Systems;
 

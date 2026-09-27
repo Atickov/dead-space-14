@@ -11,6 +11,7 @@ using Content.Shared.Popups;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Map;
 using Content.Shared.DeadSpace.Ninja.Systems;
+using Content.Shared.Ninja.Systems;
 
 namespace Content.Server.DeadSpace.Ninja.Systems;
 

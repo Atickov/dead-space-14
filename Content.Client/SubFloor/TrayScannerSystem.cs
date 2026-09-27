@@ -7,6 +7,7 @@ using Robust.Client.GameObjects;
 using Robust.Client.Player;
 using Robust.Shared.Timing;
 using Content.Shared.Stealth.Components;
+using Content.Shared.Ninja.Components;
 
 
 namespace Content.Client.SubFloor;

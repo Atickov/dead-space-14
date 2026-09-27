@@ -15,6 +15,7 @@ using Content.Shared.Shuttles.Components;
 using Robust.Server.GameObjects;
 using Robust.Shared.Prototypes;
 using Content.Shared.RetractableItemAction;
+using Content.Shared.Ninja.Components;
 
 namespace Content.Server.DeadSpace.Ninja.Systems;
 

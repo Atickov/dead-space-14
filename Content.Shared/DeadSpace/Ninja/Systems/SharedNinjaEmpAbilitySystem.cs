@@ -5,6 +5,7 @@ using Content.Shared.Actions;
 using Content.Shared.DeadSpace.Ninja.Components;
 using Content.Shared.Popups;
 using Robust.Shared.Network;
+using Content.Shared.Ninja.Systems;
 
 namespace Content.Shared.DeadSpace.Ninja.Systems;
 
