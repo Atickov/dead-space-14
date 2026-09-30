@@ -8221,3 +8221,10 @@ Entries:
   changes:
   - type: Add
     message: Больший ассортимент одежды для арены.
+- id: 784
+  author: zubekkk
+  time: '2026-09-30T10:58:53.749453+00:00'
+  pr: 2414
+  changes:
+  - type: Fix
+    message: Регулятор входного давления
