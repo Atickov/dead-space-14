@@ -1,9 +1,11 @@
+using Content.Shared.DeviceLinking;
 using Robust.Shared.GameStates;
+using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization;
 
 namespace Content.Shared.DeadSpace.Ninja.Components;
 
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState(raiseAfterAutoHandleState: true)]
+[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
 public sealed partial class NinjaInfoScannerComponent : Component
 {
     [DataField]
@@ -22,13 +24,16 @@ public sealed partial class NinjaInfoScannerComponent : Component
     public TimeSpan? ScanEndTime;
 
     [DataField]
-    public EntityUid? ScanSpeaker;
+    public EntityUid? ScanActor;
 
     [DataField]
     public string ScanReagent = "Nocturine";
 
     [DataField]
     public float ScanReagentAmount = 10f;
+
+    [DataField]
+    public ProtoId<SourcePortPrototype> LinkingPort = "NinjaScannerPort";
 }
 
 [Serializable, NetSerializable]

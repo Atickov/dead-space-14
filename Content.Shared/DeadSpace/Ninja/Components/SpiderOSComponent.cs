@@ -43,8 +43,6 @@ public sealed partial class SpiderOSComponent : Component
 
     [DataField]
     public float EnergyConsumption = 2;
-
-    public TimeSpan LastMessage;
 }
 
 [Serializable, NetSerializable]

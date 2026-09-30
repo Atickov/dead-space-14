@@ -195,9 +195,6 @@ public abstract class SharedNinjaSpiritFormSystem : EntitySystem
             if (!comp.SpiritFormActive)
                 continue;
 
-            // Charge drain and forced deactivation are server-authoritative.
-            // On the client TryUseCharge/TryGetBatteryMax always fail, which would
-            // predictively deactivate the form every second until the next server state.
             if (_net.IsClient)
                 continue;
 

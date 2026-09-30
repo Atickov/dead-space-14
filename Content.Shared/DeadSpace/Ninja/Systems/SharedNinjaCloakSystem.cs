@@ -54,6 +54,7 @@ public abstract class SharedNinjaCloakSystem : EntitySystem
         {
             _actions.RemoveAction(ent.Comp.ActionEntity);
             ent.Comp.Enabled = false;
+            Dirty(ent);
         }
     }
 

@@ -9,6 +9,7 @@ using Content.Shared.Chemistry.Components;
 using Content.Shared.Chemistry.Reagent;
 using Content.Shared.DeadSpace.Ninja;
 using Content.Shared.DeadSpace.Ninja.Components;
+using Content.Shared.DeviceLinking;
 using Content.Shared.FixedPoint;
 using Content.Shared.Mobs.Systems;
 using Robust.Server.GameObjects;
@@ -26,9 +27,11 @@ public sealed class NinjaInfoScannerSystem : SharedNinjaInfoScannerSystem
     [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly ChatSystem _chatSystem = default!;
     [Dependency] private readonly NinjaInfoObjectiveSystem _objectiveSystem = default!;
+    [Dependency] private readonly NinjaInfoConsoleSystem _infoConsoleSystem = default!;
     [Dependency] private readonly MobStateSystem _mobState = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly BloodstreamSystem _bloodstream = default!;
+    [Dependency] private readonly SharedDeviceLinkSystem _deviceLink = default!;
 
     public override void Initialize()
     {
@@ -75,7 +78,7 @@ public sealed class NinjaInfoScannerSystem : SharedNinjaInfoScannerSystem
         ref ComponentShutdown args)
     {
         ent.Comp.ScanEndTime = null;
-        ent.Comp.ScanSpeaker = null;
+        ent.Comp.ScanActor = null;
     }
 
     private void OnContainerInserted(
@@ -88,6 +91,7 @@ public sealed class NinjaInfoScannerSystem : SharedNinjaInfoScannerSystem
             return;
         }
 
+        UpdateConsolesUserInterface(ent);
         UpdateVisualState(ent);
     }
 
@@ -106,11 +110,11 @@ public sealed class NinjaInfoScannerSystem : SharedNinjaInfoScannerSystem
             FinishScan(ent);
             return;
         }
-
+        UpdateConsolesUserInterface(ent);
         UpdateVisualState(ent);
     }
 
-    public bool TryStartScan(EntityUid scanner, EntityUid speaker)
+    public bool TryStartScan(EntityUid scanner, EntityUid actor)
     {
         if (!TryComp<NinjaInfoScannerComponent>(scanner, out var comp))
             return false;
@@ -136,12 +140,12 @@ public sealed class NinjaInfoScannerSystem : SharedNinjaInfoScannerSystem
             return false;
         }
 
-        StartScan((scanner, comp), target, speaker);
+        StartScan((scanner, comp), target, actor);
 
         return true;
     }
 
-    public bool TryEjectTarget(EntityUid scanner, EntityUid? speaker = null)
+    public bool TryEjectTarget(EntityUid scanner)
     {
         if (!TryComp<NinjaInfoScannerComponent>(scanner, out var comp))
             return false;
@@ -163,7 +167,7 @@ public sealed class NinjaInfoScannerSystem : SharedNinjaInfoScannerSystem
         return true;
     }
 
-    public bool TryTeleportTarget(EntityUid scanner, EntityUid? speaker = null)
+    public bool TryTeleportTarget(EntityUid scanner)
     {
         if (!TryComp<NinjaInfoScannerComponent>(scanner, out var comp))
             return false;
@@ -182,11 +186,10 @@ public sealed class NinjaInfoScannerSystem : SharedNinjaInfoScannerSystem
 
         var target = container.ContainedEntities[0];
 
-        _container.Remove(target, container);
-
         var marker = GetRandomMarker();
         if (marker != null)
         {
+            _container.Remove(target, container);
             _transform.SetCoordinates(
                 target,
                 Transform(marker.Value).Coordinates);
@@ -202,11 +205,11 @@ public sealed class NinjaInfoScannerSystem : SharedNinjaInfoScannerSystem
     private void StartScan(
         Entity<NinjaInfoScannerComponent> ent,
         EntityUid target,
-        EntityUid speaker)
+        EntityUid actor)
     {
         ent.Comp.IsScanning = true;
         ent.Comp.ScanningEntity = target;
-        ent.Comp.ScanSpeaker = speaker;
+        ent.Comp.ScanActor = actor;
         ent.Comp.ScanEndTime =
             _timing.CurTime +
             TimeSpan.FromSeconds(ent.Comp.ScanTime);
@@ -230,11 +233,11 @@ public sealed class NinjaInfoScannerSystem : SharedNinjaInfoScannerSystem
     private void FinishScan(Entity<NinjaInfoScannerComponent> ent)
     {
         var target = ent.Comp.ScanningEntity;
-        var speaker = ent.Comp.ScanSpeaker;
+        var actor = ent.Comp.ScanActor;
 
         ent.Comp.IsScanning = false;
         ent.Comp.ScanningEntity = null;
-        ent.Comp.ScanSpeaker = null;
+        ent.Comp.ScanActor = null;
         ent.Comp.ScanEndTime = null;
 
         if (target is not { } targetUid || !Exists(targetUid))
@@ -247,7 +250,7 @@ public sealed class NinjaInfoScannerSystem : SharedNinjaInfoScannerSystem
             container.ContainedEntities.Contains(targetUid) &&
             _mobState.IsAlive(targetUid))
         {
-            var result = _objectiveSystem.TryScanEntity(targetUid, speaker);
+            var result = _objectiveSystem.TryScanEntity(targetUid, actor);
 
             Say(ent.Owner, result switch
             {
@@ -309,5 +312,16 @@ public sealed class NinjaInfoScannerSystem : SharedNinjaInfoScannerSystem
         }
 
         return NinjaInfoScannerVisualState.Open;
+    }
+
+    private void UpdateConsolesUserInterface(Entity<NinjaInfoScannerComponent> ent)
+    {
+        if (!TryComp<DeviceLinkSourceComponent>(ent, out var sourceComp))
+            return;
+
+        foreach (var source in _deviceLink.GetLinkedSinks((ent, sourceComp), ent.Comp.LinkingPort))
+        {
+            _infoConsoleSystem.UpdateUserInterface(source);
+        }
     }
 }

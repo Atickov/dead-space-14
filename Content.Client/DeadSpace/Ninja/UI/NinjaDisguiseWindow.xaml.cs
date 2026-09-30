@@ -52,6 +52,8 @@ public sealed partial class NinjaDisguiseWindow : FancyWindow
         _inventorySystem = _entManager.System<InventorySystem>();
 
         ResetButton.OnPressed += _ => OnResetPressed?.Invoke();
+
+        OnClose += HandleClose;
     }
 
     public void UpdateState(NinjaDisguiseState state)
@@ -205,13 +207,8 @@ public sealed partial class NinjaDisguiseWindow : FancyWindow
         _previews.Clear();
     }
 
-    protected override void Dispose(bool disposing)
+    private void HandleClose()
     {
-        base.Dispose(disposing);
-
-        if (disposing)
-        {
-            CleanupPreviews();
-        }
+        CleanupPreviews();
     }
 }

@@ -40,12 +40,6 @@ public sealed partial class NinjaSmokeAbilityComponent : Component
     public EntProtoId SmokePrototype = "Smoke";
 
     /// <summary>
-    /// Battery charge used to create smoke.
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public float Charge;
-
-    /// <summary>
     /// How long the smoke stays in auto mode for, after it has spread (in seconds).
     /// </summary>
     [DataField, AutoNetworkedField]
@@ -57,11 +51,6 @@ public sealed partial class NinjaSmokeAbilityComponent : Component
     [DataField(required: true), AutoNetworkedField]
     public int SpreadAmountAutoMode;
 
-    /// <summary>
-    /// Battery charge used to create smoke by auto mode.
-    /// </summary>
-    [DataField, AutoNetworkedField]
-    public float ChargeAutoMode;
 
     /// <summary>
     /// Will the ability be activated by others?

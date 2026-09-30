@@ -35,6 +35,19 @@ public sealed class NinjaHolographicClonesSystem : SharedNinjaHolographicClonesS
         if (comp.CloneAmount < 1)
             return;
 
+        var origin = Transform(user).Coordinates;
+        List<EntityCoordinates> spawncoords = new List<EntityCoordinates>();
+
+        for (var i = 0; i < comp.CloneAmount; i++)
+        {
+            if (GetFreeSpawnCoords(origin, comp.MinSpawnRadius, comp.MaxSpawnRadius) is not { } coords)
+                continue;
+            spawncoords.Add(coords);
+        }
+
+        if (spawncoords.Count == 0)
+            return;
+
         if (!_ninja.TryUseCharge(user, comp.EnergyCost))
         {
             _popup.PopupEntity(Loc.GetString("ninja-no-power"), user, user);
@@ -46,25 +59,19 @@ public sealed class NinjaHolographicClonesSystem : SharedNinjaHolographicClonesS
             _ninjaSmoke.TrySpawnNinjaSmoke((uid, ninjaSmoke), true);
         }
 
-        var origin = Transform(user).Coordinates;
         List<EntityUid> clones = new List<EntityUid>();
 
-        for (var i = 0; i < comp.CloneAmount; i++)
+        foreach (var spawnpos in spawncoords)
         {
-            if (GetFreeSpawnCoords(origin, comp.MinSpawnRadius, comp.MaxSpawnRadius) is not { } coords)
-                continue;
-            clones.Add(_ninjaClone.SpawnVisualClone(user, coords, comp.CloneProto));
+            clones.Add(_ninjaClone.SpawnVisualClone(user, spawnpos, comp.CloneProto));
         }
 
-        if (clones.Count > 0)
-        {
-            var userCoordinates = Transform(user).Coordinates;
-            var selectedClone = _random.Pick(clones);
-            var selectedCloneCoordinates = Transform(selectedClone).Coordinates;
+        var userCoordinates = Transform(user).Coordinates;
+        var selectedClone = _random.Pick(clones);
+        var selectedCloneCoordinates = Transform(selectedClone).Coordinates;
 
-            _transform.SetCoordinates(user, selectedCloneCoordinates);
-            _transform.SetCoordinates(selectedClone, userCoordinates);
-        }
+        _transform.SetCoordinates(user, selectedCloneCoordinates);
+        _transform.SetCoordinates(selectedClone, userCoordinates);
 
         args.Handled = true;
     }

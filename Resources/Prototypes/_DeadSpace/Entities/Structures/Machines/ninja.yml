@@ -15,6 +15,9 @@
   description: Высокотехнологичная капсула для извлечения данных из живых субъектов.
   components:
   - type: NinjaInfoScanner
+  - type: Speech
+    speechVerb: Robotic
+    speechSounds: Pai
   - type: DeviceLinkSource
     ports:
     - NinjaScannerPort

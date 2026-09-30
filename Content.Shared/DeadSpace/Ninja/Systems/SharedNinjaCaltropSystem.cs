@@ -75,7 +75,7 @@ public sealed class SharedNinjaCaltropSystem : EntitySystem
         var xform = Transform(args.Performer);
         var spawnpositions = GetCaltropSpawnPositions(xform.Coordinates, xform.WorldRotation);
 
-        if (spawnpositions == null)
+        if (spawnpositions.Count == 0)
             return;
 
         if (_net.IsServer)
@@ -104,7 +104,7 @@ public sealed class SharedNinjaCaltropSystem : EntitySystem
 
     }
 
-    private List<EntityCoordinates>? GetCaltropSpawnPositions(EntityCoordinates position, Angle angle)
+    private List<EntityCoordinates> GetCaltropSpawnPositions(EntityCoordinates position, Angle angle)
     {
         var backwards = -angle.ToWorldVec();
         var side = new Vector2(-backwards.Y, backwards.X);

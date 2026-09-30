@@ -27,8 +27,6 @@ public sealed class NinjaInfoConsoleSystem : EntitySystem
         SubscribeLocalEvent<NinjaInfoConsoleComponent, NinjaInfoScannerScanMessage>(OnScanMessage);
         SubscribeLocalEvent<NinjaInfoConsoleComponent, NinjaInfoScannerEjectMessage>(OnEjectMessage);
         SubscribeLocalEvent<NinjaInfoConsoleComponent, NinjaInfoScannerTeleportMessage>(OnTeleportMessage);
-        SubscribeLocalEvent<NinjaInfoConsoleComponent, EntInsertedIntoContainerMessage>(OnScannerContainerModified);
-        SubscribeLocalEvent<NinjaInfoConsoleComponent, EntRemovedFromContainerMessage>(OnScannerContainerModified);
     }
 
     private EntityUid? GetLinkedScanner(EntityUid console)
@@ -45,31 +43,6 @@ public sealed class NinjaInfoConsoleSystem : EntitySystem
         return null;
     }
 
-    private void OnScannerContainerModified(
-        Entity<NinjaInfoConsoleComponent> ent,
-        ref EntInsertedIntoContainerMessage args)
-    {
-        OnScannerContainerModified(ent.Owner, args.Container);
-    }
-
-    private void OnScannerContainerModified(
-        Entity<NinjaInfoConsoleComponent> ent,
-        ref EntRemovedFromContainerMessage args)
-    {
-        OnScannerContainerModified(ent.Owner, args.Container);
-    }
-
-    private void OnScannerContainerModified(EntityUid console, BaseContainer container)
-    {
-        if (GetLinkedScanner(console) is not { } scanner ||
-            container.Owner != scanner)
-        {
-            return;
-        }
-
-        UpdateUserInterface(console);
-    }
-
     private void OnUiOpenAttempt(
         Entity<NinjaInfoConsoleComponent> ent,
         ref ActivatableUIOpenAttemptEvent args)
@@ -81,8 +54,7 @@ public sealed class NinjaInfoConsoleSystem : EntitySystem
             return;
 
         args.Cancel();
-        if (!args.Silent)
-            Say(ent.Owner, "ninja-info-phrase-no-scanner-linked");
+        Say(ent.Owner, "ninja-info-phrase-no-scanner-linked");
     }
 
     private void OnUiOpened(
@@ -135,7 +107,7 @@ public sealed class NinjaInfoConsoleSystem : EntitySystem
         if (GetLinkedScanner(ent.Owner) is not { } scanner)
             return;
 
-        _scannerSystem.TryEjectTarget(scanner, args.Actor);
+        _scannerSystem.TryEjectTarget(scanner);
     }
 
     private void OnTeleportMessage(
@@ -145,6 +117,6 @@ public sealed class NinjaInfoConsoleSystem : EntitySystem
         if (GetLinkedScanner(ent.Owner) is not { } scanner)
             return;
 
-        _scannerSystem.TryTeleportTarget(scanner, args.Actor);
+        _scannerSystem.TryTeleportTarget(scanner);
     }
 }

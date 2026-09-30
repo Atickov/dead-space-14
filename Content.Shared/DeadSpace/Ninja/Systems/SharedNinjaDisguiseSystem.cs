@@ -25,6 +25,10 @@ public abstract class SharedNinjaDisguiseSystem : EntitySystem
     private void OnMapInit(Entity<NinjaDisguiseComponent> ent, ref MapInitEvent args)
     {
         var (uid, comp) = ent;
+
+        if (!TryComp<SpiderOSComponent>(ent.Owner, out var os) || !os.SuitActivated)
+            return;
+
         _actionContainer.EnsureAction(uid, ref comp.ActionScanEntity, comp.ActionScan);
         _actionContainer.EnsureAction(uid, ref comp.ActionMenuEntity, comp.ActionMenu);
         Dirty(uid, comp);
