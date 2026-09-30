@@ -8228,3 +8228,10 @@ Entries:
   changes:
   - type: Fix
     message: Регулятор входного давления
+- id: 785
+  author: sastr457
+  time: '2026-09-30T11:23:31.715824+00:00'
+  pr: 2415
+  changes:
+  - type: Fix
+    message: Лошадки 🐎
