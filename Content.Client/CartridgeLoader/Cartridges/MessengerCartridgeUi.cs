@@ -51,14 +51,6 @@ public sealed partial class MessengerCartridgeUi : UIFragment
             var msg = new MessengerSetIncomingDisabledEvent(disabled);
             _userInterface?.SendMessage(new CartridgeUiMessage(msg));
         };
-        _fragment.OnDeleteMessage += (messageId) =>
-        {
-            var msg = new MessengerDeleteMessageEvent(messageId);
-            _userInterface?.SendMessage(new CartridgeUiMessage(msg));
-        };
-        _fragment.OnDeleteSelfMessage += (messageId) =>
-        {
-        };
         // DS14-End
     }
 

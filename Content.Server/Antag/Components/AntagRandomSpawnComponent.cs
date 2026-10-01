@@ -6,7 +6,6 @@ namespace Content.Server.Antag.Components;
 /// Spawns this rule's antags at random tiles on a station using <c>TryGetRandomTile</c>.
 /// Requires <see cref="AntagSelectionComponent"/>.
 /// </summary>
-[Content.Server.DeadSpace.CentComm.AllowedGameRuleOnCentComm] // DS14
 [RegisterComponent]
 public sealed partial class AntagRandomSpawnComponent : Component
 {

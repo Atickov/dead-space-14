@@ -19,7 +19,7 @@ public sealed class VentCrittersRule : StationEventSystem<VentCrittersRuleCompon
     {
         base.Started(uid, component, gameRule, args);
 
-        if (!TryGetRandomStation(out var station, rule: uid)) // DS14
+        if (!TryGetRandomStation(out var station))
         {
             return;
         }

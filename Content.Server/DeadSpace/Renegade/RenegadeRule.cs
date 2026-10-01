@@ -21,7 +21,9 @@ public sealed class RenegadeRule : StationEventSystem<Renegade.Components.Renega
 {
     [Dependency] private readonly AntagSelectionSystem _antag = default!;
     [Dependency] private readonly MindSystem _mindSystem = default!;
+    [Dependency] private readonly ChatSystem _chatSystem = default!;
     [Dependency] private readonly RoleSystem _role = default!;
+    [Dependency] private readonly StationSystem _stationSystem = default!;
     [Dependency] private readonly SharedObjectivesSystem _objectives = default!;
 
     public override void Initialize()
@@ -89,9 +91,10 @@ public sealed class RenegadeRule : StationEventSystem<Renegade.Components.Renega
             return;
 
         var msg = new GameGlobalSoundEvent("/Audio/_DeadSpace/Renegade/the_Renegade_has_captured_the_space_station.ogg", AudioParams.Default);
-        var stationFilter = RuleStation.GetEventPlayers(RenegadeEntity);
+        var stationFilter = _stationSystem.GetInOwningStation(RenegadeEntity);
+        stationFilter.AddPlayersByPvs(RenegadeEntity, entityManager: EntityManager);
         RaiseNetworkEvent(msg, stationFilter);
 
-        RuleStation.Announce(RenegadeEntity, Loc.GetString("round-end-system-renegade-shuttle-called-announcement"), playSound: true, colorOverride: Color.DarkRed);
+        _chatSystem.DispatchGlobalAnnouncement(Loc.GetString("round-end-system-renegade-shuttle-called-announcement"), playSound: true, colorOverride: Color.DarkRed);
     }
 }

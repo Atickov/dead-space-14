@@ -1,12 +1,9 @@
 using System.Numerics;
 using Content.Client.Hands.Systems;
-using Content.Shared.DeadSpace.Implants; // DS14
-using Content.Shared.DeadSpace.Weapons.Smart; // DS14
 using Content.Shared.Weapons.Ranged.Components;
 using Robust.Client.GameObjects;
 using Robust.Client.Graphics;
 using Robust.Client.Input;
-using Robust.Client.Player; // DS14
 using Robust.Client.UserInterface;
 using Robust.Shared.Enums;
 using Robust.Shared.Utility;
@@ -26,7 +23,6 @@ public sealed class CombatModeIndicatorsOverlay : Overlay
     private readonly IEyeManager _eye;
     private readonly CombatModeSystem _combat;
     private readonly HandsSystem _hands = default!;
-    private readonly IPlayerManager _playerManager = default!; // DS14
 
     private readonly Texture _gunSight;
     private readonly Texture _gunBoltSight;
@@ -39,15 +35,13 @@ public sealed class CombatModeIndicatorsOverlay : Overlay
     public float Scale = 0.6f;  // 1 is a little big
 
     public CombatModeIndicatorsOverlay(IInputManager input, IEntityManager entMan,
-            IEyeManager eye, CombatModeSystem combatSys, HandsSystem hands,
-            IPlayerManager playerManager) // DS14
+            IEyeManager eye, CombatModeSystem combatSys, HandsSystem hands)
     {
         _inputManager = input;
         _entMan = entMan;
         _eye = eye;
         _combat = combatSys;
         _hands = hands;
-        _playerManager = playerManager; // DS14
 
         var spriteSys = _entMan.EntitySysManager.GetEntitySystem<SpriteSystem>();
         _gunSight = spriteSys.Frame0(new SpriteSpecifier.Rsi(new ResPath("/Textures/Interface/Misc/crosshair_pointers.rsi"),
@@ -62,15 +56,6 @@ public sealed class CombatModeIndicatorsOverlay : Overlay
     {
         if (!_combat.IsInCombatMode())
             return false;
-        // DS14-start
-        var player = _playerManager.LocalEntity;
-        if (player != null && _entMan.HasComponent<SmartLinkImplantComponent>(player.Value))
-        {
-            var handEntity = _hands.GetActiveHandEntity();
-            if (handEntity != null && _entMan.HasComponent<SmartWeaponComponent>(handEntity.Value))
-                return false;
-        }
-        // DS14-end
 
         return base.BeforeDraw(in args);
     }

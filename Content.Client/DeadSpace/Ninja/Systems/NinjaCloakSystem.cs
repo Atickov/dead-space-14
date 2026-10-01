@@ -1,0 +1,41 @@
+// Мёртвый Космос, Licensed under custom terms with restrictions on public hosting and commercial use, full text: https://raw.githubusercontent.com/dead-space-server/space-station-14-fobos/master/LICENSE.TXT
+
+using Content.Shared.DeadSpace.Ninja.Components;
+using Content.Shared.DeadSpace.Ninja.Systems;
+using Content.Shared.DeadSpace.ThermalVision;
+using Robust.Client.GameObjects;
+using Robust.Shared.GameObjects;
+using Content.Shared.Inventory.Events;
+
+namespace Content.Client.DeadSpace.Ninja.Systems;
+
+public sealed class NinjaCloakSystem : SharedNinjaCloakSystem
+{
+    [Dependency] private readonly SpriteSystem _sprite = default!;
+
+    public override void Initialize()
+    {
+        base.Initialize();
+        SubscribeLocalEvent<NinjaCloakComponent, AfterAutoHandleStateEvent>(OnStateChanged);
+    }
+
+    private void OnStateChanged(Entity<NinjaCloakComponent> ent, ref AfterAutoHandleStateEvent args)
+    {
+        var parent = Transform(ent.Owner).ParentUid;
+
+        if (!TryComp<SpriteComponent>(parent, out var parentSprite))
+            return;
+
+        if (ent.Comp.Enabled)
+        {
+            _sprite.SetVisible((parent, parentSprite), false);
+        }
+        else
+        {
+            _sprite.SetVisible((parent, parentSprite), true);
+        }
+
+        if (TryComp<ThermalVisibleComponent>(parent, out var thermal))
+            thermal.DrawWhenInvisible = ent.Comp.Enabled;
+    }
+}

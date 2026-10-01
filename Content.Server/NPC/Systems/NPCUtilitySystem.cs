@@ -173,9 +173,6 @@ public sealed class NPCUtilitySystem : EntitySystem
         var owner = blackboard.GetValue<EntityUid>(NPCBlackboard.Owner);
         switch (consideration)
         {
-            case CanIngestCon:
-                return _ingestion.CanIngest(owner, targetUid) ? 1f : 0f;
-
             case FoodValueCon foodValueConsideration:
             {
                 // do we have a mouth available? Is the food item opened?
@@ -356,11 +353,9 @@ public sealed class NPCUtilitySystem : EntitySystem
 
                 return _examine.InRangeUnOccluded(owner, targetUid, radius + bufferRange, null) ? 1f : 0f;
             }
-            case TargetIsAliveCon con:
+            case TargetIsAliveCon:
             {
-                return _mobState.IsAlive(targetUid) || con.IncludePreCritical && _mobState.IsPreCritical(targetUid)
-                    ? 1f
-                    : 0f;
+                return _mobState.IsAlive(targetUid) ? 1f : 0f;
             }
             case TargetIsCritCon:
             {

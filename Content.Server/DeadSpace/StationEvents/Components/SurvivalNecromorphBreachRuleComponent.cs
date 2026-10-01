@@ -8,7 +8,6 @@ using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototy
 
 namespace Content.Server.StationEvents.Components;
 
-[Content.Server.DeadSpace.CentComm.AllowedGameRuleOnCentComm]
 [RegisterComponent, Access(typeof(SurvivalNecromorphBreachRule))]
 public sealed partial class SurvivalNecromorphBreachRuleComponent : Component
 {

@@ -16,7 +16,7 @@ public sealed class RandomEntityStorageSpawnRule : StationEventSystem<RandomEnti
         base.Started(uid, comp, gameRule, args);
 
         // DS14-start
-        if (!TryGetRandomStation(out var station, rule: uid) || // DS14
+        if (!TryGetRandomStation(out var station) ||
             StationSystem.GetLargestGrid(station.Value) is not { } stationGrid)
             return;
         // DS14-end

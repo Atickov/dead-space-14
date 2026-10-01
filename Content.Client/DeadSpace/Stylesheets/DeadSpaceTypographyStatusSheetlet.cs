@@ -30,24 +30,24 @@ public sealed class DeadSpaceTypographyStatusSheetlet : Sheetlet<NanotrasenStyle
         // semantic controls on the same 14x2 content margins as the global Button baseline.
         var accentControl = DeadSpaceStyleBoxes.Flat(
             DeadSpaceStylePalette.Control,
-            Color.Transparent,
+            DeadSpaceStylePalette.HoverOutline,
             new Thickness(1),
             14,
             2);
         var accentControlHover = new StyleBoxFlat(accentControl)
         {
             BackgroundColor = DeadSpaceStylePalette.ControlHover,
-            BorderColor = DeadSpaceStylePalette.HoverOutline,
+            BorderColor = DeadSpaceStylePalette.PressedOutline,
         };
         var accentControlPressed = new StyleBoxFlat(accentControl)
         {
             BackgroundColor = DeadSpaceStylePalette.ControlPressed,
-            BorderColor = Color.Transparent,
+            BorderColor = DeadSpaceStylePalette.PressedOutline,
         };
         var accentControlDisabled = new StyleBoxFlat(accentControl)
         {
             BackgroundColor = DeadSpaceStylePalette.ControlDisabled,
-            BorderColor = Color.Transparent,
+            BorderColor = DeadSpaceStylePalette.BorderDisabled,
         };
         var positive = DeadSpaceStyleBoxes.Flat(
             DeadSpaceStylePalette.Positive,
@@ -58,12 +58,12 @@ public sealed class DeadSpaceTypographyStatusSheetlet : Sheetlet<NanotrasenStyle
         var positiveHover = new StyleBoxFlat(positive)
         {
             BackgroundColor = DeadSpaceStylePalette.PositiveHover,
-            BorderColor = DeadSpaceStylePalette.HoverOutline,
+            BorderColor = DeadSpaceStylePalette.PositiveBorderHover,
         };
         var positivePressed = new StyleBoxFlat(positive)
         {
             BackgroundColor = DeadSpaceStylePalette.PositivePressed,
-            BorderColor = Color.Transparent,
+            BorderColor = DeadSpaceStylePalette.PositiveBorderPressed,
         };
         var positiveDisabled = new StyleBoxFlat(positive)
         {
@@ -79,12 +79,7 @@ public sealed class DeadSpaceTypographyStatusSheetlet : Sheetlet<NanotrasenStyle
         var negativeHover = new StyleBoxFlat(negative)
         {
             BackgroundColor = DeadSpaceStylePalette.NegativeHover,
-            BorderColor = DeadSpaceStylePalette.HoverOutline,
-        };
-        var negativePressed = new StyleBoxFlat(negative)
-        {
-            BackgroundColor = DeadSpaceStylePalette.NegativeHover,
-            BorderColor = Color.Transparent,
+            BorderColor = DeadSpaceStylePalette.NegativeBorderHover,
         };
         var negativeDisabled = new StyleBoxFlat(negative)
         {
@@ -100,12 +95,12 @@ public sealed class DeadSpaceTypographyStatusSheetlet : Sheetlet<NanotrasenStyle
         var warningHover = new StyleBoxFlat(warning)
         {
             BackgroundColor = DeadSpaceStylePalette.WarningControlHover,
-            BorderColor = DeadSpaceStylePalette.HoverOutline,
+            BorderColor = DeadSpaceStylePalette.WarningBorderHover,
         };
         var warningPressed = new StyleBoxFlat(warning)
         {
             BackgroundColor = DeadSpaceStylePalette.WarningControlPressed,
-            BorderColor = Color.Transparent,
+            BorderColor = DeadSpaceStylePalette.WarningBorderHover,
         };
         var warningDisabled = new StyleBoxFlat(warning)
         {
@@ -123,12 +118,12 @@ public sealed class DeadSpaceTypographyStatusSheetlet : Sheetlet<NanotrasenStyle
         var actionPositiveHover = new StyleBoxFlat(actionPositive)
         {
             BackgroundColor = DeadSpaceStylePalette.PositiveHover,
-            BorderColor = DeadSpaceStylePalette.HoverOutline,
+            BorderColor = DeadSpaceStylePalette.PositiveBorderHover,
         };
         var actionPositivePressed = new StyleBoxFlat(actionPositive)
         {
             BackgroundColor = DeadSpaceStylePalette.PositivePressed,
-            BorderColor = Color.Transparent,
+            BorderColor = DeadSpaceStylePalette.PositiveBorderPressed,
         };
         var topActionNegative = DeadSpaceStyleBoxes.Flat(
             DeadSpaceStylePalette.Negative,
@@ -139,12 +134,7 @@ public sealed class DeadSpaceTypographyStatusSheetlet : Sheetlet<NanotrasenStyle
         var topActionNegativeHover = new StyleBoxFlat(topActionNegative)
         {
             BackgroundColor = DeadSpaceStylePalette.NegativeHover,
-            BorderColor = DeadSpaceStylePalette.HoverOutline,
-        };
-        var topActionNegativePressed = new StyleBoxFlat(topActionNegative)
-        {
-            BackgroundColor = DeadSpaceStylePalette.NegativeHover,
-            BorderColor = Color.Transparent,
+            BorderColor = DeadSpaceStylePalette.NegativeBorderHover,
         };
         var topActionNegativeDisabled = new StyleBoxFlat(topActionNegative)
         {
@@ -162,7 +152,7 @@ public sealed class DeadSpaceTypographyStatusSheetlet : Sheetlet<NanotrasenStyle
         var readyOffHover = new StyleBoxFlat(readyOff)
         {
             BackgroundColor = DeadSpaceStylePalette.NegativeStrongHover,
-            BorderColor = DeadSpaceStylePalette.HoverOutline,
+            BorderColor = DeadSpaceStylePalette.NegativeBorderHover,
         };
         var priorityNever = DeadSpaceStyleBoxes.Flat(
             DeadSpaceStylePalette.NegativeStrong,
@@ -181,7 +171,7 @@ public sealed class DeadSpaceTypographyStatusSheetlet : Sheetlet<NanotrasenStyle
         var listUnreadHover = new StyleBoxFlat(listUnread)
         {
             BackgroundColor = DeadSpaceStylePalette.PositiveHover,
-            BorderColor = DeadSpaceStylePalette.HoverOutline,
+            BorderColor = DeadSpaceStylePalette.PositiveBorderHover,
         };
         var listUnreadDisabled = new StyleBoxFlat(listUnread)
         {
@@ -190,33 +180,10 @@ public sealed class DeadSpaceTypographyStatusSheetlet : Sheetlet<NanotrasenStyle
         };
         var listPressed = DeadSpaceStyleBoxes.Flat(
             DeadSpaceStylePalette.ListItemPressed,
-            Color.Transparent,
+            DeadSpaceStylePalette.CyanBright,
             new Thickness(1),
             6,
             4);
-        // Destructive admin actions use the same strong red fill as the explicit "never" priority state.
-        // The former generic negative fill made AHelp actions look like a separate, muddier palette.
-        var danger = DeadSpaceStyleBoxes.Flat(
-            DeadSpaceStylePalette.NegativeStrong,
-            Color.Transparent,
-            new Thickness(1),
-            14,
-            2);
-        var dangerHover = new StyleBoxFlat(danger)
-        {
-            BackgroundColor = DeadSpaceStylePalette.NegativeStrongHover,
-            BorderColor = DeadSpaceStylePalette.HoverOutline,
-        };
-        var dangerPressed = new StyleBoxFlat(danger)
-        {
-            BackgroundColor = DeadSpaceStylePalette.NegativeStrongHover,
-            BorderColor = Color.Transparent,
-        };
-        var dangerDisabled = new StyleBoxFlat(danger)
-        {
-            BackgroundColor = DeadSpaceStylePalette.ControlDisabled,
-            BorderColor = Color.Transparent,
-        };
         var progressHighlight = DeadSpaceStyleBoxes.Flat(DeadSpaceStylePalette.Amber);
         progressHighlight.SetContentMarginOverride(StyleBox.Margin.Vertical, 14.5f);
         var progressAccent = DeadSpaceStyleBoxes.Flat(DeadSpaceStylePalette.Cyan);
@@ -319,7 +286,7 @@ public sealed class DeadSpaceTypographyStatusSheetlet : Sheetlet<NanotrasenStyle
                 Button(DeadSpaceStyleClass.ActionPositive).PseudoPressed().Box(actionPositivePressed).Modulate(Color.White),
                 CompoundButton(DeadSpaceStyleClass.TopAction, StyleClass.Negative).PseudoNormal().Box(topActionNegative).Modulate(Color.White),
                 CompoundButton(DeadSpaceStyleClass.TopAction, StyleClass.Negative).PseudoHovered().Box(topActionNegativeHover).Modulate(Color.White),
-                CompoundButton(DeadSpaceStyleClass.TopAction, StyleClass.Negative).PseudoPressed().Box(topActionNegativePressed).Modulate(Color.White),
+                CompoundButton(DeadSpaceStyleClass.TopAction, StyleClass.Negative).PseudoPressed().Box(topActionNegativeHover).Modulate(Color.White),
                 CompoundButton(DeadSpaceStyleClass.TopAction, StyleClass.Negative).PseudoDisabled().Box(topActionNegativeDisabled).Modulate(Color.White),
                 Button(StyleClass.Positive).PseudoNormal().Box(positive).Modulate(Color.White),
                 Button(StyleClass.Positive).PseudoHovered().Box(positiveHover).Modulate(Color.White),
@@ -327,7 +294,7 @@ public sealed class DeadSpaceTypographyStatusSheetlet : Sheetlet<NanotrasenStyle
                 Button(StyleClass.Positive).PseudoDisabled().Box(positiveDisabled).Modulate(Color.White),
                 Button(StyleClass.Negative).PseudoNormal().Box(negative).Modulate(Color.White),
                 Button(StyleClass.Negative).PseudoHovered().Box(negativeHover).Modulate(Color.White),
-                Button(StyleClass.Negative).PseudoPressed().Box(negativePressed).Modulate(Color.White),
+                Button(StyleClass.Negative).PseudoPressed().Box(negativeHover).Modulate(Color.White),
                 Button(StyleClass.Negative).PseudoDisabled().Box(negativeDisabled).Modulate(Color.White),
                 Button(DeadSpaceStyleClass.ControlAccent).PseudoNormal().Box(accentControl).Modulate(Color.White),
                 Button(DeadSpaceStyleClass.ControlAccent).PseudoHovered().Box(accentControlHover).Modulate(Color.White),
@@ -341,16 +308,16 @@ public sealed class DeadSpaceTypographyStatusSheetlet : Sheetlet<NanotrasenStyle
                 Button(DeadSpaceStyleClass.ControlWarning).PseudoHovered().Box(warningHover).Modulate(Color.White),
                 Button(DeadSpaceStyleClass.ControlWarning).PseudoPressed().Box(warningPressed).Modulate(Color.White),
                 Button(DeadSpaceStyleClass.ControlWarning).PseudoDisabled().Box(warningDisabled).Modulate(Color.White),
-                Button(DeadSpaceStyleClass.ControlDanger).PseudoNormal().Box(danger).Modulate(Color.White),
-                Button(DeadSpaceStyleClass.ControlDanger).PseudoHovered().Box(dangerHover).Modulate(Color.White),
-                Button(DeadSpaceStyleClass.ControlDanger).PseudoPressed().Box(dangerPressed).Modulate(Color.White),
-                Button(DeadSpaceStyleClass.ControlDanger).PseudoDisabled().Box(dangerDisabled).Modulate(Color.White),
+                Button(DeadSpaceStyleClass.ControlDanger).PseudoNormal().Box(negative).Modulate(Color.White),
+                Button(DeadSpaceStyleClass.ControlDanger).PseudoHovered().Box(negativeHover).Modulate(Color.White),
+                Button(DeadSpaceStyleClass.ControlDanger).PseudoPressed().Box(negativeHover).Modulate(Color.White),
+                Button(DeadSpaceStyleClass.ControlDanger).PseudoDisabled().Box(negativeDisabled).Modulate(Color.White),
                 Button(DeadSpaceStyleClass.Ready).PseudoNormal().Box(readyOff).Modulate(Color.White),
                 Button(DeadSpaceStyleClass.Ready).PseudoHovered().Box(readyOffHover).Modulate(Color.White),
-                Button(DeadSpaceStyleClass.Ready).PseudoPressed().Box(actionPositivePressed).Modulate(Color.White),
-                Button(DeadSpaceStyleClass.JobPriorityPreferred).PseudoPressed().Box(positivePressed).Modulate(Color.White),
+                Button(DeadSpaceStyleClass.Ready).PseudoPressed().Box(actionPositiveHover).Modulate(Color.White),
+                Button(DeadSpaceStyleClass.JobPriorityPreferred).PseudoPressed().Box(positiveHover).Modulate(Color.White),
                 Button(DeadSpaceStyleClass.JobPriorityNever).PseudoPressed().Box(priorityNever).Modulate(Color.White),
-                Button(DeadSpaceStyleClass.AntagPreferenceOn).PseudoPressed().Box(positivePressed).Modulate(Color.White),
+                Button(DeadSpaceStyleClass.AntagPreferenceOn).PseudoPressed().Box(positiveHover).Modulate(Color.White),
                 Button(DeadSpaceStyleClass.AntagPreferenceOff).PseudoPressed().Box(priorityNever).Modulate(Color.White),
                 Button(DeadSpaceStyleClass.ListItemUnread).PseudoNormal().Box(listUnread).Modulate(Color.White),
                 Button(DeadSpaceStyleClass.ListItemUnread).PseudoHovered().Box(listUnreadHover).Modulate(Color.White),

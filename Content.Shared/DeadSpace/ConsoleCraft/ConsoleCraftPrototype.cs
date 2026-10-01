@@ -50,7 +50,7 @@ public sealed partial class ConsoleCraftRequirement
 public sealed partial class RandomRequestItemGroup
 {
     [DataField(required: true)]
-    public List<EntProtoId> Items = new();
+    public List<ProtoId<EntityPrototype>> Items = new();
 
     [DataField]
     public int Amount = 1;

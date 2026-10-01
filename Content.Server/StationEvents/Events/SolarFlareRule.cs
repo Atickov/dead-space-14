@@ -16,7 +16,8 @@ public sealed class SolarFlareRule : StationEventSystem<SolarFlareRuleComponent>
 {
     [Dependency] private readonly PoweredLightSystem _poweredLight = default!;
     [Dependency] private readonly SharedDoorSystem _door = default!;
-    // private float _effectTimer = 0; // DS14: the timer belongs to each rule instance.
+
+    private float _effectTimer = 0;
 
     public override void Initialize()
     {
@@ -39,31 +40,19 @@ public sealed class SolarFlareRule : StationEventSystem<SolarFlareRuleComponent>
     {
         base.ActiveTick(uid, component, gameRule, frameTime);
 
-        // DS14-start
-        component.EffectTimer -= frameTime;
-        if (component.EffectTimer < 0)
+        _effectTimer -= frameTime;
+        if (_effectTimer < 0)
         {
-            component.EffectTimer += 1;
-            // DS14-end
+            _effectTimer += 1;
             var lightQuery = EntityQueryEnumerator<PoweredLightComponent>();
             while (lightQuery.MoveNext(out var lightEnt, out var light))
             {
-                // DS14-start
-                if (!RuleStation.IsTarget(uid, lightEnt))
-                    continue;
-                // DS14-end
-
                 if (RobustRandom.Prob(component.LightBreakChancePerSecond))
                     _poweredLight.TryDestroyBulb(lightEnt, light);
             }
             var airlockQuery = EntityQueryEnumerator<AirlockComponent, DoorComponent>();
             while (airlockQuery.MoveNext(out var airlockEnt, out var airlock, out var door))
             {
-                // DS14-start
-                if (!RuleStation.IsTarget(uid, airlockEnt))
-                    continue;
-                // DS14-end
-
                 if (airlock.AutoClose && RobustRandom.Prob(component.DoorToggleChancePerSecond))
                     _door.TryToggleDoor(airlockEnt, door);
             }
@@ -77,11 +66,6 @@ public sealed class SolarFlareRule : StationEventSystem<SolarFlareRuleComponent>
         {
             if (!GameTicker.IsGameRuleActive(uid, gameRule))
                 continue;
-
-            // DS14-start
-            if (!RuleStation.IsTarget(uid, args.RadioReceiver))
-                continue;
-            // DS14-end
 
             if (!flare.AffectedChannels.Contains(args.Channel.ID))
                 continue;

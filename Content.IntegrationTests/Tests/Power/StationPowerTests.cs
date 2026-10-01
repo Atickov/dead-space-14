@@ -58,7 +58,6 @@ public sealed class StationPowerTests
         "Reach",
         "Saltern",
         "Train",
-        "DsTram2", // guess what? DS14
     ];
 
     [Explicit]

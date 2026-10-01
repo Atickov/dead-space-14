@@ -2,7 +2,6 @@ using Content.Shared.GameTicking;
 using Content.Server.Hands.Systems;
 using Robust.Shared.Prototypes;
 using Content.DeadSpace.Interfaces.Server;
-using Robust.Shared.Network;
 
 namespace Content.Server.DeadSpace.SponsorLoadout;
 
@@ -11,12 +10,10 @@ public sealed class SponsorLoadoutSystem : EntitySystem
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
     [Dependency] private readonly HandsSystem _handsSystem = default!;
     private IServerSponsorsManager? _sponsorsManager; // DS14-sponsors
-    private readonly HashSet<(NetUserId User, string Loadout)> _granted = new();
 
     public override void Initialize()
     {
         SubscribeLocalEvent<PlayerSpawnCompleteEvent>(OnPlayerSpawned);
-        SubscribeLocalEvent<RoundRestartCleanupEvent>(_ => _granted.Clear());
 
         IoCManager.Instance!.TryResolveType(out _sponsorsManager); // DS14-sponsors
     }
@@ -42,9 +39,6 @@ public sealed class SponsorLoadoutSystem : EntitySystem
                                               loadout.SpeciesRestrictions.Contains(ev.Profile.Species);
 
                     if (isSponsorOnly || isWhitelisted || isBlacklisted || isSpeciesRestricted)
-                        continue;
-
-                    if (!_granted.Add((ev.Player.UserId, loadoutId)))
                         continue;
 
                     var entity = Spawn(loadout.EntityId, Transform(ev.Mob).Coordinates);

@@ -1,8 +1,9 @@
 using Content.Shared.CriminalRecords.Components;
 using Content.Shared.DoAfter;
 using Content.Shared.Interaction;
-using Content.Shared.Ninja.Systems;
+using Content.Shared.DeadSpace.Ninja.Systems; //DS-14
 using Robust.Shared.Serialization;
+using Content.Shared.Ninja.Systems;
 
 namespace Content.Shared.CriminalRecords.Systems;
 

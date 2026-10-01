@@ -99,7 +99,6 @@ namespace Content.Server.Power.EntitySystems
 
         private void ApcPowerReceiverInit(EntityUid uid, ApcPowerReceiverComponent component, ComponentInit args)
         {
-            component.NetworkLoad.Paused = Paused(uid); // DS14
             AllocLoad(component.NetworkLoad);
             // DS14-start
             _apcReceiverLoads[component.NetworkLoad.Id] = uid;
@@ -158,7 +157,6 @@ namespace Content.Server.Power.EntitySystems
 
         private void BatteryInit(EntityUid uid, PowerNetworkBatteryComponent component, ComponentInit args)
         {
-            component.NetworkBattery.Paused = Paused(uid); // DS14
             AllocBattery(component.NetworkBattery);
             _networkBatteries[component.NetworkBattery.Id] = uid; // DS14
         }
@@ -185,7 +183,6 @@ namespace Content.Server.Power.EntitySystems
         private void PowerConsumerInit(EntityUid uid, PowerConsumerComponent component, ComponentInit args)
         {
             _powerNetConnector.BaseNetConnectorInit(component);
-            component.NetworkLoad.Paused = Paused(uid); // DS14
             AllocLoad(component.NetworkLoad);
             _powerConsumerLoads[component.NetworkLoad.Id] = uid; // DS14
         }
@@ -212,7 +209,6 @@ namespace Content.Server.Power.EntitySystems
         private void PowerSupplierInit(EntityUid uid, PowerSupplierComponent component, ComponentInit args)
         {
             _powerNetConnector.BaseNetConnectorInit(component);
-            component.NetworkSupply.Paused = Paused(uid); // DS14
             AllocSupply(component.NetworkSupply);
         }
 

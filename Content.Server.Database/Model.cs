@@ -1181,13 +1181,6 @@ namespace Content.Server.Database
         public bool CheckPlayerLimit { get; set; }
 
         public string WhitelistModesJson { get; set; } = string.Empty;
-
-        public bool EnableLowPlayerPreset { get; set; }
-
-        public int LowPlayerThreshold { get; set; }
-
-        public string? LowPlayerPresetId { get; set; }
-
     }
     // DS14-end
 

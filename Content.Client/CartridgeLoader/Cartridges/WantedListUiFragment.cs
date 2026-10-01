@@ -181,12 +181,7 @@ public sealed partial class WantedListUiFragment : BoxContainer
 
                 HistoryTable.AddChild(new RichTextLabel()
                 {
-                    // DS14: append the sentence, if any, to the crime text - same idea as CrimeHistoryWindow
-                    Text = $"[color=white]{FormattedMessage.EscapeText(history.Crime)}" +
-                           (string.IsNullOrWhiteSpace(history.Sentence)
-                               ? string.Empty
-                               : $" {FormattedMessage.EscapeText(Loc.GetString("criminal-records-history-sentence", ("sentence", history.Sentence)))}") +
-                           "[/color]",
+                    Text = $"[color=white]{FormattedMessage.EscapeText(history.Crime)}[/color]",
                     HorizontalExpand = true,
                     VerticalAlignment = VAlignment.Top,
                     Margin = new(10f, 0f),

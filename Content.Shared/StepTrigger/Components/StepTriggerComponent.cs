@@ -59,7 +59,7 @@ public sealed partial class StepTriggerComponent : Component
     public bool StepOn = false;
 }
 
-[RegisterComponent, UnsavedComponent]
+[RegisterComponent]
 [Access(typeof(StepTriggerSystem))]
 public sealed partial class StepTriggerActiveComponent : Component
 {

@@ -174,8 +174,7 @@ public sealed partial class ExplosionSystem : SharedExplosionSystem
             explosive.TileBreakScale,
             explosive.MaxTileBreak,
             explosive.CanCreateVacuum,
-            user,
-            explosive.AddLog);
+            user);
 
         if (explosive.DeleteAfterExplosion ?? delete)
             QueueDel(uid);

@@ -4,6 +4,8 @@ using Content.Shared.CombatMode;
 using Content.Shared.Cuffs;
 using Content.Shared.Cuffs.Components;
 using Content.Shared.Database;
+using Content.Shared.DeadSpace.Ninja.Components; //DS-14
+using Content.Shared.DeadSpace.Ninja.Systems; //DS-14
 using Content.Shared.DoAfter;
 using Content.Shared.DragDrop;
 using Content.Shared.Ghost;
@@ -47,6 +49,7 @@ public abstract class SharedStrippableSystem : EntitySystem
     [Dependency] private readonly MobStateSystem _mobState = default!;
     [Dependency] private readonly SharedContainerSystem _container = default!;
     [Dependency] private readonly INetManager _netManager = default!;
+    [Dependency] private readonly SharedNinjaDisguiseSystem _ninjaDisguise = default!;
     // DS14-end
 
     public override void Initialize()
@@ -74,11 +77,6 @@ public abstract class SharedStrippableSystem : EntitySystem
         if (args.Hands == null || !args.CanAccess || !args.CanInteract || args.Target == args.User)
             return;
 
-        // DS14-start: don't offer to strip a target that can't be stripped (e.g. a stasis cocoon).
-        if (args.Target is { Valid: true } target && TryComp<HandsComponent>(target, out var targetHands) && !targetHands.CanBeStripped)
-            return;
-        // DS14-end
-
         Verb verb = new()
         {
             Text = Loc.GetString("strip-verb-get-data-text"),
@@ -93,11 +91,6 @@ public abstract class SharedStrippableSystem : EntitySystem
     {
         if (args.Hands == null || !args.CanAccess || !args.CanInteract || args.Target == args.User)
             return;
-
-        // DS14-start: don't offer to strip a target that can't be stripped (e.g. a stasis cocoon).
-        if (args.Target is { Valid: true } target && TryComp<HandsComponent>(target, out var targetHands) && !targetHands.CanBeStripped)
-            return;
-        // DS14-end
 
         ExamineVerb verb = new()
         {
@@ -121,6 +114,14 @@ public abstract class SharedStrippableSystem : EntitySystem
             StripHand((user, userHands), (strippable.Owner, null), args.Slot, strippable);
             return;
         }
+
+        // DS14-start
+        if (IsStripTargetDisguised(strippable.Owner))
+        {
+            RaiseStripAttempt(strippable.Owner);
+            return;
+        }
+        // DS14-end
 
         if (!TryComp<InventoryComponent>(strippable, out var inventory))
             return;
@@ -180,8 +181,8 @@ public abstract class SharedStrippableSystem : EntitySystem
         if (!Resolve(user, ref user.Comp))
             return false;
 
-        // DS14-start: a stasis cocoon blocks inventory slots as well as hands.
-        if (TryComp<HandsComponent>(target, out var targetHands) && !targetHands.CanBeStripped)
+        // DS14-start
+        if (IsStripTargetDisguised(target))
             return false;
         // DS14-end
 
@@ -291,8 +292,8 @@ public abstract class SharedStrippableSystem : EntitySystem
         EntityUid item,
         string slot)
     {
-        // DS14-start: re-check during the strip do-after so entering a cocoon cancels it.
-        if (TryComp<HandsComponent>(target, out var targetHands) && !targetHands.CanBeStripped)
+        // DS14-start
+        if (IsStripTargetDisguised(target))
             return false;
         // DS14-end
 
@@ -773,15 +774,6 @@ public abstract class SharedStrippableSystem : EntitySystem
         if (!HasComp<StrippingComponent>(user))
             return false;
 
-        // DS14-start: don't let anyone open the stripping UI on a target that
-        // can't be stripped (e.g. a changeling in a stasis cocoon).
-        if (TryComp<HandsComponent>(target.Owner, out var targetHands) && !targetHands.CanBeStripped)
-        {
-            _popupSystem.PopupCursor(Loc.GetString("strip-cannot-strip"), user);
-            return false;
-        }
-        // DS14-end
-
         _ui.OpenUi(target.Owner, StrippingUiKey.Key, user);
         return true;
     }
@@ -889,6 +881,21 @@ public abstract class SharedStrippableSystem : EntitySystem
     private static bool IsActiveSession(ICommonSession session)
     {
         return session.Status is SessionStatus.Connected or SessionStatus.InGame;
+    }
+
+    // DS14-start
+    private bool IsStripTargetDisguised(EntityUid target)
+    {
+        return _ninjaDisguise.TryGetActiveDisguise(target, out _, out _);
+    }
+
+    private void RaiseStripAttempt(EntityUid wearer)
+    {
+        if (!_ninjaDisguise.TryGetActiveDisguise(wearer, out var suit, out _))
+            return;
+
+        var ev = new NinjaDisguiseStripAttemptEvent(wearer);
+        RaiseLocalEvent(suit, ref ev);
     }
     // DS14-end
 

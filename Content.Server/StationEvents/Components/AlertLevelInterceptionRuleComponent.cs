@@ -4,7 +4,6 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Server.StationEvents.Components;
 
-[Content.Server.DeadSpace.CentComm.AllowedGameRuleOnCentComm] // DS14
 [RegisterComponent, Access(typeof(AlertLevelInterceptionRule))]
 public sealed partial class AlertLevelInterceptionRuleComponent : Component
 {

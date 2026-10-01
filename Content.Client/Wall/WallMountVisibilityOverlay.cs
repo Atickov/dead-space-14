@@ -58,8 +58,6 @@ public sealed class WallMountVisibilityOverlay : Overlay
     /// </summary>
     private readonly List<EntityUid> _toRemove = [];
 
-    private readonly HashSet<Entity<WallMountComponent, TransformComponent>> _visibleEntities = []; // DS14
-
     /// <summary>
     /// Alpha change per second during fade.
     /// </summary>
@@ -76,11 +74,6 @@ public sealed class WallMountVisibilityOverlay : Overlay
             return;
 
         var viewportState = _fadeCache.GetForViewport(args.Viewport, _ => new ViewportFadeState(_sprite, _spriteQuery));
-
-        // DS14-start
-        _visibleEntities.Clear();
-        _tree.QueryAabb(_visibleEntities, args.MapId, args.WorldBounds);
-        // DS14-end
 
         if (!eye.DrawFov)
         {
@@ -124,9 +117,9 @@ public sealed class WallMountVisibilityOverlay : Overlay
         }
 
         // Restore alpha modified by other viewports.
-        foreach (var entity in _visibleEntities) // DS14
+        foreach (var entity in _tree.QueryAabb(args.MapId, args.WorldBounds))
         {
-            var uid = entity.Owner; // DS14
+            var uid = entity.Uid;
             if (!_spriteQuery.TryGetComponent(uid, out var sprite))
                 continue;
 
@@ -142,9 +135,10 @@ public sealed class WallMountVisibilityOverlay : Overlay
     /// </summary>
     private void ProcessVisibleEntities(in OverlayDrawArgs args, IEye eye, Matrix3x2 matrix, float fadeStep, ViewportFadeState viewportState)
     {
-        foreach (var entity in _visibleEntities) // DS14
+        foreach (var entity in _tree.QueryAabb(args.MapId, args.WorldBounds))
         {
-            var (uid, wallmount, xform) = entity; // DS14
+            var (wallmount, xform) = entity;
+            var uid = entity.Uid;
 
             if (!_spriteQuery.TryGetComponent(uid, out var sprite))
                 continue;
@@ -271,7 +265,6 @@ public sealed class WallMountVisibilityOverlay : Overlay
         _fadeCache.Dispose();
         _originalAlphas.Clear();
         _toRemove.Clear();
-        _visibleEntities.Clear(); // DS14
     }
 
     protected override void DisposeBehavior()

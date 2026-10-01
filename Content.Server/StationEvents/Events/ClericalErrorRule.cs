@@ -16,7 +16,7 @@ public sealed class ClericalErrorRule : StationEventSystem<ClericalErrorRuleComp
     {
         base.Started(uid, component, gameRule, args);
 
-        if (!TryGetRandomStation(out var chosenStation, rule: uid)) // DS14
+        if (!TryGetRandomStation(out var chosenStation))
             return;
 
         if (!TryComp<StationRecordsComponent>(chosenStation, out var stationRecords))

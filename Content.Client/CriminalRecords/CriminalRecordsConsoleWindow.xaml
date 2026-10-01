@@ -104,14 +104,9 @@
                     <RichTextLabel Name="WantedReason"
                                    Visible="False"
                                    MaxWidth="425" />
-                    <BoxContainer Orientation="Horizontal"
-                                  Margin="0 5">
-                        <Button Name="PrintButton"
-                                Text="{Loc 'criminal-records-console-print-button'}" /> <!-- DS14 -->
-                        <Button Name="HistoryButton"
-                                Text="{Loc 'criminal-records-console-crime-history'}"
-                                Margin="6 0 0 0" />
-                    </BoxContainer>
+                    <Button Name="HistoryButton"
+                            Text="{Loc 'criminal-records-console-crime-history'}"
+                            Margin="0 5" />
                 </BoxContainer>
             </BoxContainer>
             <BoxContainer Orientation="Horizontal"

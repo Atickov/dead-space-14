@@ -15,8 +15,6 @@ namespace Content.Server.Power.Pow3r
         // DS14-start
         private const int ParallelMinGroupWork = 4096;
         private const int ParallelMinAverageNetworkWork = 8;
-        private readonly HashSet<Network> _validationNets = new();
-        private readonly HashSet<NodeId> _validationNetIds = new();
         // DS14-end
 
         public BatteryRampPegSolver(bool disableParallel = false)
@@ -434,11 +432,8 @@ namespace Content.Server.Power.Pow3r
         /// </summary>
         private void ValidateNetworkGroups(PowerState state, List<NetworkGroup> groupedNetworks) // DS14
         {
-            // DS14-start
-            // This runs every Debug/DebugOpt tick; retain the backing arrays.
-            var nets = _validationNets;
-            var netIds = _validationNetIds;
-            // DS14-end
+            HashSet<Network> nets = new();
+            HashSet<NodeId> netIds = new();
             foreach (var layer in groupedNetworks)
             {
                 nets.Clear();

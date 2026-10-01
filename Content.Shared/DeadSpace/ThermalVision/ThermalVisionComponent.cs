@@ -17,9 +17,6 @@ public sealed partial class ThermalVisionComponent : Component
     public EntityUid? ActionToggleThermalVisionEntity;
 
     [DataField, AutoNetworkedField]
-    public EntityUid? GrantedBy;
-
-    [DataField, AutoNetworkedField]
     public bool IsActive;
 
     [DataField, AutoNetworkedField]

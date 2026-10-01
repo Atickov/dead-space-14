@@ -3850,7 +3850,7 @@
   productEntity: ClothingEyesGlassesThermalVisor
   discountCategory: rareDiscounts
   discountDownTo:
-    Telecrystal: 2
+    Telecrystal: 3
   cost:
     Telecrystal: 4
   categories:

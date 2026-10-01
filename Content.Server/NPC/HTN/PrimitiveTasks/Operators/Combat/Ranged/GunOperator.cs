@@ -22,10 +22,10 @@ public sealed partial class GunOperator : HTNOperator, IHtnConditionalShutdown
     public string TargetKey = default!;
 
     /// <summary>
-    /// Most injured state in which the target is still eligible for attack.
+    /// Minimum damage state that the target has to be in for us to consider attacking.
     /// </summary>
     [DataField("targetState")]
-    public MobState TargetState = MobState.PreCritical;
+    public MobState TargetState = MobState.Alive;
 
     /// <summary>
     /// Do we require line of sight of the target before failing.

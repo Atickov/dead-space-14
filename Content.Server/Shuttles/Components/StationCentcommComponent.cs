@@ -1,5 +1,5 @@
-using Content.Shared.Maps;
-using Robust.Shared.Prototypes;
+using Robust.Shared.Map;
+using Robust.Shared.Utility;
 
 namespace Content.Server.Shuttles.Components;
 
@@ -16,7 +16,7 @@ public sealed partial class StationCentcommComponent : Component
     public float ShuttleIndex;
 
     [DataField]
-    public ProtoId<GameMapPrototype> Map = "CentComm"; // DS14
+    public ResPath Map = new("/Maps/centcomm.yml");
 
     /// <summary>
     /// Centcomm entity that was loaded.

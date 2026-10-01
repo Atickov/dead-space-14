@@ -43,10 +43,10 @@ public abstract class StationEventSystem<T> : GameRuleSystem<T> where T : ICompo
         AdminLogManager.Add(LogType.EventAnnounced, $"Event added / announced: {ToPrettyString(uid)}");
 
         // we don't want to send to players who aren't in game (i.e. in the lobby)
-        Filter allPlayersInGame = RuleStation.GetEventPlayers(uid); // DS14
+        Filter allPlayersInGame = Filter.Empty().AddWhere(GameTicker.UserHasJoinedGame);
 
         if (stationEvent.StartAnnouncement != null)
-            ChatSystem.DispatchFilteredAnnouncement(allPlayersInGame, Loc.GetString(stationEvent.StartAnnouncement), sender: Loc.GetString("station-event-announcer"), playSound: false, colorOverride: stationEvent.StartAnnouncementColor); // DS14
+            ChatSystem.DispatchFilteredAnnouncement(allPlayersInGame, Loc.GetString(stationEvent.StartAnnouncement), playSound: false, colorOverride: stationEvent.StartAnnouncementColor);
 
         Audio.PlayGlobal(stationEvent.StartAudio, allPlayersInGame, true);
     }
@@ -82,10 +82,10 @@ public abstract class StationEventSystem<T> : GameRuleSystem<T> where T : ICompo
         AdminLogManager.Add(LogType.EventStopped, $"Event ended: {ToPrettyString(uid)}");
 
         // we don't want to send to players who aren't in game (i.e. in the lobby)
-        Filter allPlayersInGame = RuleStation.GetEventPlayers(uid); // DS14
+        Filter allPlayersInGame = Filter.Empty().AddWhere(GameTicker.UserHasJoinedGame);
 
         if (stationEvent.EndAnnouncement != null)
-            ChatSystem.DispatchFilteredAnnouncement(allPlayersInGame, Loc.GetString(stationEvent.EndAnnouncement), sender: Loc.GetString("station-event-announcer"), playSound: false, colorOverride: stationEvent.EndAnnouncementColor); // DS14
+            ChatSystem.DispatchFilteredAnnouncement(allPlayersInGame, Loc.GetString(stationEvent.EndAnnouncement), playSound: false, colorOverride: stationEvent.EndAnnouncementColor);
 
         Audio.PlayGlobal(stationEvent.EndAudio, allPlayersInGame, true);
     }

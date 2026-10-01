@@ -4,7 +4,6 @@ using Robust.Shared.Map;
 
 namespace Content.Server.StationEvents.Components;
 
-[Content.Server.DeadSpace.CentComm.AllowedGameRuleOnCentComm] // DS14
 [RegisterComponent, Access(typeof(GasLeakRule))]
 public sealed partial class GasLeakRuleComponent : Component
 {

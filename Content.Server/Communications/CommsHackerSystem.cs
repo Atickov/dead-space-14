@@ -1,6 +1,6 @@
 using Content.Server.Chat.Systems;
 using Content.Server.GameTicking;
-using Content.Server.Ninja.Systems;
+using Content.Server.DeadSpace.Ninja.Systems; //DS-14
 using Content.Shared.Communications;
 using Content.Shared.DoAfter;
 using Content.Shared.Interaction;
@@ -9,12 +9,13 @@ using Content.Shared.Random.Helpers;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 using Robust.Shared.Serialization;
+using Content.Server.Ninja.Systems;
 
 namespace Content.Server.Communications;
 
 public sealed class CommsHackerSystem : SharedCommsHackerSystem
 {
-    [Dependency] private readonly Content.Server.DeadSpace.CentComm.GameRuleStationSystem _ruleStation = default!; // DS14
+    [Dependency] private readonly ChatSystem _chat = default!;
     [Dependency] private readonly GameTicker _gameTicker = default!;
     [Dependency] private readonly IPrototypeManager _proto = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
@@ -78,8 +79,8 @@ public sealed class CommsHackerSystem : SharedCommsHackerSystem
     /// </summary>
     public void CallInThreat(NinjaHackingThreatPrototype ninjaHackingThreat)
     {
-        _gameTicker.StartGameRule(ninjaHackingThreat.Rule, out var rule); // DS14
-        _ruleStation.Announce(rule, Loc.GetString(ninjaHackingThreat.Announcement), playSound: true, colorOverride: Color.Red); // DS14
+        _gameTicker.StartGameRule(ninjaHackingThreat.Rule, out _);
+        _chat.DispatchGlobalAnnouncement(Loc.GetString(ninjaHackingThreat.Announcement), playSound: true, colorOverride: Color.Red);
     }
 }
 
