@@ -198,12 +198,18 @@ public sealed class NinjaSuitSystem : SharedNinjaSuitSystem
     //DS14-start
     private void OnOpenOS(Entity<NinjaSuitComponent> ent, ref OpenSpiderOSEvent args)
     {
-        var (uid, comp) = ent;
+        var (uid, _) = ent;
+
+        // Без этого UI открывался бы любому, кто поднял костюм с пола.
         if (!_ninja.IsNinja(args.Performer))
-            if (TryComp<AutoDustMarkerComponent>(args.Performer, out var marker))
-                _autoDust.ActivateAutoDust(args.Performer, marker);
-            else
+        {
+            if (!TryComp<AutoDustMarkerComponent>(args.Performer, out var marker))
                 return;
+
+            _autoDust.ActivateAutoDust(args.Performer, marker);
+            return;
+        }
+
         if (!_uiSystem.HasUi(uid, SpiderOSUiKey.Key))
             return;
 

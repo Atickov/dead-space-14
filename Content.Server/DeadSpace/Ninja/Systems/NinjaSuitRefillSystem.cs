@@ -57,7 +57,6 @@ public sealed class NinjaSuitRefillSystem : EntitySystem
             _charges.AddCharges((actionUid, charges), 1);
             _popup.PopupEntity(Loc.GetString("ninja-action-refill", ("action", MetaData(actionUid).EntityName)), args.User, args.User, PopupType.Small);
             args.Handled = true;
-            break;
         }
     }
 

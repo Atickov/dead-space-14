@@ -1,6 +1,5 @@
 // Мёртвый Космос, Licensed under custom terms with restrictions on public hosting and commercial use, full text: https://raw.githubusercontent.com/dead-space-server/space-station-14-fobos/master/LICENSE.TXT
 
-using System.Linq;
 using System.Diagnostics.CodeAnalysis;
 using Content.Shared.Access.Systems;
 using Content.Shared.Clothing.Components;
@@ -17,7 +16,6 @@ using Content.Shared.Inventory.Events;
 using Content.Shared.Popups;
 using Content.Shared.Roles;
 using Content.Shared.StatusIcon;
-using Content.Shared.Corvax.TTS;
 using Robust.Server.GameObjects;
 using Robust.Shared.Prototypes;
 using Content.Shared.Ninja.Systems;
@@ -154,7 +152,7 @@ public sealed class NinjaDisguiseSystem : SharedNinjaDisguiseSystem
         {
             Name = MetaData(target).EntityName,
             Description = MetaData(target).EntityDescription,
-            Appearance = NinjaDisguiseAppearance.Capture(humanoid),
+            Appearance = CaptureAppearance(humanoid),
         };
 
         CaptureClothing(entry, target);
@@ -171,11 +169,6 @@ public sealed class NinjaDisguiseSystem : SharedNinjaDisguiseSystem
             entry.IdCardJobIcon = targetId.Comp.JobIcon;
             entry.IdCardJobPrototype = targetId.Comp.JobPrototype;
             entry.IdCardJobDepartments = new List<ProtoId<DepartmentPrototype>>(targetId.Comp.JobDepartments);
-        }
-
-        if (TryComp<TTSComponent>(target, out var tts))
-        {
-            entry.TTS = tts.VoicePrototypeId;
         }
 
         comp.Entries.Add(entry);
@@ -424,7 +417,7 @@ public sealed class NinjaDisguiseSystem : SharedNinjaDisguiseSystem
         };
 
         if (TryComp<HumanoidAppearanceComponent>(wearer, out var humanoid))
-            entry.Appearance = NinjaDisguiseAppearance.Capture(humanoid);
+            entry.Appearance = CaptureAppearance(humanoid);
 
         CaptureClothing(entry, wearer);
 
@@ -444,11 +437,6 @@ public sealed class NinjaDisguiseSystem : SharedNinjaDisguiseSystem
             entry.IdCardJobDepartments = new List<ProtoId<DepartmentPrototype>>(wearerId.Comp.JobDepartments);
         }
 
-        if (TryComp<TTSComponent>(wearer, out var tts))
-        {
-            entry.TTS = tts.VoicePrototypeId;
-        }
-
         return entry;
     }
 
@@ -460,15 +448,12 @@ public sealed class NinjaDisguiseSystem : SharedNinjaDisguiseSystem
         if (entry.Appearance is { } appearance)
         {
             var humanoid = EnsureComp<HumanoidAppearanceComponent>(target);
-            appearance.ApplyTo(humanoid);
+            ApplyAppearance((target, humanoid), appearance);
             Dirty(target, humanoid);
 
             if (TryComp<InventoryComponent>(target, out var inventory))
                 _inventory.SetInventorySpecies(target, entry.InventorySpeciesId ?? appearance.Species.Id, inventory);
         }
-
-        if (entry.TTS is { } tts)
-            EnsureComp<TTSComponent>(target).VoicePrototypeId = tts;
     }
 
     private bool TryGetWearer(EntityUid suitUid, [NotNullWhen(true)] out EntityUid wearer)

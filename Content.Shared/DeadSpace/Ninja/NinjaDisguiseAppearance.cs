@@ -3,7 +3,6 @@
 using Content.Shared.Humanoid;
 using Content.Shared.Humanoid.Markings;
 using Content.Shared.Humanoid.Prototypes;
-using Content.Shared.Inventory;
 using Robust.Shared.Enums;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization;
@@ -38,6 +37,9 @@ public sealed class NinjaDisguiseAppearance
     public int Age = 18;
 
     [DataField]
+    public string Voice = SharedHumanoidAppearanceSystem.DefaultVoice;
+
+    [DataField]
     public HashSet<HumanoidVisualLayers> PermanentlyHidden = new();
 
     [DataField]
@@ -48,45 +50,4 @@ public sealed class NinjaDisguiseAppearance
 
     [DataField]
     public Color HairGradientColor = Color.Black;
-
-    public static NinjaDisguiseAppearance Capture(HumanoidAppearanceComponent humanoid)
-    {
-        return new NinjaDisguiseAppearance
-        {
-            MarkingSet = new MarkingSet(humanoid.MarkingSet),
-            Species = humanoid.Species,
-            SkinColor = humanoid.SkinColor,
-            EyeColor = humanoid.EyeColor,
-            SpeakerColor = humanoid.SpeakerColor,
-            Sex = humanoid.Sex,
-            Gender = humanoid.Gender,
-            Age = humanoid.Age,
-            PermanentlyHidden = new HashSet<HumanoidVisualLayers>(humanoid.PermanentlyHidden),
-            CustomBaseLayers = new Dictionary<HumanoidVisualLayers, CustomBaseLayerInfo>(humanoid.CustomBaseLayers),
-            HairGradientEnabled = humanoid.HairGradientEnabled,
-            HairGradientColor = humanoid.HairGradientColor,
-        };
-    }
-
-    public void ApplyTo(HumanoidAppearanceComponent humanoid)
-    {
-        humanoid.MarkingSet = new MarkingSet(MarkingSet);
-
-        if (Species.Id != null)
-            humanoid.Species = Species.Id;
-
-        humanoid.SkinColor = SkinColor;
-        humanoid.EyeColor = EyeColor;
-        humanoid.SpeakerColor = SpeakerColor;
-        humanoid.Sex = Sex;
-        humanoid.Gender = Gender;
-        humanoid.Age = Age;
-        humanoid.PermanentlyHidden = new HashSet<HumanoidVisualLayers>(PermanentlyHidden);
-        humanoid.CustomBaseLayers = new Dictionary<HumanoidVisualLayers, CustomBaseLayerInfo>(CustomBaseLayers);
-
-        humanoid.HiddenLayers = new Dictionary<HumanoidVisualLayers, SlotFlags>();
-
-        humanoid.HairGradientEnabled = HairGradientEnabled;
-        humanoid.HairGradientColor = HairGradientColor;
-    }
 }

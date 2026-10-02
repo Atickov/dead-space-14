@@ -1,5 +1,4 @@
 using Content.Server.Beam;
-using Content.Shared.DeadSpace.Ninja.Systems;
 using Robust.Shared.Map;
 using Content.Shared.Ninja.Systems;
 

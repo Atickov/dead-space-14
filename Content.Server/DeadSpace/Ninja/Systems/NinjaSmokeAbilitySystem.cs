@@ -114,7 +114,10 @@ public sealed class NinjaSmokeAbilitySystem : SharedNinjaSmokeAbilitySystem
         var coords = _map.MapToGrid(gridUid, mapCoords);
         var smoke = Spawn(ent.Comp.SmokePrototype, coords.SnapToGrid());
         if (!TryComp<SmokeComponent>(smoke, out var smokeComp))
+        {
+            QueueDel(smoke);
             return false;
+        }
 
         _audio.PlayPvs(ent.Comp.SmokeSound, user);
         if (!autoMode)

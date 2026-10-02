@@ -29,7 +29,9 @@ public sealed class AutoDustSystem : SharedAutoDustSystem
     }
     private void OnEquipped(Entity<AutoDustComponent> ent, ref GotEquippedEvent args)
     {
-        EnsureComp<AutoDustMarkerComponent>(args.Equipee).AutoDustItem = ent.Owner;
+        var marker = EnsureComp<AutoDustMarkerComponent>(args.Equipee);
+        marker.AutoDustItem = ent.Owner;
+        Dirty(args.Equipee, marker);
     }
 
     private void OnUnequipped(Entity<AutoDustComponent> ent, ref GotUnequippedEvent args)

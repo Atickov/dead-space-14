@@ -39,6 +39,11 @@ public abstract class SharedSpaceNinjaSystem : EntitySystem
     //DS14-start
     public override void Update(float frameTime)
     {
+        base.Update(frameTime);
+
+        if (!SimulateHeat)
+            return;
+
         var query = EntityQueryEnumerator<SpaceNinjaComponent>();
 
         while (query.MoveNext(out var uid, out var ninja))
@@ -60,7 +65,7 @@ public abstract class SharedSpaceNinjaSystem : EntitySystem
                     Popup.PopupPredicted(Loc.GetString("ninja-suit-heat-warning"), uid, uid, PopupType.MediumCaution);
                 }
 
-                var dangerThreshold = heat.MaxHeat * 0.75f;
+                var dangerThreshold = heat.DangerThreshold;
 
                 if (heat.Heat >= dangerThreshold &&
                     previousHeat < dangerThreshold)
@@ -98,6 +103,8 @@ public abstract class SharedSpaceNinjaSystem : EntitySystem
             }
         }
     }
+
+    protected virtual bool SimulateHeat => false;
     //DS14-end
 
     public bool IsNinja([NotNullWhen(true)] EntityUid? uid)

@@ -4,8 +4,8 @@ meta:
   engineVersion: 276.0.0
   forkId: ""
   forkVersion: ""
-  time: 09/21/2026 14:43:05
-  entityCount: 3031
+  time: 10/02/2026 14:22:42
+  entityCount: 3032
 maps:
 - 1
 grids:
@@ -71,6 +71,8 @@ entities:
         moles:
           Oxygen: 21
           Nitrogen: 82
+    - type: FTLDestination
+      requireCoordinateDisk: True
   - uid: 2
     components:
     - type: MetaData
@@ -10961,6 +10963,14 @@ entities:
       parent: 2
     - type: Physics
       canCollide: False
+- proto: FTLDiskSpawnPoint
+  entities:
+  - uid: 3032
+    components:
+    - type: Transform
+      rot: -1.5707963267948966 rad
+      pos: -5.5,-0.5
+      parent: 2748
 - proto: Futon
   entities:
   - uid: 903

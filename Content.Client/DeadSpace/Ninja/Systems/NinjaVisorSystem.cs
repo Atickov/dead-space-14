@@ -21,6 +21,8 @@ public sealed class NinjaVisorSystem : EntitySystem
 
     public override void Initialize()
     {
+        base.Initialize();
+
         SubscribeLocalEvent<NinjaVisorComponent, ComponentInit>(OnInit);
         SubscribeLocalEvent<NinjaVisorComponent, AfterAutoHandleStateEvent>(OnState);
         SubscribeLocalEvent<NinjaVisorComponent, ComponentShutdown>(OnShutdown);

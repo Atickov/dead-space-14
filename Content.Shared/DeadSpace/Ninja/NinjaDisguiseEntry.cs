@@ -43,9 +43,6 @@ public sealed class NinjaDisguiseEntry
     public List<ProtoId<DepartmentPrototype>> IdCardJobDepartments = new();
 
     [DataField]
-    public string? TTS;
-
-    [DataField]
     public NinjaDisguiseAppearance? Appearance;
 
     [DataField]

@@ -90,7 +90,8 @@ public sealed class SpiderOSWindowBoundUserInterface : BoundUserInterface
             },
             OnCheckFailed = failReason =>
             {
-                _window.AppendBootLog(Loc.GetString(failReason), SpiderOSWindow.BootErrorColor);
+                if (!string.IsNullOrEmpty(failReason.Id))
+                    _window.AppendBootLog(Loc.GetString(failReason), SpiderOSWindow.BootErrorColor);
                 _window.AppendBootLog(Loc.GetString("spider-os-boot-rollback"), SpiderOSWindow.BootLogColor);
             },
             OnSecureRequest = (secure, check) =>
@@ -152,15 +153,18 @@ public sealed class SpiderOSWindowBoundUserInterface : BoundUserInterface
 
     protected override void Dispose(bool disposing)
     {
+        if (disposing)
+        {
+            _bootSystem?.CancelBoot(Owner);
+            if (_lockActive)
+                SendMessage(new SpiderOSSecureRequestMessage(false, SpiderOSBootCheck.VisorSecure));
+        }
+
         base.Dispose(disposing);
+
         if (!disposing)
             return;
 
-        _bootSystem?.CancelBoot(Owner);
-        if (_lockActive)
-        {
-            SendMessage(new SpiderOSSecureRequestMessage(false, SpiderOSBootCheck.VisorSecure));
-        }
         _window?.Close();
         _window = null;
     }

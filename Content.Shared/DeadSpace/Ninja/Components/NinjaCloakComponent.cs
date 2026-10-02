@@ -7,8 +7,6 @@ namespace Content.Shared.DeadSpace.Ninja.Components;
 [RegisterComponent, NetworkedComponent, AutoGenerateComponentState(raiseAfterAutoHandleState: true)]
 public sealed partial class NinjaCloakComponent : Component
 {
-    [DataField]
-    public int? OriginalDrawDepth;
     [DataField, AutoNetworkedField]
     public bool Enabled = false;
 

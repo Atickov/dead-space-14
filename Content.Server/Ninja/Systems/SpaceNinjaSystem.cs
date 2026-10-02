@@ -52,6 +52,10 @@ public sealed class SpaceNinjaSystem : SharedSpaceNinjaSystem
         }
     }
 
+    // DS14-start
+    protected override bool SimulateHeat => true;
+    // DS14-end
+
     /// <summary>
     /// Download the given set of nodes, returning how many new nodes were downloaded.
     /// </summary>

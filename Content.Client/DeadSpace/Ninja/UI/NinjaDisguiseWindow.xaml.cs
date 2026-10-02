@@ -19,6 +19,7 @@ using Robust.Client.UserInterface.XAML;
 using Robust.Shared.Map;
 using Robust.Shared.Prototypes;
 using Content.Client.DeadSpace.Stylesheets;
+using Content.Shared.DeadSpace.Ninja.Systems;
 
 namespace Content.Client.DeadSpace.Ninja.UI;
 
@@ -32,6 +33,7 @@ public sealed partial class NinjaDisguiseWindow : FancyWindow
     private readonly HumanoidAppearanceSystem _humanoid;
     private readonly ClientClothingSystem _clothingSystem;
     private readonly InventorySystem _inventorySystem;
+    private readonly SharedNinjaDisguiseSystem _ninjaDisguiseSystem = default!;
 
     private readonly List<EntityUid> _previews = new();
 
@@ -50,6 +52,7 @@ public sealed partial class NinjaDisguiseWindow : FancyWindow
         _humanoid = _entManager.System<HumanoidAppearanceSystem>();
         _clothingSystem = _entManager.System<ClientClothingSystem>();
         _inventorySystem = _entManager.System<InventorySystem>();
+        _ninjaDisguiseSystem = _entManager.System<SharedNinjaDisguiseSystem>();
 
         ResetButton.OnPressed += _ => OnResetPressed?.Invoke();
 
@@ -161,7 +164,7 @@ public sealed partial class NinjaDisguiseWindow : FancyWindow
                 return null;
             }
 
-            appearance.ApplyTo(humanoid);
+            _ninjaDisguiseSystem.ApplyAppearance((uid, humanoid), appearance);
 
             _inventorySystem.SetInventorySpecies(uid, entry.InventorySpeciesId ?? appearance.Species.Id);
 

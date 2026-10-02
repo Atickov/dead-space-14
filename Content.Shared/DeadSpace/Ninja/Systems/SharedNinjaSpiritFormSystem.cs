@@ -30,9 +30,9 @@ public abstract class SharedNinjaSpiritFormSystem : EntitySystem
 
         SubscribeLocalEvent<NinjaSpiritFormComponent, SpiderOSPowerChangedEvent>(OnSpiderOSPowerChanged);
 
-        SubscribeLocalEvent<NinjaSpiritFormComponent, AttackAttemptEvent>(OnAttackAttempt);
-        SubscribeLocalEvent<NinjaSpiritFormComponent, UseAttemptEvent>(OnUseAttempt);
-        SubscribeLocalEvent<NinjaSpiritFormComponent, InteractionAttemptEvent>(OnInteractAttempt);
+        SubscribeLocalEvent<SpaceNinjaComponent, AttackAttemptEvent>(OnAttackAttempt);
+        SubscribeLocalEvent<SpaceNinjaComponent, UseAttemptEvent>(OnUseAttempt);
+        SubscribeLocalEvent<SpaceNinjaComponent, InteractionAttemptEvent>(OnInteractAttempt);
     }
 
     private void OnMapInit(
@@ -161,27 +161,34 @@ public abstract class SharedNinjaSpiritFormSystem : EntitySystem
     }
 
     private void OnAttackAttempt(
-        Entity<NinjaSpiritFormComponent> ent,
+        Entity<SpaceNinjaComponent> ent,
         ref AttackAttemptEvent args)
     {
-        if (ent.Comp.SpiritFormActive)
+        if (IsSpiritFormActive(ent))
             args.Cancel();
     }
 
     private void OnUseAttempt(
-        Entity<NinjaSpiritFormComponent> ent,
+        Entity<SpaceNinjaComponent> ent,
         ref UseAttemptEvent args)
     {
-        if (ent.Comp.SpiritFormActive)
+        if (IsSpiritFormActive(ent))
             args.Cancel();
     }
 
     private void OnInteractAttempt(
-        Entity<NinjaSpiritFormComponent> ent,
+        Entity<SpaceNinjaComponent> ent,
         ref InteractionAttemptEvent args)
     {
-        if (ent.Comp.SpiritFormActive)
+        if (IsSpiritFormActive(ent))
             args.Cancelled = true;
+    }
+
+    private bool IsSpiritFormActive(Entity<SpaceNinjaComponent> ent)
+    {
+        return ent.Comp.Suit is { } suit &&
+               TryComp<NinjaSpiritFormComponent>(suit, out var form) &&
+               form.SpiritFormActive;
     }
 
     public override void Update(float frameTime)
@@ -209,7 +216,11 @@ public abstract class SharedNinjaSpiritFormSystem : EntitySystem
 
             if (!xform.ParentUid.IsValid())
             {
-                DeactivateSpirit((uid, comp), xform.ParentUid);
+                // Костюм больше не на носителе — гасим форму напрямую,
+                // DeactivateSpirit здесь получил бы невалидный uid.
+                comp.SpiritFormActive = false;
+                comp.DrainAccumulator = 0f;
+                Dirty(uid, comp);
                 continue;
             }
 
