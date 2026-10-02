@@ -8235,3 +8235,10 @@ Entries:
   changes:
   - type: Fix
     message: Лошадки 🐎
+- id: 786
+  author: IvanKuvalda
+  time: '2026-10-02T10:58:58.324764+00:00'
+  pr: 2403
+  changes:
+  - type: Add
+    message: новые каталоги в емагнутые автоматы, инфа в ПРе
