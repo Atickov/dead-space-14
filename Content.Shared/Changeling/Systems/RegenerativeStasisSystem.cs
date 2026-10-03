@@ -1,10 +1,16 @@
-﻿using Content.Shared.Actions;
+﻿using System.Linq;
+using Content.Shared.Actions;
 using Content.Shared.Actions.Components;
 using Content.Shared.Body.Components;
 using Content.Shared.Body.Systems;
 using Content.Shared.Changeling.Components;
+using Content.Shared.Cuffs; // DS14
+using Content.Shared.Cuffs.Components; // DS14
+using Content.Shared.DeadSpace.Changeling.Systems; // DS14
 using Content.Shared.Damage.Components;
 using Content.Shared.Damage.Systems;
+using Content.Shared.Hands.Components;
+using Content.Shared.Hands.EntitySystems;
 using Content.Shared.IdentityManagement;
 using Content.Shared.Mobs;
 using Content.Shared.Mobs.Systems;
@@ -18,6 +24,9 @@ public sealed partial class RegenerativeStasisSystem : EntitySystem
     [Dependency] private readonly SharedActionsSystem _actions = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly SharedHandsSystem _hands = default!; // DS14
+    [Dependency] private readonly ChangelingCocoonAbilitySystem _cocoon = default!; // DS14
+    [Dependency] private readonly SharedCuffableSystem _cuffs = default!; // DS14
     [Dependency] private readonly MetaDataSystem _metaData = default!;
     [Dependency] private readonly MobStateSystem _mobs = default!;
     [Dependency] private readonly DamageableSystem _damage = default!;
@@ -50,7 +59,11 @@ public sealed partial class RegenerativeStasisSystem : EntitySystem
         foreach (var action in ent.Comp.Actions)
         {
             if (TryComp<RegenerativeStasisActionComponent>(action, out var stasis) && stasis.IsInStasis)
+            {
                 CancelStasis((action, stasis));
+                RestoreStrip(ent.Owner);
+                RemoveCuffs(ent.Owner); // DS14
+            }
         }
     }
     // DS14-end
@@ -93,6 +106,17 @@ public sealed partial class RegenerativeStasisSystem : EntitySystem
             _mobs.ChangeMobState(target, MobState.Dead);
 
         _popup.PopupPredicted(Loc.GetString("changeling-stasis-enter"), null, target, target, PopupType.MediumCaution); // DS14
+
+        // DS14-start
+        if (_cocoon.IsEnabled(target) &&
+            TryComp<HandsComponent>(target, out var cocoonHands) &&
+            cocoonHands.CanBeStripped)
+        {
+            ent.Comp.CocoonActive = true;
+            _hands.SetCanBeStripped((target, cocoonHands), false);
+            _popup.PopupPredicted(Loc.GetString("changeling-stasis-cocoon-enter"), null, target, target); // DS14
+            Dirty(ent);
+        }
 
         ent.Comp.IsInStasis = true;
         Dirty(ent);
@@ -140,7 +164,12 @@ public sealed partial class RegenerativeStasisSystem : EntitySystem
         _popup.PopupPredicted(Loc.GetString("changeling-stasis-exit"), Loc.GetString("changeling-stasis-exit-others", ("user", Identity.Entity(target, EntityManager))), target, target, PopupType.MediumCaution);
         _audio.PlayPredicted(ent.Comp.ExitSound, target, target);
 
+        // DS14-start
         ent.Comp.IsInStasis = false;
+        ent.Comp.CocoonActive = false;
+        RestoreStrip(target);
+        RemoveCuffs(target);
+        // DS14-end
         Dirty(ent);
 
         if (ent.Comp.InitialName != null)
@@ -163,6 +192,7 @@ public sealed partial class RegenerativeStasisSystem : EntitySystem
             return;
 
         ent.Comp.IsInStasis = false;
+        ent.Comp.CocoonActive = false;
         Dirty(ent);
 
         if (ent.Comp.InitialName != null)
@@ -172,6 +202,25 @@ public sealed partial class RegenerativeStasisSystem : EntitySystem
 
         _actions.SetToggled(ent.Owner, ent.Comp.IsInStasis);
     }
+
+    // DS14-start
+    private void RestoreStrip(EntityUid target)
+    {
+        if (TryComp<HandsComponent>(target, out var hands) && !hands.CanBeStripped)
+            _hands.SetCanBeStripped((target, hands), true);
+    }
+
+    private void RemoveCuffs(EntityUid target)
+    {
+        if (!TryComp<CuffableComponent>(target, out var cuffable) || cuffable.Container.ContainedEntities.Count == 0)
+            return;
+
+        foreach (var cuffs in cuffable.Container.ContainedEntities.ToArray())
+        {
+            _cuffs.Uncuff(target, null, cuffs, cuffable);
+        }
+    }
+    // DS14-end
 }
 
 /// <summary>

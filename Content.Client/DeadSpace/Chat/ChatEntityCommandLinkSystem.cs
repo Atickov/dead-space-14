@@ -32,10 +32,8 @@ public sealed class ChatEntityCommandLinkSystem : EntitySystem
     {
         prefix = string.Empty;
 
-        if (message is null ||
-            !CanAttachLinksToMessage(message) ||
-            _player is not { } player ||
-            player.LocalEntity is not { } localEntity)
+        if (!CanAttachLinksToMessage(message) ||
+            _player.LocalEntity is not { } localEntity)
         {
             return false;
         }
@@ -54,13 +52,10 @@ public sealed class ChatEntityCommandLinkSystem : EntitySystem
 
         if (CanUseAdminChatLinks(localEntity))
         {
-            if (_admin is not { } admin)
-                return builder.Length > 0;
-
-            if (admin.CanCommand("follow"))
+            if (_admin.CanCommand("follow"))
                 AppendLink(builder, "[FLW]", $"follow {message.SenderEntity}");
 
-            if (admin.CanCommand("playerpanel"))
+            if (_admin.CanCommand("playerpanel"))
                 AppendLink(builder, "[PP]", $"playerpanel {message.SenderEntity}");
         }
 
@@ -73,8 +68,7 @@ public sealed class ChatEntityCommandLinkSystem : EntitySystem
 
     private bool CanUseAdminChatLinks(EntityUid localEntity)
     {
-        return _admin is { } admin &&
-               admin.IsActive() &&
+        return _admin.IsActive() &&
                TryComp<GhostComponent>(localEntity, out var ghost) &&
                ghost.CanGhostInteract;
     }

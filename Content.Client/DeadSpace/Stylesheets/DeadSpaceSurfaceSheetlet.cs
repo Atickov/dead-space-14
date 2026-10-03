@@ -76,6 +76,9 @@ public sealed class DeadSpaceSurfaceSheetlet : Sheetlet<NanotrasenStylesheet>
             verticalMargin: 8);
         var panelWarning = DeadSpaceStyleBoxes.Flat(
             DeadSpaceStylePalette.Warning);
+        var panelPositive = DeadSpaceStyleBoxes.Flat(DeadSpaceStylePalette.Positive);
+        var panelNegative = DeadSpaceStyleBoxes.Flat(DeadSpaceStylePalette.Negative);
+        var panelHighlight = DeadSpaceStyleBoxes.Flat(DeadSpaceStylePalette.WarningControl);
         var modalScrim = DeadSpaceStyleBoxes.Flat(DeadSpaceStylePalette.ModalScrim);
         var flatBody = DeadSpaceStyleBoxes.Flat(DeadSpaceStylePalette.SurfaceFlat, horizontalMargin: 8);
         flatBody.ContentMarginTopOverride = 8;
@@ -99,9 +102,6 @@ public sealed class DeadSpaceSurfaceSheetlet : Sheetlet<NanotrasenStylesheet>
             classicThickness,
             horizontalMargin: 18,
             verticalMargin: 7);
-        var spiderOSBackground = DeadSpaceStyleBoxes.Flat(Color.FromHex("#182019"));
-        var spiderOSHeader = DeadSpaceStyleBoxes.Flat(Color.FromHex("#202B23"));
-        var spiderOSDivider = DeadSpaceStyleBoxes.Flat(Color.FromHex("#1bcc15"));
 
         var accent = DeadSpaceStyleBoxes.Flat(DeadSpaceStylePalette.Amber);
         accent.ContentMarginLeftOverride = 2;
@@ -155,8 +155,10 @@ public sealed class DeadSpaceSurfaceSheetlet : Sheetlet<NanotrasenStylesheet>
         };
         var input = DeadSpaceStyleBoxes.Flat(
             DeadSpaceStylePalette.Input,
-            DeadSpaceStylePalette.BorderControl,
-            DeadSpaceStylePalette.ClassicChrome ? new Thickness(0) : new Thickness(0, 0, 0, 1),
+            DeadSpaceStylePalette.ClassicChrome
+                ? DeadSpaceStylePalette.BorderControl
+                : Color.Transparent,
+            DeadSpaceStylePalette.ClassicChrome ? new Thickness(0) : new Thickness(1),
             7,
             4);
         var popup = new StyleBoxFlat(panel)
@@ -194,14 +196,6 @@ public sealed class DeadSpaceSurfaceSheetlet : Sheetlet<NanotrasenStylesheet>
             E<PanelContainer>().Class(DeadSpaceStyleClass.SurfaceFlat).Panel(flatBody),
             E<PanelContainer>().Class(DeadSpaceStyleClass.SectionHeader).Panel(header),
             E<PanelContainer>().Class(DeadSpaceStyleClass.Inset).Panel(inset),
-            E().Class(DeadSpaceStyleClass.SpiderOSWindow)
-                .ParentOf(E<PanelContainer>().Class(StyleClass.BackgroundPanel))
-                .Panel(spiderOSBackground),
-            E().Class(DeadSpaceStyleClass.SpiderOSWindow)
-                .ParentOf(E<BoxContainer>())
-                .ParentOf(E<PanelContainer>().Class(StyleClass.LowDivider))
-                .Panel(spiderOSDivider),
-            E<PanelContainer>().Class(DeadSpaceStyleClass.SpiderOSWindowHeader).Panel(spiderOSHeader),
             E<PanelContainer>().Class(DeadSpaceStyleClass.RoundStatus).Panel(roundStatus),
             E<PanelContainer>().Class(DeadSpaceStyleClass.Accent).Panel(accent),
             E<PanelContainer>().Class(DeadSpaceStyleClass.AccentDim).Panel(accentDim),
@@ -228,6 +222,9 @@ public sealed class DeadSpaceSurfaceSheetlet : Sheetlet<NanotrasenStylesheet>
             E<PanelContainer>().Class(StyleClass.PanelDeep).Panel(legacyPanelDeep),
             E<PanelContainer>().Class(StyleClass.PanelInsetDeep).Panel(legacyPanelInsetDeep),
             E<PanelContainer>().Class("BackgroundDark").Panel(legacyPanelDeep),
+            E<PanelContainer>().Class(StyleClass.Positive).Panel(panelPositive),
+            E<PanelContainer>().Class(StyleClass.Negative).Panel(panelNegative),
+            E<PanelContainer>().Class(StyleClass.Highlight).Panel(panelHighlight),
             // Standard content windows use DS chrome without per-window style annotations.
             E<PanelContainer>().Class(DefaultWindow.StyleClassWindowPanel).Panel(defaultWindowPanel),
             E<PanelContainer>().Class(DefaultWindow.StyleClassWindowHeader).Panel(defaultWindowHeader),

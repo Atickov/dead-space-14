@@ -2,7 +2,6 @@ using System.Linq;
 using System.Numerics;
 using Content.Client.Examine;
 using Content.Client.Hands.Systems;
-using Content.Client.DeadSpace.Ninja.Systems; //DS-14
 using Content.Client.Strip;
 using Content.Client.Stylesheets;
 using Content.Client.UserInterface.Controls;
@@ -33,7 +32,6 @@ using Robust.Shared.Prototypes;
 using Robust.Shared.Utility;
 using static Content.Client.Inventory.ClientInventorySystem;
 using static Robust.Client.UserInterface.Control;
-using Robust.Shared.Containers; //DS-14
 
 namespace Content.Client.Inventory
 {
@@ -89,11 +87,6 @@ namespace Content.Client.Inventory
 
         [ViewVariables]
         private StrippingMenu? _strippingMenu;
-
-        //DS14-start
-        [ViewVariables]
-        private bool _disguiseView;
-        //DS14-end
 
         [ViewVariables]
         private readonly EntityUid _virtualHiddenEntity;
@@ -161,19 +154,18 @@ namespace Content.Client.Inventory
             _handCount = 0;
             _inventoryDimensions = Vector2i.Zero;
 
-            // DS14-start
-            _disguiseView = EntMan.System<NinjaDisguiseClientSystem>().IsDisguised(Owner);
+            // DS14-start: a stasis cocoon hides the entire inventory, not only hands.
+            if (EntMan.TryGetComponent<HandsComponent>(Owner, out var targetHands) && !targetHands.CanBeStripped)
+                return;
+            // DS14-end
 
             if (EntMan.TryGetComponent<InventoryComponent>(Owner, out var inv))
             {
                 foreach (var slot in inv.Slots)
                 {
-                    if (!_inv.TryGetSlotContainer(Owner, slot.Name, out var container, out _))
-                        continue;
-                    AddInventoryButton(slot, container);
+                    AddInventoryButton(Owner, slot.Name, inv);
                 }
             }
-            // DS14-end
 
             if (EntMan.TryGetComponent<HandsComponent>(Owner, out var handsComp) && handsComp.CanBeStripped)
             {
@@ -310,53 +302,24 @@ namespace Content.Client.Inventory
             }
         }
 
-        // DS14-start
-        private void AddInventoryButton(SlotDefinition slotDef, ContainerSlot? container = null)
+        private void AddInventoryButton(EntityUid invUid, string slotId, InventoryComponent inv)
         {
-            EntityUid? entity = null;
+            if (!_inv.TryGetSlotContainer(invUid, slotId, out var container, out var slotDef, inv))
+                return;
 
-            if (container != null)
-                entity = container.ContainedEntity;
-
-            if (_disguiseView)
-                entity = null;
-            // DS14-end
+            var entity = container.ContainedEntity;
 
             // If this is a full pocket, obscure the real entity
             // this does not work for modified clients because they are still sent the real entity
             if (entity != null && _strippable.IsStripHidden(slotDef, _player.LocalEntity))
                 entity = _virtualHiddenEntity;
 
-            // DS14-start
-            var button = new SlotButton(new SlotData(slotDef, _disguiseView ? null : container));
-            // DS14-end
+            var button = new SlotButton(new SlotData(slotDef, container));
             button.Pressed += SlotPressed;
 
             _strippingMenu!.InventoryContainer.AddChild(button);
 
-            // DS14-start
-            if (_disguiseView)
-            {
-                var ninjaDisguise = EntMan.System<NinjaDisguiseClientSystem>();
-                var isHidden = _strippable.IsStripHidden(slotDef, _player.LocalEntity);
-                if (ninjaDisguise.TryGetDisguiseSlotProxy(Owner, slotDef.Name, out var proxy))
-                    if (isHidden)
-                        UpdateEntityIcon(button, _virtualHiddenEntity);
-                    else
-                        UpdateEntityIcon(button, proxy);
-                else if (ninjaDisguise.TryGetDisguiseSlotProto(Owner, slotDef.Name, out var fakeProto) && _proto.HasIndex(fakeProto))
-                    if (isHidden)
-                        UpdateEntityIcon(button, _virtualHiddenEntity);
-                    else
-                        button.SetPrototype(fakeProto, false);
-                else
-                    UpdateEntityIcon(button, null);
-            }
-            else
-            {
-                UpdateEntityIcon(button, entity);
-            }
-            // DS14-end
+            UpdateEntityIcon(button, entity);
 
             LayoutContainer.SetPosition(button,
                 slotDef.StrippingWindowPos * (SlotControl.DefaultButtonSize + ButtonSeparation));
