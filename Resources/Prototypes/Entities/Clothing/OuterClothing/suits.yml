@@ -220,6 +220,8 @@
   - type: NinjaSuitHeat
   - type: NinjaAppearance
   - type: NinjaAppearanceItem
+    frozenColor: Green
+    frozenStyle: Old
   #DS14 end
   - type: EmpResistance
     strengthMultiplier: 0

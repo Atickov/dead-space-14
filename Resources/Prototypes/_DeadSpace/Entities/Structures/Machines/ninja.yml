@@ -48,6 +48,9 @@
         - MachineMask
         layer:
         - MachineLayer
+  - type: ContainerContainer
+    containers:
+      entity_storage: !type:ContainerSlot
   - type: Climbable
 
 - type: entity

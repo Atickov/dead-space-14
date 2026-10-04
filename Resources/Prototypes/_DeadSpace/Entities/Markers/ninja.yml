@@ -25,6 +25,7 @@
 - type: entity
   parent: MarkerBase
   id: FTLDiskSpawnPoint
+  categories: [ HideSpawnMenu, Spawner ]
   name: точка спавна диска координат
   components:
   - type: Sprite
