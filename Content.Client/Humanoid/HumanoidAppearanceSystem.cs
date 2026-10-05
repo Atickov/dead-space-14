@@ -28,9 +28,6 @@ public sealed class HumanoidAppearanceSystem : SharedHumanoidAppearanceSystem
     private void OnHandleState(EntityUid uid, HumanoidAppearanceComponent component, ref AfterAutoHandleStateEvent args)
     {
         UpdateSprite((uid, component, Comp<SpriteComponent>(uid)));
-
-        var ev = new AfterHumanoidAppearanceAppliedEvent(uid);
-        RaiseLocalEvent(ref ev);
     }
 
     private void UpdateSprite(Entity<HumanoidAppearanceComponent, SpriteComponent> entity)
@@ -490,11 +487,3 @@ public sealed class HumanoidAppearanceSystem : SharedHumanoidAppearanceSystem
         }
     }
 }
-
-/// <summary>
-///     Broadcast right after a humanoid's sprite layers have been rebuilt from a networked appearance
-///     state. Unlike <see cref="AfterAutoHandleStateEvent"/> this is a plain broadcast event, so any
-///     number of systems may subscribe.
-/// </summary>
-[ByRefEvent]
-public record struct AfterHumanoidAppearanceAppliedEvent(EntityUid Uid);
