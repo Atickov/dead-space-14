@@ -1,12 +1,17 @@
 // Мёртвый Космос, Licensed under custom terms with restrictions on public hosting and commercial use, full text: https://raw.githubusercontent.com/dead-space-server/space-station-14-fobos/master/LICENSE.TXT
 
+using System.Linq;
+using Content.Server.Mind;
 using Content.Shared.DeadSpace.Ninja.Components;
 using Content.Shared.DeadSpace.Ninja.Systems;
 using Content.Shared.Gibbing;
 using Content.Shared.Inventory;
 using Content.Shared.Inventory.Events;
+using Content.Shared.Mind;
 using Content.Shared.Mobs;
 using Content.Shared.Popups;
+using Content.Shared.Tag;
+using Robust.Shared.Containers;
 
 namespace Content.Server.DeadSpace.Ninja.Systems;
 
@@ -16,6 +21,10 @@ public sealed class AutoDustSystem : SharedAutoDustSystem
     [Dependency] private readonly GibbingSystem _gibbing = default!;
     [Dependency] private readonly InventorySystem _inventory = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly MindSystem _mindSystem = default!;
+    [Dependency] private readonly TagSystem _tag = default!;
+    [Dependency] private readonly SharedContainerSystem _container = default!;
+
     public override void Initialize()
     {
         base.Initialize();
@@ -80,7 +89,12 @@ public sealed class AutoDustSystem : SharedAutoDustSystem
     public void ActivateAutoDust(EntityUid uid, AutoDustMarkerComponent component)
     {
         TryComp<SpiderOSComponent>(component.AutoDustItem, out var spiderOS);
-        var ev = new AutoDustEvent(uid, spiderOS);
+
+        Entity<MindComponent>? mindEnt = null;
+        if (_mindSystem.TryGetMind(uid, out var mindId, out var mind))
+            mindEnt = (mindId, mind);
+
+        var ev = new AutoDustEvent(uid, mindEnt, spiderOS);
         RaiseLocalEvent(component.AutoDustItem, ref ev);
         var mapCoords = _transform.GetMapCoordinates(uid);
         if (!TryComp<AutoDustComponent>(component.AutoDustItem, out var dust))
@@ -92,6 +106,17 @@ public sealed class AutoDustSystem : SharedAutoDustSystem
             var items = _inventory.GetHandOrInventoryEntities(uid);
             foreach (var item in items)
             {
+                if (TerminatingOrDeleted(item))
+                    continue;
+
+                foreach (var container in _container.GetAllContainers(item).ToList())
+                {
+                    foreach (var ent in container.ContainedEntities.ToList())
+                    {
+                        if (_tag.HasAnyTag(ent, dust.HightRiskTags))
+                            _container.Remove(ent, container);
+                    }
+                }
                 QueueDel(item);
             }
         }
@@ -101,4 +126,4 @@ public sealed class AutoDustSystem : SharedAutoDustSystem
 }
 
 [ByRefEvent]
-public record struct AutoDustEvent(EntityUid Target, SpiderOSComponent? SpiderOS);
+public record struct AutoDustEvent(EntityUid Target, Entity<MindComponent>? Mind, SpiderOSComponent? SpiderOS);
