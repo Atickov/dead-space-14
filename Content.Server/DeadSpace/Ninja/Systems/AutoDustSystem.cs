@@ -103,20 +103,27 @@ public sealed class AutoDustSystem : SharedAutoDustSystem
 
         if (dust.DeleteItems)
         {
-            var items = _inventory.GetHandOrInventoryEntities(uid);
+            var items = _inventory.GetHandOrInventoryEntities(uid).ToList();
             foreach (var item in items)
             {
-                if (TerminatingOrDeleted(item))
-                    continue;
-
-                foreach (var container in _container.GetAllContainers(item).ToList())
+                if (_tag.HasAnyTag(item, dust.HightRiskTags))
                 {
-                    foreach (var ent in container.ContainedEntities.ToList())
+                    _container.TryRemoveFromContainer(item);
+                    continue;
+                }
+
+                if (HasComp<ContainerManagerComponent>(item))
+                {
+                    foreach (var container in _container.GetAllContainers(item))
                     {
-                        if (_tag.HasAnyTag(ent, dust.HightRiskTags))
-                            _container.Remove(ent, container);
+                        foreach (var ent in container.ContainedEntities.ToList())
+                        {
+                            if (_tag.HasAnyTag(ent, dust.HightRiskTags))
+                                _container.TryRemoveFromContainer(ent);
+                        }
                     }
                 }
+
                 QueueDel(item);
             }
         }
