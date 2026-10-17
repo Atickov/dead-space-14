@@ -4,7 +4,7 @@ meta:
   engineVersion: 276.0.0
   forkId: ""
   forkVersion: ""
-  time: 10/17/2026 11:14:45
+  time: 10/17/2026 11:54:48
   entityCount: 14121
 maps:
 - 1
@@ -65,8 +65,6 @@ entities:
     - type: OccluderTree
     - type: Parallax
       parallax: Taipan
-    - type: BecomesStation
-      id: Taipan
   - uid: 2
     components:
     - type: MetaData
@@ -5694,6 +5692,8 @@ entities:
     - type: NavMap
     - type: IFF
       color: '#BF0912FF'
+    - type: BecomesStation
+      id: Taipan
   - uid: 11716
     components:
     - type: MetaData
